@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi import HTTPException
 from decouple import config
 from U2Net.u2net_test import main as u2test
+from RemBg.rb import remove_bg            #rembg import
 from request_body import rb
 import pymysql
 import boto3
@@ -103,16 +104,21 @@ def run_u2net(body: rb):
     return {"result": "성공", "stdout": stdout}
 
 
-@app.get("/rembg/cloth")
+@app.get("/rembg/cloth")    #옷 누끼딸꺼 (원본사진)
 def run_rembg_for_cloth():
     print()
 
 
-@app.get("/rembg/photo")
+@app.get("/rembg/photo")    #사람사진 누끼 
 def run_rembg_for_photo():
     print()
 
 
-@app.get("/cihp")
+@app.get("/cihp")  #사람부위별 마스킹
 def run_cihp():
     print()
+
+
+
+
+
