@@ -50,7 +50,7 @@ class _LogInState extends State<LogIn> {
               '로그인',
               style: TextStyle(
                   fontSize: 25,
-                  color: Colors.black,
+                  color: Color.fromARGB(255, 0, 0, 0),
                   fontWeight: FontWeight.w700),
             ),
             elevation: 0.0,
@@ -102,7 +102,7 @@ class _LogInState extends State<LogIn> {
                                         ),
                                         border: OutlineInputBorder(
                                             borderSide: BorderSide()),
-                                        labelText: '이메일',
+                                        labelText: '아이디',
                                         focusColor: Color(0xFFF5BEB5)),
                                     keyboardType: TextInputType.emailAddress,
                                   ),
@@ -176,10 +176,20 @@ class _LogInState extends State<LogIn> {
                                                       '아이디 비밀번호를 확인해주세요'));
                                             }
                                           },
-                                          style: const ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStatePropertyAll(
-                                                      Color(0xFFF5BEB5))),
+                                          style:
+                                              // const ButtonStyle(
+                                              //     backgroundColor:
+                                              //         MaterialStatePropertyAll(
+                                              //             Color(0xFFF5BEB5))),
+                                              OutlinedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      5.0), // 원하는 각진 정도로 설정
+                                            ),
+                                            backgroundColor:
+                                                const Color(0xFFF5BEB5),
+                                          ),
                                           child: const SizedBox(
                                             height: 40,
                                             child: Row(
