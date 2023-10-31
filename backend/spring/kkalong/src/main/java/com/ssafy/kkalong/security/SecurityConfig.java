@@ -31,7 +31,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationEntryPoint entryPoint;
 
-    private final List<String> CORS_ALLOW_LIST = Arrays.asList("http://localhost:5173", "http://localhost:5001","http://i9c104.p.ssafy.io:5001", "https://i9c104.p.ssafy.io");
+    private final List<String> CORS_ALLOW_LIST = Arrays.asList("https://k9c105.p.ssafy.io");
     private final List<String> CORS_ALLOW_METHOD = Arrays.asList("HEAD", "GET", "POST", "DELETE", "PUT", "OPTIONS");
     private final List<String> CORS_ALLOW_HEADER = Arrays.asList("Authorization", "Cache-Control", "Content-Type",
             "Access-Control-Allow-Headers", "Access-Control-Allow-Origin");
@@ -41,10 +41,7 @@ public class SecurityConfig {
         String ALLOW_URL[] = {"/,/**,/sign-up", "/sign-in","/swagger-ui/**", "/api/swagger-ui/**", "/api/**", "/v3/api-docs/**"};
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-//                .formLogin().disable()
-//                .httpBasic().disable()
                 .csrf().disable()
-//            .cors().disable()
                 .headers(headers -> headers.frameOptions().sameOrigin())
                 .authorizeHttpRequests(request -> request.requestMatchers(ALLOW_URL).permitAll()
                         .anyRequest().authenticated())

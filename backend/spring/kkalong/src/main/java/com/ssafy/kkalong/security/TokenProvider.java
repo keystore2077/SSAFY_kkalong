@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.kkalong.common.error.TokenErrorCode;
 import com.ssafy.kkalong.common.exception.ApiException;
+import com.ssafy.kkalong.domain.member.entity.MemberRefreshToken;
 import com.ssafy.kkalong.domain.member.repository.MemberRefreshTokenRepository;
 import com.ssafy.kkalong.domain.member.repository.MemberRepository;
 import io.jsonwebtoken.*;
@@ -11,10 +12,8 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +38,6 @@ TODO: 회원의 리프레시 토큰을 관리할 엔티티
 @Service
 @Getter
 @Slf4j
-@PropertySource("classpath:security.yaml")
 public class TokenProvider {
 
         private final MemberRefreshTokenRepository memberRefreshTokenRepository;
@@ -55,10 +53,10 @@ public class TokenProvider {
 
         public TokenProvider(
                 MemberRefreshTokenRepository memberRefreshTokenRepository,
-                @Value("${secret-key}") String secretKey,
-                @Value("${expiration-minutes}") long expirationMinutes,
-                @Value("${refresh-expiration-hours}") long refreshExpirationHours,
-                @Value("${issuer}") String issuer,
+                @Value("${jwt.secret-key}") String secretKey,
+                @Value("${jwt.expiration-minutes}") long expirationMinutes,
+                @Value("${jwt.refresh-expiration-hours}") long refreshExpirationHours,
+                @Value("${jwt.issuer}") String issuer,
                 MemberRepository memberRepository,
                 RedisTemplate<String, String> redisTemplate){
                 this.memberRefreshTokenRepository = memberRefreshTokenRepository;
@@ -87,10 +85,10 @@ public class TokenProvider {
         @Transactional
         public String recreateAccessToken(String oldAccessToken) throws JsonProcessingException {
                 String subject = decodeJwtPayloadSubject(oldAccessToken);
-                Optional<UserRefreshTokenRepository> userRefreshTokenOptional = userRefreshTokenRepository.findByUserIdAndReissueCountLessThan(UUID.fromString(subject.split(":")[0]), reissueLimit);
+                Optional<MemberRefreshTokenRepository> userRefreshTokenOptional = memberRefreshTokenRepository.findByUserIdAndReissueCountLessThan(UUID.fromString(subject.split(":")[0]), reissueLimit);
 
                 if (userRefreshTokenOptional.isPresent()) {
-                        UserRefreshToken userRefreshToken = (UserRefreshToken) userRefreshTokenOptional.get();
+                        MemberRefreshToken userRefreshToken = (MemberRefreshToken) userRefreshTokenOptional.get();
                         userRefreshToken.increaseReissueCount();
                 } else {
                         throw new ExpiredJwtException(null, null, "Refresh Token expire");
@@ -98,11 +96,26 @@ public class TokenProvider {
                 return createAccessToken(subject);
         }
 
+        public String createRefreshToken(){
+                Date now = new Date();
+                long refreshExpirationMillis = refreshExpirationHours * 60 * 60 * 1000;
+                Date expireDate = new Date(now.getTime() + refreshExpirationHours);
+
+                String refreshToken = Jwts.builder()
+                        .signWith(new SecretKeySpec(secretKey.getBytes(),SignatureAlgorithm.HS512.getJcaName()))
+                        .setIssuer(issuer)
+                        .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .setExpiration(Date.from(Instant.now().plus(refreshExpirationHours, ChronoUnit.HOURS)))
+                        .compact();
+                redisTemplate.opsForValue().set(String.valueOf(Jwts.builder().setIssuer(issuer)),refreshToken,refreshExpirationMillis, TimeUnit.MILLISECONDS);
+                return refreshToken;
+        }
+
         @Transactional
         public void validateRefreshToken(String refreshToken, String oldAccessToken) throws  JsonProcessingException{
                 validateAndParserToken(refreshToken);
                 String userId = decodeJwtPayloadSubject(oldAccessToken).split(":")[0];
-                userRefreshTokenRepository.findByUserIdAndReissueCountLessThan(UUID.fromString(userId),reissueLimit)
+                memberRefreshTokenRepository.findByUserIdAndReissueCountLessThan(UUID.fromString(userId),reissueLimit)
                         .orElseThrow(() -> new ExpiredJwtException(null,null,"Refresh Token expire"));
         }
         private Jws<Claims> validateAndParserToken(String auth){
@@ -131,16 +144,5 @@ public class TokenProvider {
                 ).get("sub").toString();
         }
 
-        public static String createRefreshToken(String key) {
-                Claims claims = Jwts
-                        .claims();
 
-                return Jwts
-                        .builder()
-                        .setClaims(claims)
-                        .setIssuedAt(new Date(System.currentTimeMillis()))
-                        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))//유효시간 (3일)
-                        .signWith(SignatureAlgorithm.HS256, key) //HS256알고리즘으로 key를 암호화 해줄것이다.
-                        .compact();
-        }
 }
