@@ -132,9 +132,9 @@ def run_rembg_for_cloth(body:rb):
     # 4. 작업이 끝나면 파일을 S3서버에 올린다
     try:
         s3.upload_file(r".cloth/yes_bg/" + rb.file_name + ".jpg", bucket_name,
-                       "openpose/img/" + rb.file_name + ".jpg")
+                       r"cloth/yes_bg/" + rb.file_name + ".jpg")
         s3.upload_file(r".cloth/no_bg/" + rb.file_name + ".png", bucket_name,
-                       "openpose/json/" + rb.file_name + ".png")
+                       r"cloth/no_bg/" + rb.file_name + ".png")
     except boto3.exceptions.NoCredentialsError:
         return "AWS 자격 증명을 찾을 수 없습니다. 자격 증명을 설정하세요."
     except boto3.exceptions.EndpointConnectionError:

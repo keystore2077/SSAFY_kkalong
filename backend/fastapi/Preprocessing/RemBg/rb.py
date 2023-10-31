@@ -14,3 +14,5 @@ def remove_no_bg(original_file_path: str, output_no_bg: str):
     output_image_transparent_bg = remove(original, alpha=True)  # 투명 배경의 PNG 이미지
     output_image_transparent_bg.save(output_no_bg, format='png')
     output_image_transparent_bg.close() #작업 끝나면 닫기
+
+
