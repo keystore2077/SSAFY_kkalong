@@ -293,48 +293,89 @@ class MyClosetState extends State<MyCloset> {
                     ],
                   ),
                 ),
+                // Padding(
+                //   padding: const EdgeInsets.fromLTRB(10, 0, 0, 12),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       SizedBox(
+                //         child: Padding(
+                //           padding: const EdgeInsets.fromLTRB(20, 0, 10, 12),
+                //           child: Row(
+                //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //             children: [
+                //               const Text(
+                //                 'My깔롱',
+                //                 style: TextStyle(
+                //                   fontSize: 22,
+                //                   fontWeight: FontWeight.w700,
+                //                   color: Color(0xFFF5BEB5),
+                //                 ),
+                //               ),
+                //               const Spacer(),
+                //               ElevatedButton(
+                //                 onPressed: () async {
+                //                   final ImagePicker picker = ImagePicker();
+                //                   final XFile? image = await picker.pickImage(
+                //                       source: ImageSource.camera);
+
+                //                   if (image != null) {
+                //                     // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
+                //                     // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
+                //                   }
+                //                 },
+                //                 style: ElevatedButton.styleFrom(
+                //                   shape: RoundedRectangleBorder(
+                //                     borderRadius: BorderRadius.circular(
+                //                         5.0), // 원하는 각진 정도로 설정
+                //                   ),
+                //                   // 다른 스타일 속성들
+                //                 ),
+                //                 child: const Text(' + 옷장등록'),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 0, 12),
+                  padding: const EdgeInsets.fromLTRB(12, 0, 30, 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 10, 12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'My깔롱',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFFF5BEB5),
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  final ImagePicker picker = ImagePicker();
-                                  final XFile? image = await picker.pickImage(
-                                      source: ImageSource.camera);
-
-                                  if (image != null) {
-                                    // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
-                                    // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        5.0), // 원하는 각진 정도로 설정
-                                  ),
-                                  // 다른 스타일 속성들
-                                ),
-                                child: const Text(' + 옷장등록'),
-                              ),
-                            ],
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(20, 0, 0, 12),
+                        child: Text(
+                          'My깔롱',
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFFF5BEB5),
                           ),
                         ),
+                      ),
+                      const Spacer(),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final ImagePicker picker = ImagePicker();
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
+
+                          if (image != null) {
+                            // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
+                            // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(5.0), // 원하는 각진 정도로 설정
+                          ),
+                          // 다른 스타일 속성들
+                        ),
+                        child: const Text(' + 옷장등록'),
                       ),
                     ],
                   ),
