@@ -94,6 +94,7 @@ import './reafeat/bottom.dart';
 import './reafeat/splash.dart';
 import './closet/mycloset.dart';
 import './closet/closetdetail.dart';
+import './category/category.dart';
 
 void main() {
   runApp(const Main());
@@ -119,7 +120,7 @@ class _MainState extends State<Main> {
             child: TabBarView(
               children: [
                 NamPage(),
-                MyCloset(),
+                CategoryPage(),
                 ClosetDetail(),
                 LogIn(),
               ],
