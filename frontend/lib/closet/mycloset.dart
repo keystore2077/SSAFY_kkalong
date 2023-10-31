@@ -231,12 +231,12 @@ class MyClosetState extends State<MyCloset> {
             delegate: SliverChildListDelegate(
               [
                 Container(
-                  padding: const EdgeInsets.all(25),
+                  padding: const EdgeInsets.fromLTRB(25, 25, 25, 15),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 35),
+                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
                         child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
