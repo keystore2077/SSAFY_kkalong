@@ -237,10 +237,10 @@ class MyClosetState extends State<MyCloset> {
                     children: [
                       Container(
                         margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-                        child: const Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               child: Padding(
                                 padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                 child: Text(
@@ -254,7 +254,7 @@ class MyClosetState extends State<MyCloset> {
                             ),
                             Row(
                               children: [
-                                Padding(
+                                const Padding(
                                   padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                   child: Text(
                                     '나는야김싸피',
@@ -265,7 +265,7 @@ class MyClosetState extends State<MyCloset> {
                                     ),
                                   ),
                                 ),
-                                Padding(
+                                const Padding(
                                   padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                   child: Text(
                                     '님',
@@ -275,14 +275,35 @@ class MyClosetState extends State<MyCloset> {
                                     ),
                                   ),
                                 ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(55, 2, 0, 1),
+                                  child: ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            5.0), // 원하는 각진 정도로 설정
+                                      ),
+                                      // 다른 스타일 속성들
+                                    ),
+                                    child: const Text(
+                                      '카테고리별 옷보기',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                )
                               ],
                             ),
-                            Padding(
+                            const Padding(
                               padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                               child: Text(
                                 '오늘도 깔롱쟁이와 멋쟁이 돼보아요!',
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 25,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -375,7 +396,13 @@ class MyClosetState extends State<MyCloset> {
                           ),
                           // 다른 스타일 속성들
                         ),
-                        child: const Text(' + 옷장등록'),
+                        child: const Text(
+                          ' + 옷장등록',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
