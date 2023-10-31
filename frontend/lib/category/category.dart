@@ -34,7 +34,7 @@ class CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 251, 235, 233),
+      backgroundColor: const Color.fromARGB(255, 202, 198, 197),
       body: CustomScrollView(
         slivers: <Widget>[
           const SliverAppBar(
@@ -81,7 +81,9 @@ class CategoryPageState extends State<CategoryPage> {
                 //     ],
                 //   ),
                 // ),
+
                 AppBar(
+                  toolbarHeight: 81,
                   leading: IconButton(
                     icon: const Icon(
                         Icons.arrow_back_ios_outlined), // 원하는 아이콘으로 변경할 수 있습니다.
@@ -103,13 +105,54 @@ class CategoryPageState extends State<CategoryPage> {
               ],
             ),
           ),
+          // SliverPadding(
+          //   padding: const EdgeInsets.fromLTRB(2, 2, 2, 1),
+          //   sliver: SliverGrid(
+          //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          //       crossAxisCount: 2,
+          //       crossAxisSpacing: 2.0,
+          //       mainAxisSpacing: 2.0,
+          //     ),
+          //     delegate: SliverChildBuilderDelegate(
+          //       (BuildContext context, int index) {
+          //         final item = savecloset['list']?[index];
+          //         if (item == null) {
+          //           return const SizedBox(); // 빈 위젯 반환
+          //         }
+          //         return GestureDetector(
+          //           onTap: () {
+          //             // 클릭이벤트
+          //           },
+          //           child: Column(
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             children: <Widget>[
+          //               Image.asset(
+          //                 item["image"] ?? "Assets/Image/logo.png",
+          //                 height: 120,
+          //                 width: 180,
+          //               ),
+          //               Text(
+          //                 item["name"] ?? "Unknown",
+          //                 style: const TextStyle(
+          //                   fontSize: 20,
+          //                   fontWeight: FontWeight.w500,
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         );
+          //       },
+          //       childCount: savecloset['list']?.length ?? 0,
+          //     ),
+          //   ),
+          // ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(2, 2, 2, 1),
+            padding: const EdgeInsets.fromLTRB(0, 1, 0, 0),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 3.0,
-                mainAxisSpacing: 3.0,
+                crossAxisSpacing: 1.0,
+                mainAxisSpacing: 1.0,
               ),
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
@@ -119,24 +162,28 @@ class CategoryPageState extends State<CategoryPage> {
                   }
                   return GestureDetector(
                     onTap: () {
-                      // 클릭이벤트
+                      // 클릭 이벤트
                     },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset(
-                          item["image"] ?? "Assets/Image/logo.png",
-                          height: 120,
-                          width: 180,
-                        ),
-                        Text(
-                          item["name"] ?? "Unknown",
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
+                    child: Container(
+                      color: const Color.fromARGB(
+                          255, 251, 235, 233), // "점선"의 색상입니다.
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Image.asset(
+                            item["image"] ?? "Assets/Image/logo.png",
+                            height: 125,
+                            width: 180,
                           ),
-                        ),
-                      ],
+                          Text(
+                            item["name"] ?? "Unknown",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -147,14 +194,5 @@ class CategoryPageState extends State<CategoryPage> {
         ],
       ),
     );
-  }
-
-  void showSnackBar(BuildContext context, String text) {
-    final snackBar = SnackBar(
-      content: Text(text),
-      backgroundColor: const Color(0xFFF5BEB5),
-    );
-
-    // ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
