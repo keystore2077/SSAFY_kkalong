@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:flutter_mycloset/category/categoryselect.dart';
+import './categoryselect.dart';
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({
@@ -83,7 +84,7 @@ class CategoryPageState extends State<CategoryPage> {
                 // ),
 
                 AppBar(
-                  toolbarHeight: 81,
+                  toolbarHeight: 100,
                   leading: IconButton(
                     icon: const Icon(
                         Icons.arrow_back_ios_outlined), // 원하는 아이콘으로 변경할 수 있습니다.
@@ -162,7 +163,11 @@ class CategoryPageState extends State<CategoryPage> {
                   }
                   return GestureDetector(
                     onTap: () {
-                      // 클릭 이벤트
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CategorySelect()),
+                      );
                     },
                     child: Container(
                       color: const Color.fromARGB(

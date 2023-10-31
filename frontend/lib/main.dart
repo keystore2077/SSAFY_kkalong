@@ -85,6 +85,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/avata/choicepicture.dart';
 import 'package:flutter_mycloset/user/mypage.dart';
 // import 'package:animated_splash_screen/animated_splash_screen.dart';
 import '../user/login.dart';
@@ -119,7 +120,7 @@ class _MainState extends State<Main> {
           body: SafeArea(
             child: TabBarView(
               children: [
-                NamPage(),
+                ChoicePicture(),
                 CategoryPage(),
                 ClosetDetail(),
                 LogIn(),
