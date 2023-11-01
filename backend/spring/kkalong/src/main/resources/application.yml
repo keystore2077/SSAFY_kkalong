@@ -1,0 +1,57 @@
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+      dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${MYSQL_POST}/kkalong
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+  data:
+    mongodb:
+      uri: mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${DB_HOST}:${MONGODB_PORT}/kkalong
+    redis:
+      host: ${DB_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+  security:
+    user:
+      name: ${SECURITY_NAME}
+      password: ${SECURITY_PASSWORD}
+
+springdoc:
+  packages-to-scan: com.ssafy.kkalong
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /kkalong-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    api-docs:
+      path: /api-docs/json
+      groups:
+        enabled: true
+    cache:
+      disabled: true
+
+logging.level:
+  org.hibernate:
+    SQL: debug
+    type: trace
+
+server:
+  port: 8761
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  expiration-minutes: ${JWT_EXPIRATION_MINUTES}
+  refresh-expiration-hours: ${JWT_REFRESH_EXPIRATION_HOURS}
+  issuer: ${JWT_ISSUER}
+
