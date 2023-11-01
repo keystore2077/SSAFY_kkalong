@@ -1,8 +1,9 @@
+CREATE SCHEMA `kkalong` ;
 use kkalong;
 DROP TABLE IF EXISTS `member`;
 
 CREATE TABLE `member` (
-	`member_seq`	int	NOT NULL	COMMENT '인덱스',
+	`member_seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`member_nickname`	varchar(20)	NOT NULL	COMMENT '닉네임',
 	`member_id`	varchar(20)	NOT NULL	COMMENT '아이디',
 	`member_pw`	varchar(100)	NOT NULL	COMMENT '비밀번호',
@@ -28,7 +29,7 @@ CREATE TABLE `assess` (
 DROP TABLE IF EXISTS `cloth`;
 
 CREATE TABLE `cloth` (
-	`cloth_seq`	int	NOT NULL	COMMENT '인덱스',
+	`cloth_seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`cloth_name`	varchar(40)	NOT NULL	COMMENT '옷 이름',
 	`cloth_img_name`	varchar(75)	NOT NULL	COMMENT '옷 원본 사진 파일 이름(cloth_소유자아이디_올린시간_무작위난수6자리)',
 	`cloth_img_no_bg`	boolean	NOT NULL	DEFAULT false	COMMENT '옷 누끼 사진 배경 없는 파일 존재 여부',
@@ -46,14 +47,14 @@ CREATE TABLE `cloth` (
 DROP TABLE IF EXISTS `tag`;
 
 CREATE TABLE `tag` (
-	`seq`	int	NOT NULL	COMMENT '인덱스',
+	`seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`tag`	varchar(40)	NOT NULL	COMMENT '태그명'
 );
 
 DROP TABLE IF EXISTS `closet`;
 
 CREATE TABLE `closet` (
-	`closet_seq`	int	NOT NULL	COMMENT '인덱스',
+	`closet_seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`closet_name`	varchar(40)	NOT NULL	COMMENT '옷장 이름',
 	`closet_img_name`	varchar(70)	NOT NULL	COMMENT '옷장 사진 파일 이름(closet_소유자아이디_올린시간_무작위난수6자리)',
 	`closet_reg_date`	datetime	NOT NULL	DEFAULT now()	COMMENT '생성 날짜',
@@ -75,7 +76,7 @@ CREATE TABLE `follow` (
 DROP TABLE IF EXISTS `section`;
 
 CREATE TABLE `section` (
-	`section_seq`	int	NOT NULL	COMMENT '인덱스',
+	`section_seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`section_name`	varchar(40)	NOT NULL	COMMENT '상세구역 이름',
 	`is_section_deleted`	boolean	NOT NULL	DEFAULT false	COMMENT '삭제여부',
 	`section_del_date`	datetime	NULL	COMMENT '삭제일시',
@@ -86,7 +87,7 @@ CREATE TABLE `section` (
 DROP TABLE IF EXISTS `fashion`;
 
 CREATE TABLE `fashion` (
-	`fashion_seq`	int	NOT NULL	COMMENT '인덱스',
+	`fashion_seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`fashion_name`	varchar(40)	NOT NULL	COMMENT '코디이름',
 	`fashion_img_name`	varchar(70)	NOT NULL	COMMENT '파일 이름 (fashion_소유자아이디_올린시간_무작위6자리난수.)',
 	`is_ai`	tinyint	NOT NULL	COMMENT '(1- ai사진, 0- 실제사진)',
@@ -99,7 +100,7 @@ CREATE TABLE `fashion` (
 DROP TABLE IF EXISTS `sort`;
 
 CREATE TABLE `sort` (
-	`sort_seq`	int	NOT NULL	COMMENT '인덱스',
+	`sort_seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`sort`	varchar(20)	NOT NULL	COMMENT '종류',
 	`sort_group_seq`	int	NOT NULL	COMMENT '그룹 인덱스'
 );
@@ -116,7 +117,7 @@ CREATE TABLE `tag_relation` (
 DROP TABLE IF EXISTS `photo`;
 
 CREATE TABLE `photo` (
-	`photo_seq`	int	NOT NULL	COMMENT '인덱스',
+	`photo_seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`photo_img_name`	varchar(75)	NOT NULL	COMMENT '사용자 누끼 사진 파일 이름 (photo_소유자아이디_올린시간_무작위6자리난수)',
 	`photo_img_masking`	boolean	NOT NULL	DEFAULT false	COMMENT '사용자 마스킹 사진 파일 존재여부',
 	`photo_img_openpose`	boolean	NOT NULL	DEFAULT false	COMMENT '사용자 오픈포즈 사진 파일 존재여부',
@@ -130,63 +131,18 @@ CREATE TABLE `photo` (
 DROP TABLE IF EXISTS `sort_group`;
 
 CREATE TABLE `sort_group` (
-	`sort_group_seq`	int	NOT NULL	COMMENT '인덱스',
+	`sort_group_seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`group_name`	varchar(20)	NOT NULL	COMMENT '그룹 이름'
 );
 
 DROP TABLE IF EXISTS `chat_room`;
 
 CREATE TABLE `chat_room` (
-	`seq`	int	NOT NULL	COMMENT '인덱스',
+	`seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`chat_room_latest_log`	varchar(100)	NULL	COMMENT '마지막 채팅 내용',
 	`chat_room_latest_date`	datetime	NULL	COMMENT '마지막 채팅 보낸 일시',
 	`member_fir_seq`	int	NOT NULL	COMMENT '채팅 요청한 사용자 인덱스',
 	`member_sec_seq`	int	NOT NULL	COMMENT '채팅 요청 받은 사용자 인덱스'
-);
-
-ALTER TABLE `member` ADD CONSTRAINT `PK_MEMBER` PRIMARY KEY (
-	`member_seq`
-);
-
-ALTER TABLE `assess` ADD CONSTRAINT `PK_ASSESS` PRIMARY KEY (
-	`fashion_seq`,
-	`member_seq`
-);
-
-ALTER TABLE `cloth` ADD CONSTRAINT `PK_CLOTH` PRIMARY KEY (
-	`cloth_seq`
-);
-
-ALTER TABLE `tag` ADD CONSTRAINT `PK_TAG` PRIMARY KEY (
-	`seq`
-);
-
-ALTER TABLE `closet` ADD CONSTRAINT `PK_CLOSET` PRIMARY KEY (
-	`closet_seq`
-);
-
-ALTER TABLE `section` ADD CONSTRAINT `PK_SECTION` PRIMARY KEY (
-	`section_seq`
-);
-
-ALTER TABLE `fashion` ADD CONSTRAINT `PK_FASHION` PRIMARY KEY (
-	`fashion_seq`
-);
-
-ALTER TABLE `sort` ADD CONSTRAINT `PK_SORT` PRIMARY KEY (
-	`sort_seq`
-);
-
-ALTER TABLE `photo` ADD CONSTRAINT `PK_PHOTO` PRIMARY KEY (
-	`photo_seq`
-);
-
-ALTER TABLE `sort_group` ADD CONSTRAINT `PK_SORT_GROUP` PRIMARY KEY (
-	`sort_group_seq`
-);
-
-ALTER TABLE `chat_room` ADD CONSTRAINT `PK_CHAT_ROOM` PRIMARY KEY (
-	`seq`
 );
 
 ALTER TABLE `assess` ADD CONSTRAINT `FK_fashion_TO_assess_1` FOREIGN KEY (
