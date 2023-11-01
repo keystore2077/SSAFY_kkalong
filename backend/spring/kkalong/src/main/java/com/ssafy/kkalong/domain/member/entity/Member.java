@@ -3,15 +3,15 @@ package com.ssafy.kkalong.domain.member.entity;
 import com.ssafy.kkalong.domain.member.dto.request.MemberUpdateReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @AllArgsConstructor
+
+@ToString
 @NoArgsConstructor
 @Builder
 @Getter
@@ -32,7 +32,7 @@ public class Member {
     private String memberPw ;
 
     @Column(nullable = false, unique = true, length = 40)
-    private String memberEmail ;
+    private String memberMail ;
 
     @Column(length = 11)
     private String memberPhone ;
@@ -54,22 +54,22 @@ public class Member {
                 .memberNickname(request.getMemberNickname())
                 .memberId(request.getMemberId())
                 .memberPw(encoder.encode(request.getMemberPw()))	// 수정
-                .memberEmail(request.getMemberEmail())
-                .memberPhone(request.getMemberPhone())
-                .memberGender(request.getMemberGender())
-                .memberBirthYear(request.getMemberBirthYear())
+                .memberMail(request.getMemberEmail())
+                .memberPhone(Optional.ofNullable(request.getMemberPhone()).orElse(null))
+                .memberGender(Optional.ofNullable(request.getMemberGender()).orElse(null))
+                .memberBirthYear(Optional.ofNullable(request.getMemberBirthYear()).orElse(0))
                 .memberRegDate(LocalDateTime.now())
                 .build();
     }
-
-    public void update(MemberUpdateReq newMember, PasswordEncoder encoder) {	// 파라미터에 PasswordEncoder 추가
-        this.memberPw = newMember.getMemberPw() == null || newMember.getMemberPw().isBlank()
-                ? this.memberPw : encoder.encode(newMember.getMemberPw());	// 수정
-
-        this.memberNickname = newMember.getMemberNickname();
-        this.memberEmail = newMember.getMemberEmail();
-        this.memberPhone = newMember.getMemberPhone();
-        this.memberGender = newMember.getMemberGender();
-        this.memberBirthYear = newMember.getMemberBirthYear();
-    }
+//
+//    public void update(MemberUpdateReq newMember, PasswordEncoder encoder) {	// 파라미터에 PasswordEncoder 추가
+//        this.memberPw = newMember.getMemberPw() == null || newMember.getMemberPw().isBlank()
+//                ? this.memberPw : encoder.encode(newMember.getMemberPw());	// 수정
+//
+//        this.memberNickname = newMember.getMemberNickname();
+//        this.memberMail = newMember.getMemberEmail();
+//        this.memberPhone = newMember.getMemberPhone();
+//        this.memberGender = newMember.getMemberGender();
+//        this.memberBirthYear = newMember.getMemberBirthYear();
+//    }
 }

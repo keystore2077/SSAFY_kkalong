@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.kkalong.common.error.TokenErrorCode;
 import com.ssafy.kkalong.common.exception.ApiException;
-import com.ssafy.kkalong.domain.member.entity.MemberRefreshToken;
-import com.ssafy.kkalong.domain.member.repository.MemberRefreshTokenRepository;
 import com.ssafy.kkalong.domain.member.repository.MemberRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -40,7 +38,7 @@ TODO: 회원의 리프레시 토큰을 관리할 엔티티
 @Slf4j
 public class TokenProvider {
 
-        private final MemberRefreshTokenRepository memberRefreshTokenRepository;
+
         private final MemberRepository memberRepository;
 
         private final String secretKey;
@@ -52,14 +50,12 @@ public class TokenProvider {
         private final RedisTemplate<String, String> redisTemplate;
 
         public TokenProvider(
-                MemberRefreshTokenRepository memberRefreshTokenRepository,
                 @Value("${jwt.secret-key}") String secretKey,
                 @Value("${jwt.expiration-minutes}") long expirationMinutes,
                 @Value("${jwt.refresh-expiration-hours}") long refreshExpirationHours,
                 @Value("${jwt.issuer}") String issuer,
                 MemberRepository memberRepository,
                 RedisTemplate<String, String> redisTemplate){
-                this.memberRefreshTokenRepository = memberRefreshTokenRepository;
                 this.secretKey = secretKey;
                 this.expirationMinutes = expirationMinutes;
                 this.refreshExpirationHours = refreshExpirationHours;
@@ -68,32 +64,14 @@ public class TokenProvider {
                 this.reissueLimit = refreshExpirationHours * 60 / expirationMinutes;
                 this.memberRepository = memberRepository;
         }
-        public String createAccessToken(String userSpecification){
+        public String createAccessToken(String memberId){
                 return Jwts.builder()
                     .signWith(new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName()))
-                    .setSubject(userSpecification)
+                    .setSubject(memberId)
                     .setIssuer(issuer)
                     .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
                     .setExpiration(Date.from(Instant.now().plus(expirationMinutes, ChronoUnit.HOURS)))
                     .compact();
-        }
-        public String validateTokenAndGetSubject(String token){
-                return validateAndParserToken(token)
-                        .getBody()
-                        .getSubject();
-        }
-        @Transactional
-        public String recreateAccessToken(String oldAccessToken) throws JsonProcessingException {
-                String subject = decodeJwtPayloadSubject(oldAccessToken);
-                Optional<MemberRefreshTokenRepository> userRefreshTokenOptional = memberRefreshTokenRepository.findByUserIdAndReissueCountLessThan(UUID.fromString(subject.split(":")[0]), reissueLimit);
-
-                if (userRefreshTokenOptional.isPresent()) {
-                        MemberRefreshToken userRefreshToken = (MemberRefreshToken) userRefreshTokenOptional.get();
-                        userRefreshToken.increaseReissueCount();
-                } else {
-                        throw new ExpiredJwtException(null, null, "Refresh Token expire");
-                }
-                return createAccessToken(subject);
         }
 
         public String createRefreshToken(){
@@ -109,14 +87,6 @@ public class TokenProvider {
                         .compact();
                 redisTemplate.opsForValue().set(String.valueOf(Jwts.builder().setIssuer(issuer)),refreshToken,refreshExpirationMillis, TimeUnit.MILLISECONDS);
                 return refreshToken;
-        }
-
-        @Transactional
-        public void validateRefreshToken(String refreshToken, String oldAccessToken) throws  JsonProcessingException{
-                validateAndParserToken(refreshToken);
-                String userId = decodeJwtPayloadSubject(oldAccessToken).split(":")[0];
-                memberRefreshTokenRepository.findByUserIdAndReissueCountLessThan(UUID.fromString(userId),reissueLimit)
-                        .orElseThrow(() -> new ExpiredJwtException(null,null,"Refresh Token expire"));
         }
         private Jws<Claims> validateAndParserToken(String auth){
                 var key = Keys.hmacShaKeyFor(secretKey.getBytes());
@@ -137,12 +107,41 @@ public class TokenProvider {
                         }
                 }
         }
-        private String decodeJwtPayloadSubject(String oldAccessToken) throws JsonProcessingException {
-                return objectMapper.readValue(
-                        new String(Base64.getDecoder().decode(oldAccessToken.split("\\.")[1]), StandardCharsets.UTF_8),
-                        Map.class
-                ).get("sub").toString();
+        public String validateTokenAndGetSubject(String token){
+                return validateAndParserToken(token)
+                        .getBody()
+                        .getSubject();
         }
+//        @Transactional
+//        public String recreateAccessToken(String oldAccessToken) throws JsonProcessingException {
+//                String subject = decodeJwtPayloadSubject(oldAccessToken);
+//                Optional<MemberRefreshTokenRepository> userRefreshTokenOptional = memberRefreshTokenRepository.findByUserIdAndReissueCountLessThan(UUID.fromString(subject.split(":")[0]), reissueLimit);
+//
+//                if (userRefreshTokenOptional.isPresent()) {
+//                        MemberRefreshToken userRefreshToken = (MemberRefreshToken) userRefreshTokenOptional.get();
+//                        userRefreshToken.increaseReissueCount();
+//                } else {
+//                        throw new ExpiredJwtException(null, null, "Refresh Token expire");
+//                }
+//                return createAccessToken(subject);
+//        }
+//
+//
+//
+//        @Transactional
+//        public void validateRefreshToken(String refreshToken, String oldAccessToken) throws  JsonProcessingException{
+//                validateAndParserToken(refreshToken);
+//                String userId = decodeJwtPayloadSubject(oldAccessToken).split(":")[0];
+//                memberRefreshTokenRepository.findByUserIdAndReissueCountLessThan(UUID.fromString(userId),reissueLimit)
+//                        .orElseThrow(() -> new ExpiredJwtException(null,null,"Refresh Token expire"));
+//        }
+//
+//        private String decodeJwtPayloadSubject(String oldAccessToken) throws JsonProcessingException {
+//                return objectMapper.readValue(
+//                        new String(Base64.getDecoder().decode(oldAccessToken.split("\\.")[1]), StandardCharsets.UTF_8),
+//                        Map.class
+//                ).get("sub").toString();
+//        }
 
 
 }
