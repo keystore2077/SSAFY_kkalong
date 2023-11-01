@@ -121,6 +121,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../avata/wearcloth.dart';
 
 // import 'package:flutter_mycloset/category/categoryselect.dart';
 
@@ -262,7 +263,13 @@ class ChoicePictureState extends State<ChoicePicture> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const WearCloth()),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF5BEB5),
                       shape: RoundedRectangleBorder(
