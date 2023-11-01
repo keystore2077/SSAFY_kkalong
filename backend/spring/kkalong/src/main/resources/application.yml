@@ -54,3 +54,4 @@ jwt:
   expiration-minutes: ${JWT_EXPIRATION_MINUTES}
   refresh-expiration-hours: ${JWT_REFRESH_EXPIRATION_HOURS}
   issuer: ${JWT_ISSUER}
+
