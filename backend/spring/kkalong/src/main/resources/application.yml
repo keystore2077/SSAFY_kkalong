@@ -24,8 +24,8 @@ spring:
 
   security:
     user:
-      name: ssafy
-      password: ssafy
+      name: ${SECURITY_NAME}
+      password: ${SECURITY_PASSWORD}
 
 springdoc:
   packages-to-scan: com.ssafy.kkalong
