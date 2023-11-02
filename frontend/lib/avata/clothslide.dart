@@ -8,6 +8,8 @@ class ClothSlide extends StatefulWidget {
 }
 
 class _ClothSlideState extends State<ClothSlide> {
+  int? selectedIndex;
+
   @override
   Widget build(BuildContext context) {
     var ranking = [
@@ -27,7 +29,7 @@ class _ClothSlideState extends State<ClothSlide> {
       child: Container(
         width: 1500,
         height: 170,
-        margin: const EdgeInsets.fromLTRB(0, 8, 10, 0),
+        margin: const EdgeInsets.fromLTRB(7, 8, 7, 0),
         child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: 10,
@@ -39,44 +41,68 @@ class _ClothSlideState extends State<ClothSlide> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Stack(
+                    //   children: [
+                    //     GestureDetector(
+                    //       onTap: () {
+                    //         setState(() {
+                    //           selectedIndex = i;
+                    //         });
+                    //         print('선택완료');
+                    //       },
+                    //       child: Container(
+                    //         decoration: BoxDecoration(
+                    //           borderRadius: BorderRadius.circular(5),
+                    //           border: i == selectedIndex
+                    //               ? Border.all(color: Colors.blue)
+                    //               : null,
+                    //         ),
+                    //       ),
+                    //       child: ClipRRect(
+                    //         borderRadius: BorderRadius.circular(5),
+                    //         child: Image.asset(
+                    //           'Assets/Image/${ranking[i]['image']}.png',
+                    //           width: 100,
+                    //           height: 120,
+                    //           fit: BoxFit.cover,
+                    //         ),
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
                     Stack(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(5),
-                          child: Image.asset(
-                            'Assets/Image/${ranking[i]['image']}.png',
-                            width: 100,
-                            height: 110,
-                            fit: BoxFit.cover,
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = i;
+                            });
+                            print('선택완료');
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              border: i == selectedIndex
+                                  ? Border.all(
+                                      color: const Color(0xFFF5BEB5),
+                                      width: 3.0)
+                                  : null,
+                            ),
+                            child: ClipRRect(
+                              // ClipRRect is now the child of the Container
+                              borderRadius: BorderRadius.circular(5),
+                              child: Image.asset(
+                                'Assets/Image/${ranking[i]['image']}.png',
+                                width: 100,
+                                height: 120,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
-                        ),
-                        // Container(
-                        //   width: 25,
-                        //   height: 25,
-                        //   decoration: BoxDecoration(
-                        //       color: const Color.fromRGBO(161, 203, 161, 0.8),
-                        //       boxShadow: [
-                        //         BoxShadow(
-                        //           color: Colors.grey.withOpacity(0.5),
-                        //           blurRadius: 5.0,
-                        //           spreadRadius: 0.0,
-                        //           offset: const Offset(3, 3),
-                        //         )
-                        //       ],
-                        //       borderRadius: const BorderRadius.only(
-                        //           topLeft: Radius.circular(5),
-                        //           bottomRight: Radius.circular(5))),
-                        //   child: Center(
-                        //       child: Text(
-                        //     '${ranking[i]['rank']}',
-                        //     style: const TextStyle(
-                        //         color: Colors.white,
-                        //         fontWeight: FontWeight.w600,
-                        //         fontSize: 15),
-                        //   )),
-                        // )
+                        )
                       ],
                     ),
+
                     Container(
                         margin: const EdgeInsets.fromLTRB(12, 5, 0, 0),
                         child: Text(
