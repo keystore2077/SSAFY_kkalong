@@ -59,12 +59,7 @@ public class MemberService {
         return new SignInRes(member.getMemberId(), member.getMemberNickname(), accessToken, refreshToken);
     }
 
-    //회원 정보 조회
-    @Transactional
-    public MemberInfoRes getUserInfo() {
-        return MemberInfoRes.toRes(getLoginUserInfo());
-    }
-
+    //로그인된 회원 조회
     public Member getLoginUserInfo(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User)auth.getPrincipal();
@@ -73,5 +68,18 @@ public class MemberService {
         return memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
     }
+
+    public boolean checkId(String memberId){
+        return !memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false).isPresent();
+
+    }
+
+    public boolean checkNickName(String nickName){
+        return !memberRepository.findByMemberNicknameAndIsMemberDeleted(nickName, false).isPresent();
+
+    }
+
+
+
 
 }
