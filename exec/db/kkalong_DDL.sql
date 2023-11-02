@@ -7,7 +7,6 @@ CREATE TABLE `member` (
 	`member_nickname`	varchar(20)	NOT NULL	COMMENT '닉네임',
 	`member_id`	varchar(20)	NOT NULL	COMMENT '아이디',
 	`member_pw`	varchar(100)	NOT NULL	COMMENT '비밀번호',
-	`member_salt`	varchar(200)	NOT NULL	COMMENT '비밀번호 암호화용 salt값',
 	`member_mail`	varchar(40)	NOT NULL	COMMENT '이메일',
 	`member_phone`	varchar(11)	NULL	COMMENT '전화번호',
 	`member_gender`	char(1)	NULL	COMMENT '성별(M-남자, F - 여자)',
