@@ -18,6 +18,7 @@ import java.util.Optional;
 @Table(name = "member")
 public class Member {
     @Id
+    @Column(name = "member_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int memberSeq;
 

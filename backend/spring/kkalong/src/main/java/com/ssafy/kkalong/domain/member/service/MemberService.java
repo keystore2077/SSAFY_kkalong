@@ -65,6 +65,8 @@ public class MemberService {
     //로그인된 회원 조회
     public Member getLoginUserInfo(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String token = jwtTokenProvider.resolveToken(request);
+        tokenProvider.validateAndParserToken(auth.);
         User user = (User)auth.getPrincipal();
         String memberId = user.getUsername();
         if (memberId.equals("123")){throw new NoSuchElementException("존재하지 않는 회원입니다.");}

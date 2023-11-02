@@ -93,7 +93,7 @@ public class MemberController {
 
     @Operation(summary = "회원 정보 조회")
     @GetMapping("")
-    public Api<Object> getmember( ){
+    public Api<Object> getMember( ){
         return Api.OK(MemberInfoRes.toRes(memberService.getLoginUserInfo()));
     }
 
@@ -109,6 +109,11 @@ public class MemberController {
         return Api.OK(memberService.checkNickName(nickName));
     }
 
+//    @Operation(summary = "access token 재발급")
+//    @GetMapping("/auth")
+//    public Api<Object> reCreateAccesToken(){
+//        return Api.OK(memberService.checkNickName(nickName));
+//    }
 
 
 //    @Operation(summary = "Access Token 재발급")
