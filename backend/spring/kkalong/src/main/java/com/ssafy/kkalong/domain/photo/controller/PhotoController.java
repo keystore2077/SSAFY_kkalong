@@ -4,7 +4,6 @@ import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.domain.photo.dto.request.PhotoMixRequestReq;
 import com.ssafy.kkalong.domain.photo.dto.response.PhotoMixRequestRes;
 import com.ssafy.kkalong.domain.photo.dto.response.PhotoRes;
-import com.ssafy.kkalong.domain.photo.dto.response.PhotoGeneralRes;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/photo")
+@RequestMapping("/api/photo")
 public class PhotoController {
     @Autowired
     private PhotoService photoService;
@@ -23,9 +22,8 @@ public class PhotoController {
     // 3. Rembg를 호출한다.
     // 4. 성공을 반환한다.
     @PostMapping("")
-    public Api<PhotoGeneralRes> savePhotoOriginal(){
-//        return new PhotoGeneralRes("성공");
-        return new Api<>();
+    public Api<Object> savePhotoOriginal() {
+        return Api.OK("성공");
     }
 
     // AI용 내 사진 리스트 조회
@@ -34,8 +32,8 @@ public class PhotoController {
     // 3. 사진별로 s3에서 사진용 url을 받아온다
     // 4. 반환한다
     @GetMapping("")
-    public List<PhotoRes> getPhotoList(){
-        return new ArrayList<PhotoRes>();
+    public Api<Object> getPhotoList() {
+        return Api.OK(new ArrayList<PhotoRes>());
     }
 
     // AI용 특정 사진 조회
@@ -44,8 +42,8 @@ public class PhotoController {
     // 3. s3에서 사진의 url을 받아온다
     // 4. 반환한다.
     @GetMapping("/{photoSeq}")
-    public PhotoRes getPhotoListBySeq(@PathVariable int photoSeq){
-        return new PhotoRes();
+    public Api<Object> getPhotoListBySeq(@PathVariable int photoSeq) {
+        return Api.OK(new PhotoRes());
     }
 
     // AI용 내 사진 삭제
@@ -53,8 +51,8 @@ public class PhotoController {
     // 2. DB에서 해당 사진을 삭제됨을 1로 한다.
     // 3. 성공을 반환한다.
     @PutMapping("/{photoSeq}")
-    public PhotoGeneralRes deletePhotoBySeq(@PathVariable int photoSeq){
-        return new PhotoGeneralRes("성공");
+    public Api<Object> deletePhotoBySeq(@PathVariable int photoSeq) {
+        return Api.OK("성공");
     }
 
     // 합성 요청
@@ -64,7 +62,7 @@ public class PhotoController {
     // 3. viton를 호출한다.
     // 4. viton이 완료 되면 성공을 반환한다.
     @PostMapping("/mix")
-    public PhotoMixRequestRes PhotoMixRequest(@RequestBody PhotoMixRequestReq req){
-        return new PhotoMixRequestRes();
+    public Api<Object> PhotoMixRequest(@RequestBody PhotoMixRequestReq req) {
+        return Api.OK(new PhotoMixRequestRes());
     }
 }
