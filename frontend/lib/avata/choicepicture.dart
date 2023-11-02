@@ -334,7 +334,7 @@ class ChoicePictureState extends State<ChoicePicture> {
                     ),
                   ),
                   child: const Text(
-                    '내 패션찰칵 ',
+                    '내 패션 찰칵 ',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,

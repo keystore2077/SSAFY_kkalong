@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/avata/loadingna.dart';
 import '../avata/clothslide.dart';
 import 'package:image_picker/image_picker.dart';
+import '../avata/namedavata.dart';
 
 // import 'package:flutter_mycloset/category/categoryselect.dart';
 
@@ -191,7 +193,13 @@ class ChoiceClothState extends State<ChoiceCloth> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(2, 1, 20, 10),
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const NamedAvata()),
+                        );
+                      },
                       style: OutlinedButton.styleFrom(
                         backgroundColor: const Color(0xFFF5BEB5),
                         foregroundColor: Colors.white,
