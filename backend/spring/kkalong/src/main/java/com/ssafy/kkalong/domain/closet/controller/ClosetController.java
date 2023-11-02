@@ -10,13 +10,11 @@ import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/closet")
@@ -49,14 +47,15 @@ public class ClosetController {
         Integer memberSeq = member.getMemberSeq();  //멤버의 일련번호 받아오는 과정
 
         List<Closet> closets = closetService.findClosetsByMemberSeq(memberSeq); //이게 클로셋 리스폰스
-        List<ClosetResponse> result  = new ArrayList<>();
+        List<ClosetResponse> result  = new ArrayList<>();       //클로젯의 리스트 반환해줄 리스트
 
         for(Closet closet : closets){
-            String url = closet.getClosetImgName();  //이부분 수정해야함
+//            String url = closet.getClosetImgName();  //이부분 수정해야함 개행
+            String url = "String";
             ClosetResponse closetResponse = ClosetResponse.builder()
-                    .closetSeq(closet.getClosetSeq())
-                    .closetName(closet.getClosetName())
-                    .closetPictureUrl(url)
+                    .closetSeq(closet.getClosetSeq())       //옷장인덱스
+                    .closetName(closet.getClosetName())     //옷장이름
+                    .closetPictureUrl(url)      //옷장사진 url
                     .build();
             result.add(closetResponse);
         }
