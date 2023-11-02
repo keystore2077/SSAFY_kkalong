@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../avata/clothslide.dart';
+import 'package:image_picker/image_picker.dart';
 
 // import 'package:flutter_mycloset/category/categoryselect.dart';
 
@@ -61,27 +62,6 @@ class ChoiceClothState extends State<ChoiceCloth> {
           SliverList(
             delegate: SliverChildListDelegate(
               [
-                // AppBar(
-                //   toolbarHeight: 100,
-                //   // centerTitle: true,
-                //   title: const Text(
-                //     'TOP',
-                //     style: TextStyle(
-                //       fontSize: 22,
-                //       color: Color.fromARGB(255, 0, 0, 0),
-                //       fontWeight: FontWeight.w600,
-                //     ),
-                //   ),
-                //   leading: Padding(
-                //     padding: const EdgeInsets.fromLTRB(25.0, 0, 0,
-                //         0), // padding을 적절히 조절하여 이미지의 크기와 위치를 변경할 수 있습니다.
-                //     child: Image.asset(
-                //       'Assets/Image/logo.png',
-                //       width: 150.0, // 원하는 너비 값을 설정
-                //       height: 150.0, // 원하는 높이 값을 설정
-                //     ), // 여기에 원하는 이미지 경로를 넣으세요.
-                //   ),
-                // ),
                 AppBar(
                   toolbarHeight: 100,
                   title: Row(
@@ -145,72 +125,98 @@ class ChoiceClothState extends State<ChoiceCloth> {
               ),
             ),
           ),
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(30, 2, 10, 2),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              padding: const EdgeInsets.fromLTRB(30, 2, 10, 0),
+              // child: Row(
+              //   mainAxisSize: MainAxisSize.min,
+              //   children: [
+              //     SizedBox(
+              //       width: 400,
+              //       child: Text(
+              //         '옷선택',
+              //         style: TextStyle(fontSize: 20),
+              //       ),
+              //     ),
+              //     SizedBox(
+              //       width: 400,
+              //       child: Text(
+              //         '옷선택',
+              //         style: TextStyle(fontSize: 20),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: 400,
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(8, 0, 0, 12),
                     child: Text(
                       '옷선택',
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFF5BEB5),
+                      ),
                     ),
                   ),
-                  SizedBox(height: 10),
-                  // SizedBox(
-                  //   width: double.infinity,
-                  //   height: 150,
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //     children: List<Widget>.from(
-                  //         (clomenue["list"] ?? []).map<Widget>((item) {
-                  //       return GestureDetector(
-                  //         onTap: () {},
-                  //         child: Column(
-                  //           children: <Widget>[
-                  //             Image.asset(
-                  //               item["image"] ?? 'Assets/Image/logo.png',
-                  //               width: 60,
-                  //               height: 100,
-                  //             ),
-                  //             const SizedBox(height: 5),
-                  //             Text(item["name"] ?? 'Unknown'),
-                  //           ],
-                  //         ),
-                  //       );
-                  //     })),
-                  //   ),
-                  // )
-
-                  // SizedBox(
-                  //   width: double.infinity,
-                  //   height: 150,
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //     children: List<Widget>.from(
-                  //         (clomenue["list"] ?? []).map<Widget>((item) {
-                  //       return Column(
-                  //         children: <Widget>[
-                  //           Image.asset(
-                  //             item["image"] ?? 'Assets/Image/logo.png',
-                  //             width: 60,
-                  //             height: 100,
-                  //           ),
-                  //           const SizedBox(
-                  //               height:
-                  //                   5), // const 키워드를 제거했지만 이는 필수적인 변경은 아닙니다.
-                  //           Text(item["name"] ?? 'Unknown'),
-                  //         ],
-                  //       );
-                  //     })),
-                  //   ),
-                  // )
+                  const Spacer(),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(30, 1, 10, 10),
+                      child: OutlinedButton(
+                        onPressed: () {},
+                        style: OutlinedButton.styleFrom(
+                          // backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+                          foregroundColor:
+                              const Color.fromARGB(255, 232, 170, 170),
+                          side: const BorderSide(
+                              color: Color.fromARGB(255, 232, 170, 170),
+                              width:
+                                  1.0), // Adjusting border color and thickness
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+                          ),
+                          // 다른 스타일 속성들
+                        ),
+                        child: const Text(
+                          ' + 다른옷',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      )),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(2, 1, 20, 10),
+                    child: OutlinedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF5BEB5),
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(
+                            color: Color(0xFFF5BEB5), width: 1.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+                        ),
+                        // 다른 스타일 속성들
+                      ),
+                      child: const Text(
+                        ' 저장 ',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
           ),
+          const ClothSlide()
         ],
       ),
     );
