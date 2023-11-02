@@ -1,4 +1,6 @@
 spring:
+
+
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   jpa:
@@ -12,20 +14,22 @@ spring:
   datasource:
     url: jdbc:mysql://${DB_HOST}:${MYSQL_PORT}/kkalong
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${MYSQL_USERNAME}
-    password: ${MYSQL_PASSWORD}
+    username: kkalong
+    password: c105ssafykkalong
   data:
     mongodb:
-      uri: mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${DB_HOST}:${MONGODB_PORT}/kkalong
+      uri: mongodb://admin:c105ssafykkalong@k9c105.p.ssafy.io:27017/kkalong
     redis:
-      host: ${DB_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
+      host: k9c105.p.ssafy.io
+      port: 6379
+      password: c105ssafykkalong
 
   security:
     user:
-      name: ${SECURITY_NAME}
-      password: ${SECURITY_PASSWORD}
+      name: ssafy
+      password: ssafy
+
+
 
 springdoc:
   packages-to-scan: com.ssafy.kkalong
