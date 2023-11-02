@@ -3,6 +3,7 @@ package com.ssafy.kkalong.domain.closet.controller;
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetRequest;
+import com.ssafy.kkalong.domain.closet.dto.response.ClosetResponse;
 import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.member.entity.Member;
@@ -47,9 +48,19 @@ public class ClosetController {
         }
         Integer memberSeq = member.getMemberSeq();  //멤버의 일련번호 받아오는 과정
 
-        List<Closet> closets = closetService.findClosetsByMemberSeq(memberSeq);
+        List<Closet> closets = closetService.findClosetsByMemberSeq(memberSeq); //이게 클로셋 리스폰스
+        List<ClosetResponse> result  = new ArrayList<>();
 
-        return Api.OK(closets);
+        for(Closet closet : closets){
+            String url = closet.getClosetImgName();  //이부분 수정해야함
+            ClosetResponse closetResponse = ClosetResponse.builder()
+                    .closetSeq(closet.getClosetSeq())
+                    .closetName(closet.getClosetName())
+                    .closetPictureUrl(url)
+                    .build();
+            result.add(closetResponse);
+        }
+        return Api.OK(result);
 
     }
 
