@@ -4,8 +4,6 @@ import com.ssafy.kkalong.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import org.springframework.data.mongodb.repository.CountQuery;
 
 import java.time.LocalDateTime;
 
@@ -21,15 +19,15 @@ public class Closet {
     private int closetSeq;
 
     @ManyToOne
-    @JoinColumn(name = "member_seq", referencedColumnName = "member_seq")
+    @JoinColumn(name = "member_seq", referencedColumnName = "member_seq",nullable = false)
     @Schema(description = "옷장정보 조회하는 멤버 시퀀스")
     private Member member ;
 
-    @Column(name="closet_name",nullable = false)
+    @Column(name="closet_name",nullable = false,length = 40)
     @Schema(description = "옷장이름")
     private String closetName;
 
-    @Column(name="closet_img_name",nullable = false)
+    @Column(name="closet_img_name",nullable = false,length = 70)
     @Schema(description = "옷장사진파일이름")
     private  String closetImgName;
 
@@ -40,7 +38,7 @@ public class Closet {
 
     @Column(name="is_closet_deleted",nullable = false)
     @Schema(description = "삭제여부")
-    private String closetDeleted;
+    private boolean closetDeleted;
 
 
     @Column(name="closet_del_date", nullable = true)

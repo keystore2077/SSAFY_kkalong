@@ -4,7 +4,9 @@ import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetRequest;
 import com.ssafy.kkalong.domain.closet.dto.response.ClosetResponse;
+import com.ssafy.kkalong.domain.closet.dto.response.SectionResponse;
 import com.ssafy.kkalong.domain.closet.entity.Closet;
+import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
@@ -31,8 +33,37 @@ public class ClosetController {
     @GetMapping("/{closetSeq}")
     @Operation(summary = "옷장 상세정보 및 소속구역 리스트 보기")
     public Api<Object> getClosetDetail(@PathVariable int closetSeq ){
+        //0.회원확인
+        Member member = memberService.getLoginUserInfo();
+        if(member == null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
+        }
+        //1.유효성검사를하기(옷장이있는지 확인하기)
+        Closet closet = closetService.findCloset(closetSeq);
+        if(closet == null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지않은 옷장일련번호입니다!");
+        }
 
-        return Api.OK("옷장하나 조회");
+        //2.찾은옷장이랑 옷장 주인이 맞는지,로그인된 회원이랑 옷장주인이 맞는지 확인하기
+        int memberSeq = member.getMemberSeq();
+        if (memberSeq != closet.getMember().getMemberSeq()){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된회원이 옷장 소유주와 다릅니다!");
+        }
+
+        //3.리스트(섹션)가지고오기
+        List<Section> sections = closetService.findSection(closetSeq);
+        List<SectionResponse> result  = new ArrayList<>();
+        for(Section section: sections){
+            SectionResponse sectionResponse = SectionResponse.builder()
+                    .sectionSeq(section.getSectionSeq())
+                    .sectionName(section.getSectionName())
+                    .sortSeq(section.getSort().getSortSeq())
+                    .sort(section.getSort().getSort())
+                    .build();
+            result.add(sectionResponse);
+
+        }
+        return Api.OK(result);
 
     }
 
@@ -40,11 +71,11 @@ public class ClosetController {
     @GetMapping("")
     @Operation(summary = "옷장 목록 보기")
     public Api<Object> getCloset(){
-        Member member = memberService.getLoginUserInfo(); //멤버를 반환해주는거
+        Member member = memberService.getLoginUserInfo(); //멤버를 반환해주는거(서비스에서 작성된것)
         if(member == null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
         }
-        Integer memberSeq = member.getMemberSeq();  //멤버의 일련번호 받아오는 과정
+        int memberSeq = member.getMemberSeq();  //멤버의 일련번호 받아오는 과정
 
         List<Closet> closets = closetService.findClosetsByMemberSeq(memberSeq); //이게 클로셋 리스폰스
         List<ClosetResponse> result  = new ArrayList<>();       //클로젯의 리스트 반환해줄 리스트
