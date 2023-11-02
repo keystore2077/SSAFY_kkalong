@@ -12,7 +12,7 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mysql://k9c105.p.ssafy.io:3306/kkalong
+    url: jdbc:mysql://${DB_HOST}:${MYSQL_PORT}/kkalong
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: kkalong
     password: c105ssafykkalong
@@ -53,9 +53,8 @@ logging.level:
 
 server:
   port: 8761
-
 jwt:
-  secret-key: Sfi49D0N1Gqo10bPgUyTFsRMkJpGLXSvGP0UJN56EB30r5TcrtlSXfQ7TndvYjNvfkEKLqILn0j1SmKODOSDSF098BBgI3nVPEahqxeY8qbPSFGyzyEVxnl4AQcrnVneI
-  expiration-minutes: 30
-  refresh-expiration-hours: 24
-  issuer: ssafy
+  secret-key: ${JWT_SECRET_KEY}
+  expiration-minutes: ${JWT_EXPIRATION_MINUTES}
+  refresh-expiration-hours: ${JWT_REFRESH_EXPIRATION_HOURS}
+  issuer: ${JWT_ISSUER}
