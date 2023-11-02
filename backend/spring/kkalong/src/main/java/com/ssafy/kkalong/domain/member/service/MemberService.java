@@ -38,12 +38,15 @@ public class MemberService {
     //회원 가입
     @Transactional
     public SignUpRes registMember(SignUpReq request) {
+        System.out.println("service1");
         Member member = memberRepository.save(Member.toEntity(request, encoder));
+        System.out.println("service2");
         try {
             memberRepository.flush();
         } catch (DataIntegrityViolationException e) {
             throw new IllegalArgumentException("이미 사용중인 아이디입니다.");
         }
+        System.out.println("service3");
         return SignUpRes.toRes(member);
     }
 

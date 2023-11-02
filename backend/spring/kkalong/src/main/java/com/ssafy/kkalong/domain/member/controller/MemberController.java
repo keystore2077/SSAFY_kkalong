@@ -5,14 +5,13 @@ import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.domain.member.dto.request.SignInReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
 import com.ssafy.kkalong.domain.member.dto.response.MemberInfoRes;
-import com.ssafy.kkalong.domain.member.dto.response.SignInRes;
-import com.ssafy.kkalong.domain.member.dto.response.SignUpRes;
 import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.security.TokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import java.time.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
@@ -26,27 +25,64 @@ public class MemberController {
     @Operation(summary = "회원가입")
     @PostMapping("/sign-up")
     public Api<Object> signUp(@RequestBody SignUpReq request){
-        //닉네임 체크
+        //닉네임 체크 검사
         String nickName = request.getMemberNickname();
         String nickNameRegex = "^[a-zA-Z가-힣0-9]{2,10}$";
         if(!nickName.matches(nickNameRegex)){
-            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[nickName]닉네임은 유요하지 않습니다. 영어와 한글, 숫자만 가능하고 최소 2자에서 10자로 작성해주세요", nickName));
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 않는 닉네임입니다. 영어와 한글, 숫자만 가능하고 최소 2자에서 10자이내로 작성해주세요", nickName));
+        }
+        if(!memberService.checkNickName(nickName)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 중복된 닉네임입니다.", nickName));
         }
 
+        //아이디 검사
         String memberId = request.getMemberId();
-        String IdRegex = "^(?=.*[a-zA-Z])[a-zA-Z0-9]{5,20}$";
+        String idRegex = "^(?=.*[a-zA-Z])[a-zA-Z0-9]{5,20}$";
+        if(!memberId.matches(idRegex)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 않는 아이디입니다. 영어와, 숫자만 가능하고 최소 5자에서 20자 이내로 작성해주세요. 최소 1개의 영어가 포함되어야 합니다.", memberId));
+        }
+        if(!memberService.checkId(memberId)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 중복된 아이디입니다.", memberId));
+        }
 
-        if(!memberId.matches(IdRegex)){
-            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[memberId]아이디는 유요하지 않습니다. 영어와 한글, 숫자만 가능하고 최소 2자에서 10자로 작성해주세요", memberId));
+        //비밀 번호 검사
+        String memberPw = request.getMemberPw();
+        String pwRegex = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}$";
+        if(!memberPw.matches(pwRegex)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않는 비밀번호입니다. 영어와, 숫자만 가능하고 최소 8자에서 20자 이내로 작성해주세요. 영어와 숫자는 최소 한번 이상 포함되어야 합니다.");
+        }
+
+        //이메일 검사
+        String memberMail = request.getMemberEmail();
+        String mailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        if(!memberMail.matches(mailRegex)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 안는 이메일 형식입니다.", memberMail));
+        }
+
+        //전화번호 검사
+        String memberPhone = request.getMemberPhone();
+        String phoneRegx = "^\\d{9,11}$";
+        if(!memberPhone.isEmpty() && !memberPhone.matches(phoneRegx)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 안는 전화번호 형식입니다. 숫자만 작성해주세요", memberPhone));
+        }
+
+        //성별 검사
+        Character  memberGender = request.getMemberGender();
+        if (memberGender != null && memberGender != 'F' && memberGender != 'M' && memberGender != '\u0000' && !Character.toString(memberGender).trim().isEmpty()) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 안는 성별 형식입니다. M,F,공백만 작성해주세요", memberGender));
         }
 
 
-        //아이디
-        //비밀 번호
-        //이메일
-        //전화번호
-        //성별
-        //생년
+        //생년 검사
+        int memberBirthYear = request.getMemberBirthYear();
+
+        // 현재 연도
+        LocalDate currentDate = LocalDate.now();
+        int currentYear = Year.from(currentDate).getValue();
+
+        if(memberBirthYear<0 && memberBirthYear>currentYear){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 안는 연도입니다.", memberGender));
+        }
         return Api.OK(memberService.registMember(request));
     }
     @Operation(summary = "회원 로그인")

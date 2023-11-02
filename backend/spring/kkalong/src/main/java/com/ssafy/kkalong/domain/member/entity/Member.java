@@ -1,6 +1,5 @@
 package com.ssafy.kkalong.domain.member.entity;
 
-import com.ssafy.kkalong.domain.member.dto.request.MemberUpdateReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
 import jakarta.persistence.*;
 import lombok.*;
@@ -50,14 +49,15 @@ public class Member {
     private LocalDateTime memberWithdrawnDate;
 
     public static Member toEntity(SignUpReq request, PasswordEncoder encoder) {	// 파라미터에 PasswordEncoder 추가
+        System.out.println("toEntity");
         return Member.builder()
                 .memberNickname(request.getMemberNickname())
                 .memberId(request.getMemberId())
                 .memberPw(encoder.encode(request.getMemberPw()))	// 수정
                 .memberMail(request.getMemberEmail())
-                .memberPhone(Optional.ofNullable(request.getMemberPhone()).orElse(null))
-                .memberGender(Optional.ofNullable(request.getMemberGender()).orElse(null))
-                .memberBirthYear(Optional.ofNullable(request.getMemberBirthYear()).orElse(0))
+                .memberGender(Optional.ofNullable(request.getMemberGender()).orElse('\u0000'))
+                .memberPhone(request.getMemberPhone())
+                .memberBirthYear(request.getMemberBirthYear())
                 .memberRegDate(LocalDateTime.now())
                 .build();
     }
