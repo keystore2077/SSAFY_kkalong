@@ -181,7 +181,7 @@ class ChoiceClothState extends State<ChoiceCloth> {
                           // 다른 스타일 속성들
                         ),
                         child: const Text(
-                          ' + 다른옷',
+                          '+ 다른 옷',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
