@@ -16,6 +16,7 @@ import java.util.Optional;
 @Builder
 @Getter
 @Entity
+@Setter
 @Table(name = "member")
 public class Member {
     @Id
@@ -51,7 +52,6 @@ public class Member {
     private LocalDateTime memberWithdrawnDate;
 
     public static Member toEntity(SignUpReq request, PasswordEncoder encoder) {	// 파라미터에 PasswordEncoder 추가
-        System.out.println("toEntity");
         return Member.builder()
                 .memberNickname(request.getMemberNickname())
                 .memberId(request.getMemberId())
@@ -63,15 +63,5 @@ public class Member {
                 .memberRegDate(LocalDateTime.now())
                 .build();
     }
-//
-//    public void update(MemberUpdateReq newMember, PasswordEncoder encoder) {	// 파라미터에 PasswordEncoder 추가
-//        this.memberPw = newMember.getMemberPw() == null || newMember.getMemberPw().isBlank()
-//                ? this.memberPw : encoder.encode(newMember.getMemberPw());	// 수정
-//
-//        this.memberNickname = newMember.getMemberNickname();
-//        this.memberMail = newMember.getMemberEmail();
-//        this.memberPhone = newMember.getMemberPhone();
-//        this.memberGender = newMember.getMemberGender();
-//        this.memberBirthYear = newMember.getMemberBirthYear();
-//    }
+
 }

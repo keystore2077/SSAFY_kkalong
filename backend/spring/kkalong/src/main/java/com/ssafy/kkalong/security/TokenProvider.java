@@ -74,7 +74,7 @@ public class TokenProvider {
                     .compact();
         }
 
-        public String createRefreshToken(){
+        public String createRefreshToken(String memberId){
                 Date now = new Date();
                 long refreshExpirationMillis = refreshExpirationHours * 60 * 60 * 1000;
                 Date expireDate = new Date(now.getTime() + refreshExpirationHours);
@@ -85,7 +85,7 @@ public class TokenProvider {
                         .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
                         .setExpiration(Date.from(Instant.now().plus(refreshExpirationHours, ChronoUnit.HOURS)))
                         .compact();
-                redisTemplate.opsForValue().set(String.valueOf(Jwts.builder().setIssuer(issuer)),refreshToken,refreshExpirationMillis, TimeUnit.MILLISECONDS);
+                redisTemplate.opsForValue().set(memberId,refreshToken,refreshExpirationMillis, TimeUnit.MILLISECONDS);
                 return refreshToken;
         }
         private Jws<Claims> validateAndParserToken(String auth){
@@ -93,7 +93,6 @@ public class TokenProvider {
                 var parser = Jwts.parserBuilder()
                         .setSigningKey(secretKey.getBytes())
                         .build();
-
                 try {
                         var result = parser.parseClaimsJws(auth);
                         return result;
