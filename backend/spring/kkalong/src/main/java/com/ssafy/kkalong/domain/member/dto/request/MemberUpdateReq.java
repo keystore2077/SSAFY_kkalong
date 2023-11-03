@@ -25,7 +25,7 @@ public class MemberUpdateReq {
     private String memberPhone ;
 
     @Schema(description = "성별")
-    private char memberGender;
+    private Character memberGender;
 
     @Schema(description = "생년")
     private int memberBirthYear ;
