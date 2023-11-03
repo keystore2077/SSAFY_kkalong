@@ -1,7 +1,7 @@
 package com.ssafy.kkalong.domain.closet.service;
 
-import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetCreateRequest;
+import com.ssafy.kkalong.domain.closet.dto.request.SectionCreateRequestItem;
 import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.repository.ClosetRepository;
@@ -11,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 //컨트롤러 비지니스 로직
@@ -49,6 +48,39 @@ public class ClosetService {
         return closetRepository.save(newCloset);
     }
 
+    public List<Section> createSection(List<SectionCreateRequestItem> requests, Closet newCloset) {
+        List<Section> sectionsToSave = new ArrayList<>();
+
+        for (SectionCreateRequestItem request : requests) {
+            Section section = new Section();
+            section.setSectionName(request.getSectionName());
+            section.setCloset(newCloset);
+            section.setSort(request.getSort());
+
+            sectionsToSave.add(section);
+
+
+        }
+        return sectionRepository.saveAll(sectionsToSave);
+    }
+}
+
+
+
+//    public List<Closet> createMultipleClosets(List<ClosetCreateRequest> requests) {
+//        List<Closet> closetsToSave = new ArrayList<>();
+//
+//        for (ClosetCreateRequest request : requests) {
+//            Closet closet = new Closet();
+//            closet.setClosetName(request.getClosetName());
+//            closet.setMemberSeq(request.getMemberSeq()); // 예시로 추가된 필드
+//            // 추가적으로 필요한 데이터 설정
+//            // ...
+//            closetsToSave.add(closet);
+//        }
+
+
+
 //    public Closet createCloset(ClosetCreateRequest request) {
 //        // 1. 엔티티 생성 및 데이터 설정
 //        Closet newCloset = new Closet();
@@ -79,4 +111,3 @@ public class ClosetService {
 //        return closetRepository.save(newCloset);
 //    }
 
-}
