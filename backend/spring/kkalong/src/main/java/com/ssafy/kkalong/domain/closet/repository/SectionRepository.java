@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface SectionRepository extends JpaRepository<Section, Integer> {
 
-    List<Section> findAllByClosetSeqAndIsSectoinDeleted(int closetSeq,boolean isDeleted);
+    List<Section> findAllByClosetClosetSeqAndIsSectionDeleted(int closetSeq, boolean isDeleted);
 }

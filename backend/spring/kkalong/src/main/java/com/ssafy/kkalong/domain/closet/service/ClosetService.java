@@ -17,6 +17,7 @@ import java.util.List;
 public class ClosetService {
     @Autowired
     private ClosetRepository closetRepository;
+    @Autowired
     private SectionRepository sectionRepository;
 
     public List<Closet> findClosetsByMemberSeq(int memberSeq) {
@@ -29,6 +30,6 @@ public class ClosetService {
 
     }
     public List<Section> findSection(int closetSeq){
-        return sectionRepository.findAllByClosetSeqAndIsSectoinDeleted(closetSeq,false);
+        return sectionRepository.findAllByClosetClosetSeqAndIsSectionDeleted(closetSeq,false);
     }
 }

@@ -38,7 +38,7 @@ public class Closet {
 
     @Column(name="is_closet_deleted",nullable = false)
     @Schema(description = "삭제여부")
-    private boolean closetDeleted;
+    private boolean isClosetDeleted;
 
 
     @Column(name="closet_del_date", nullable = true)

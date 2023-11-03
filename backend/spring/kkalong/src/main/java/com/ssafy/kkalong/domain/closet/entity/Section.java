@@ -23,7 +23,7 @@ public class Section {
 
     @Column(name = "is_section_deleted",nullable = false)
     @Schema(description = "삭제여부")
-    private boolean sectionDeleted;
+    private boolean isSectionDeleted;
 
     @Column(name = "section_del_date",nullable = true)
     @Schema(description = "삭제일시")
