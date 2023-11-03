@@ -1,4 +1,7 @@
 // import 'package:flutter/material.dart';
+// import 'package:image_picker/image_picker.dart';
+// import '../avata/wearcloth.dart';
+
 // // import 'package:flutter_mycloset/category/categoryselect.dart';
 
 // class ChoicePicture extends StatefulWidget {
@@ -53,18 +56,14 @@
 //               [
 //                 AppBar(
 //                   toolbarHeight: 100,
-//                   // leading: IconButton(
-//                   //   icon: const Icon(Icons.arrow_back_ios_outlined),
-//                   //   onPressed: () {},
-//                   // ),
-//                   // backgroundColor: const Color.fromARGB(255, 251, 235, 233),
 //                   centerTitle: true,
 //                   title: const Text(
 //                     '내 사진을 골라주세요!',
 //                     style: TextStyle(
-//                         fontSize: 25,
-//                         color: Color.fromARGB(255, 0, 0, 0),
-//                         fontWeight: FontWeight.w600),
+//                       fontSize: 25,
+//                       color: Color.fromARGB(255, 0, 0, 0),
+//                       fontWeight: FontWeight.w600,
+//                     ),
 //                   ),
 //                 )
 //               ],
@@ -87,8 +86,7 @@
 //                   return GestureDetector(
 //                     onTap: () {},
 //                     child: Container(
-//                       color: const Color.fromARGB(
-//                           255, 251, 235, 233), // "점선"의 색상입니다.
+//                       color: const Color.fromARGB(255, 251, 235, 233),
 //                       child: Column(
 //                         mainAxisAlignment: MainAxisAlignment.center,
 //                         children: <Widget>[
@@ -115,15 +113,123 @@
 //           ),
 //         ],
 //       ),
+//       bottomNavigationBar: Padding(
+//         padding: const EdgeInsets.fromLTRB(20, 2, 20, 2),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//               children: [
+//                 Expanded(
+//                   child: ElevatedButton(
+//                     onPressed: () {},
+//                     style: ElevatedButton.styleFrom(
+//                       backgroundColor: const Color(0xFFF5BEB5),
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(5.0),
+//                       ),
+//                     ),
+//                     child: const Text(
+//                       '다시선택',
+//                       style: TextStyle(
+//                         color: Colors.white,
+//                         fontWeight: FontWeight.w700,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 const SizedBox(width: 10),
+//                 Expanded(
+//                   child: ElevatedButton(
+//                     onPressed: () {
+//                       Navigator.push(
+//                         context,
+//                         MaterialPageRoute(
+//                             builder: (context) => const WearCloth()),
+//                       );
+//                     },
+//                     style: ElevatedButton.styleFrom(
+//                       backgroundColor: const Color(0xFFF5BEB5),
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(5.0),
+//                       ),
+//                     ),
+//                     child: const Text(
+//                       '선택완료',
+//                       style: TextStyle(
+//                         color: Colors.white,
+//                         fontWeight: FontWeight.w700,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             const SizedBox(height: 10),
+//             SizedBox(
+//                 width: 400,
+//                 child: ElevatedButton(
+//                   onPressed: () async {
+//                     final ImagePicker picker = ImagePicker();
+//                     final XFile? image =
+//                         await picker.pickImage(source: ImageSource.camera);
+
+//                     if (image != null) {
+//                       // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
+//                     }
+//                   },
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: const Color(0xFFF5BEB5),
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(5.0),
+//                     ),
+//                   ),
+//                   child: const Text(
+//                     '사진찍기 ',
+//                     style: TextStyle(
+//                       color: Colors.white,
+//                       fontWeight: FontWeight.w700,
+//                     ),
+//                   ),
+//                 )),
+//             const SizedBox(height: 10),
+//             SizedBox(
+//                 width: 400,
+//                 child: ElevatedButton(
+//                   onPressed: () async {
+//                     final ImagePicker picker = ImagePicker();
+//                     final XFile? image =
+//                         await picker.pickImage(source: ImageSource.camera);
+
+//                     if (image != null) {
+//                       // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
+//                     }
+//                   },
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: const Color(0xFFF5BEB5),
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(5.0),
+//                     ),
+//                   ),
+//                   child: const Text(
+//                     '내 패션 찰칵 ',
+//                     style: TextStyle(
+//                       color: Colors.white,
+//                       fontWeight: FontWeight.w700,
+//                     ),
+//                   ),
+//                 )),
+//           ],
+//         ),
+//       ),
 //     );
 //   }
 // }
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import '../avata/avatacamera.dart';
 import '../avata/wearcloth.dart';
-
-// import 'package:flutter_mycloset/category/categoryselect.dart';
 
 class ChoicePicture extends StatefulWidget {
   const ChoicePicture({
@@ -291,14 +397,12 @@ class ChoicePictureState extends State<ChoicePicture> {
             SizedBox(
                 width: 400,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    final ImagePicker picker = ImagePicker();
-                    final XFile? image =
-                        await picker.pickImage(source: ImageSource.camera);
-
-                    if (image != null) {
-                      // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
-                    }
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AvataPicture()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF5BEB5),
@@ -318,15 +422,7 @@ class ChoicePictureState extends State<ChoicePicture> {
             SizedBox(
                 width: 400,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    final ImagePicker picker = ImagePicker();
-                    final XFile? image =
-                        await picker.pickImage(source: ImageSource.camera);
-
-                    if (image != null) {
-                      // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
-                    }
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF5BEB5),
                     shape: RoundedRectangleBorder(

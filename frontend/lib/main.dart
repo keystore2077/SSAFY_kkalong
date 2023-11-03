@@ -94,6 +94,7 @@ import './reafeat/bottom.dart';
 import './closet/mycloset.dart';
 import './closet/closetdetail.dart';
 import './category/category.dart';
+import 'package:camera/camera.dart';
 
 void main() {
   runApp(const Main());
