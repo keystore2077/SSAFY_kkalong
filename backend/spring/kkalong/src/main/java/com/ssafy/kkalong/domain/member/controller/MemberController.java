@@ -2,9 +2,11 @@ package com.ssafy.kkalong.domain.member.controller;
 
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
+import com.ssafy.kkalong.domain.member.dto.request.MemberUpdateReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignInReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
 import com.ssafy.kkalong.domain.member.dto.response.MemberInfoRes;
+import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.security.TokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
@@ -93,7 +95,7 @@ public class MemberController {
 
     @Operation(summary = "회원 정보 조회")
     @GetMapping("")
-    public Api<Object> getmember( ){
+    public Api<Object> getMember( ){
         return Api.OK(MemberInfoRes.toRes(memberService.getLoginUserInfo()));
     }
 
@@ -109,13 +111,97 @@ public class MemberController {
         return Api.OK(memberService.checkNickName(nickName));
     }
 
-
-
-//    @Operation(summary = "Access Token 재발급")
 //    @GetMapping("/verifyToken")
 //    public Api<String> verifyToken(@RequestHeader("Authorization") String auth){
+//        log.info(auth);
 //        var result = tokenProvider.validateTokenAndGetSubject(auth);
 //        return Api.OK(result);
 //    }
+    @Operation(summary = "로그아웃")
+    @DeleteMapping("/logout")
+    public Api<Object> logout(){
+        Member member = memberService.getLoginUserInfo();
+        if(member==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST,"로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        memberService.logout(member);
+        return Api.OK("로그아웃 되었습니다.");
+    }
+
+    @Operation(summary = "회원 정보 수정")
+    @PutMapping("")
+    public Api<Object> updateMember(@RequestBody MemberUpdateReq request){
+        Member member = memberService.getLoginUserInfo();
+        if(member==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST,"로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        //닉네임 체크 검사
+        String nickName = request.getMemberNickname();
+        String nickNameRegex = "^[a-zA-Z가-힣0-9]{2,10}$";
+        if(!nickName.matches(nickNameRegex)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 않는 닉네임입니다. 영어와 한글, 숫자만 가능하고 최소 2자에서 10자이내로 작성해주세요", nickName));
+        }
+        if(!nickName.equals(member.getMemberNickname())&&!memberService.checkNickName(nickName)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 중복된 닉네임입니다.", nickName));
+        }
+
+        //비밀 번호 검사
+        String memberNewPw = request.getNewPassword();
+        String pwRegex = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}$";
+        if(memberNewPw.length()!=0&&!memberNewPw.matches(pwRegex)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않는 비밀번호입니다. 영어와, 숫자만 가능하고 최소 8자에서 20자 이내로 작성해주세요. 영어와 숫자는 최소 한번 이상 포함되어야 합니다.");
+        }
+
+        //이메일 검사
+        String memberMail = request.getMemberEmail();
+        String mailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        if(!memberMail.matches(mailRegex)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 안는 이메일 형식입니다.", memberMail));
+        }
+
+        //전화번호 검사
+        String memberPhone = request.getMemberPhone();
+        String phoneRegx = "^\\d{9,11}$";
+        if(!memberPhone.isEmpty() && !memberPhone.matches(phoneRegx)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 안는 전화번호 형식입니다. 숫자만 작성해주세요", memberPhone));
+        }
+
+        //성별 검사
+        Character  memberGender = request.getMemberGender();
+        if (memberGender != null && memberGender != 'F' && memberGender != 'M' && memberGender != '\u0000' && !Character.toString(memberGender).trim().isEmpty()) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 안는 성별 형식입니다. M,F,공백만 작성해주세요", memberGender));
+        }
+
+        //생년 검사
+        int memberBirthYear = request.getMemberBirthYear();
+
+        // 현재 연도
+        LocalDate currentDate = LocalDate.now();
+        int currentYear = Year.from(currentDate).getValue();
+
+        if(memberBirthYear<0 && memberBirthYear>currentYear){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 안는 연도입니다.", memberGender));
+        }
+
+        return Api.OK(memberService.updateMember(member.getMemberId(), request));
+    }
+
+
+    @Operation(summary = "회원 탈퇴")
+    @PutMapping("/delete")
+    public Api<Object> deleteMember(){
+        Member member = memberService.getLoginUserInfo();
+        if(member==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST,"로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        memberService.deleteMember(member);
+        return Api.OK("탈퇴 되었습니다.");
+    }
+
+
+
 
 }

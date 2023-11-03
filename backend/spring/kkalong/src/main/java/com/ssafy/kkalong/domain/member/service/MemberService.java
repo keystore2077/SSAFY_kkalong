@@ -1,5 +1,6 @@
 package com.ssafy.kkalong.domain.member.service;
 
+import com.ssafy.kkalong.domain.member.dto.request.MemberUpdateReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignInReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
 import com.ssafy.kkalong.domain.member.dto.response.MemberInfoRes;
@@ -18,8 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +37,6 @@ public class MemberService {
     private final RedisTemplate<String, String> redisTemplate;
 
     //회원 가입
-    @Transactional
     public SignUpRes registMember(SignUpReq request) {
         System.out.println("service1");
         Member member = memberRepository.save(Member.toEntity(request, encoder));
@@ -52,13 +52,12 @@ public class MemberService {
 
 
     //로그인
-    @Transactional(readOnly = true)
     public SignInRes signIn(SignInReq request) {
         Member member = memberRepository.findByMemberIdAndIsMemberDeleted(request.getMemberId(), false)
                 .filter(it -> encoder.matches(request.getMemberPw(), it.getMemberPw()))	// 암호화된 비밀번호와 비교하도록 수정
                 .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다."));
         String accessToken = tokenProvider.createAccessToken(member.getMemberId());
-        String refreshToken = tokenProvider.createRefreshToken();
+        String refreshToken = tokenProvider.createRefreshToken(member.getMemberId());
         return new SignInRes(member.getMemberId(), member.getMemberNickname(), accessToken, refreshToken);
     }
 
@@ -67,21 +66,54 @@ public class MemberService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User)auth.getPrincipal();
         String memberId = user.getUsername();
+
         if (memberId.equals("123")){throw new NoSuchElementException("존재하지 않는 회원입니다.");}
+        if (redisTemplate.opsForValue().get(memberId) == null) {
+            throw new NoSuchElementException("로그인되어 있지 않는 회원입니다.");
+        }
         return memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
     }
 
     public boolean checkId(String memberId){
         return !memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false).isPresent();
-
     }
 
     public boolean checkNickName(String nickName){
         return !memberRepository.findByMemberNicknameAndIsMemberDeleted(nickName, false).isPresent();
-
     }
 
+    public void logout(Member member){
+
+        if (redisTemplate.opsForValue().get(member.getMemberId()) != null) {
+            redisTemplate.delete(member.getMemberId()); //Token 삭제
+        }
+    }
+
+    public Optional<MemberUpdateRes> updateMember(String memberId, MemberUpdateReq request){
+        return Optional.ofNullable(memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false)
+                .filter(member -> encoder.matches(request.getMemberPw(), member.getMemberPw()))
+                .map(member -> {
+                    if(request.getNewPassword() != null && !request.getNewPassword().isBlank()){
+                        member.setMemberPw(encoder.encode(request.getNewPassword()));
+                    }
+                    member.setMemberNickname(request.getMemberNickname());
+                    member.setMemberMail(request.getMemberEmail());
+                    member.setMemberPhone(request.getMemberPhone());
+                    member.setMemberGender(request.getMemberGender());
+                    member.setMemberBirthYear(request.getMemberBirthYear());
+
+
+                    return MemberUpdateRes.toRes(memberRepository.save(member));
+                })
+                .orElseThrow(() -> new NoSuchElementException("비밀번호가 틀립니다")));
+    }
+
+    public void deleteMember(Member member){
+        member.setMemberDeleted(true);
+        member.setMemberWithdrawnDate(LocalDateTime.now());
+        memberRepository.save(member);
+    }
 
 
 
