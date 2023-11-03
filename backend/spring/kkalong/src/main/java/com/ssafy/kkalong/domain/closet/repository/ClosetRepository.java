@@ -11,5 +11,4 @@ public interface ClosetRepository extends JpaRepository<Closet, Integer> {
     List<Closet> findAllByMemberMemberSeq(int member);
 
     Optional<Closet> findByClosetSeqAndIsClosetDeleted(int closetSeq, boolean isDeleted);
-
 }

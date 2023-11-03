@@ -19,8 +19,8 @@ public class ClosetCreateRequest {
     @Schema(description = "옷장구성 섹션")
     private List<String> closetSectionNameList ;
 
-    @Schema(description = "옷장사진")
-    private MultipartFile closetPicture;
+    @Schema(description = "옷장사진이름")
+    private String closetImageName;
 
 
 }

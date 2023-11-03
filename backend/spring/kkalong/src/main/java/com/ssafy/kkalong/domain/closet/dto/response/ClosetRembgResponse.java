@@ -13,6 +13,6 @@ public class ClosetRembgResponse {
     @Schema(description = "누끼제거후 옷장사진 이름")
     private String closetRembgName;
 
-    @Schema(description = "누끼제거후 옷장사진")
-    private MultipartFile closetNoBg;
+    @Schema(description = "누끼제거후 옷장사진링크")
+    private String closetNoBgUrl;
 }
