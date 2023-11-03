@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,7 +17,7 @@ public class PhotoRes {
     @Schema(description = "사진의 이름")
     private String photoImgName;
     @Schema(description = "사진의 등록일")
-    private String photoRegDate;
+    private LocalDateTime photoRegDate;
     @Schema(description = "사진의 URL")
     private String url;
 
