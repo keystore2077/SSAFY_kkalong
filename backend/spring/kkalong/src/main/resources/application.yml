@@ -26,6 +26,11 @@ spring:
     user:
       name: ${SECURITY_NAME}
       password: ${SECURITY_PASSWORD}
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 10MB
+      file-size-threshold: 0
 
 springdoc:
   packages-to-scan: com.ssafy.kkalong
@@ -55,3 +60,24 @@ jwt:
   refresh-expiration-hours: ${JWT_REFRESH_EXPIRATION_HOURS}
   issuer: ${JWT_ISSUER}
 
+cloud:
+  aws:
+    credentials:
+      instance-profile: false
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+
+aws:
+  s3:
+    bucket: kkalong
