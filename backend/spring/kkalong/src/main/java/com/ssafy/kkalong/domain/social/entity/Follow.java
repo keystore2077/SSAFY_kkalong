@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Setter
 @Table(name = "follow")
 public class Follow {
     @Schema(description = "팔로우, 팔로워의 회원 일련번호")

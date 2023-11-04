@@ -9,10 +9,7 @@ import com.ssafy.kkalong.domain.social.service.SocialService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/social")
@@ -52,5 +49,21 @@ public class SocialController {
 
         return Api.OK(socialService.getFollowList(member));
 
+    }
+
+    @Operation(summary = "팔로우 취소")
+    @PutMapping("/follow/{nickName}")
+    public Api<Object> deleteFollow( @PathVariable String nickName){
+        Member followingMember = memberService.getLoginUserInfo();//구독자
+        Member followerMember = memberService.checkNickName(nickName);//유튜버
+
+        if(followingMember==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST,"로그인된 회원 정보를 찾지 못했습니다.");
+        }
+        if (followerMember==null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST,String.format("해당 닉네임[%s]을/를 가진 회원을 찾지 못했습니다.", nickName));
+        }
+        socialService.deleteFollow(followingMember,followerMember);
+        return Api.OK("팔로우가 취소 되었습니다.");
     }
 }

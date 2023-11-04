@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface  FollowRepository extends JpaRepository <Follow, FollowKey> {
-    //Optional<Follow> findByFollowingMemberSeqAndFollowerMemberSeq(int followerId, int followeeId);
-    List<Follow> findAllByFollowingMemberMemberSeqAndIsFollowDeleted(int followeeId, boolean isDeleted);
-    List<Follow> findAllByFollowerMemberMemberSeqAndIsFollowDeleted(int followeeId, boolean isDeleted);
+    Optional<Follow> findByFollowingMemberMemberSeqAndFollowerMemberMemberSeqAndIsFollowDeleted(int followingId, int followerId, boolean isDeleted);
+    List<Follow> findAllByFollowingMemberMemberSeqAndIsFollowDeleted(int followingId, boolean isDeleted);
+    List<Follow> findAllByFollowerMemberMemberSeqAndIsFollowDeleted(int followerId, boolean isDeleted);
 
 }
