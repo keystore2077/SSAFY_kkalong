@@ -33,7 +33,7 @@ public class MemberController {
         if(!nickName.matches(nickNameRegex)){
             return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 않는 닉네임입니다. 영어와 한글, 숫자만 가능하고 최소 2자에서 10자이내로 작성해주세요", nickName));
         }
-        if(!memberService.checkNickName(nickName)){
+        if(memberService.checkNickName(nickName)!=null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 중복된 닉네임입니다.", nickName));
         }
 
@@ -43,7 +43,7 @@ public class MemberController {
         if(!memberId.matches(idRegex)){
             return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 않는 아이디입니다. 영어와, 숫자만 가능하고 최소 5자에서 20자 이내로 작성해주세요. 최소 1개의 영어가 포함되어야 합니다.", memberId));
         }
-        if(!memberService.checkId(memberId)){
+        if(memberService.checkId(memberId)!=null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 중복된 아이디입니다.", memberId));
         }
 
@@ -102,13 +102,14 @@ public class MemberController {
     @Operation(summary = "아이디 중복확인 : 중복이면 false")
     @GetMapping("/id/{memberId}")
     public Api<Object> checkId(@PathVariable String memberId){
-        return Api.OK(memberService.checkId(memberId));
+
+        return Api.OK(memberService.checkId(memberId)==null);
     }
 
     @Operation(summary = "닉네임 중복확인 : 중복이면 false")
     @GetMapping("/nickname/{nickName}")
     public Api<Object> checkNickName(@PathVariable String nickName){
-        return Api.OK(memberService.checkNickName(nickName));
+        return Api.OK(memberService.checkNickName(nickName)==null);
     }
 
 //    @GetMapping("/verifyToken")
@@ -143,7 +144,7 @@ public class MemberController {
         if(!nickName.matches(nickNameRegex)){
             return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 않는 닉네임입니다. 영어와 한글, 숫자만 가능하고 최소 2자에서 10자이내로 작성해주세요", nickName));
         }
-        if(!nickName.equals(member.getMemberNickname())&&!memberService.checkNickName(nickName)){
+        if(!nickName.equals(member.getMemberNickname())&&memberService.checkNickName(nickName)!=null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 중복된 닉네임입니다.", nickName));
         }
 

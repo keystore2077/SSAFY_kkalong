@@ -34,7 +34,7 @@ public class SignUpRes {
 
 
     public static SignUpRes toRes (Member member) {
-        SignUpRes resutl = SignUpRes.builder()
+        return SignUpRes.builder()
                 .memberSeq(member.getMemberSeq())
                 .memberNickname(member.getMemberNickname())
                 .memberId(member.getMemberId())
@@ -45,6 +45,5 @@ public class SignUpRes {
                 .memberRegDate(member.getMemberRegDate())
                 .isMemberDeleted(member.isMemberDeleted())
                 .build();
-        return resutl;
     }
 }
