@@ -75,12 +75,12 @@ public class MemberService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
     }
 
-    public boolean checkId(String memberId){
-        return !memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false).isPresent();
+    public Member checkId(String memberId){
+        return memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false).orElse(null);
     }
 
-    public boolean checkNickName(String nickName){
-        return !memberRepository.findByMemberNicknameAndIsMemberDeleted(nickName, false).isPresent();
+    public Member checkNickName(String nickName){
+        return memberRepository.findByMemberNicknameAndIsMemberDeleted(nickName, false).orElse(null);
     }
 
     public void logout(Member member){
