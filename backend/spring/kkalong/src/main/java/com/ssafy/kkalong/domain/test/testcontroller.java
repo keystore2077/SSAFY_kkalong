@@ -3,8 +3,11 @@ package com.ssafy.kkalong.domain.test;
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
+import com.ssafy.kkalong.fastapi.FastApiService;
+import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,9 @@ import java.io.IOException;
 public class testcontroller {
     @Autowired
     private S3Service s3Service;
+
+    @Autowired
+    private FastApiService fastApiService;
 
     @Operation(summary = "test")
     @GetMapping("/test1")
@@ -77,5 +83,27 @@ public class testcontroller {
             e.printStackTrace();
             return Api.ERROR((ErrorCode.BAD_REQUEST), "파일을 찾을 수 없습니다");
         }
+    }
+
+    @PostMapping("/s3/fast/rembg")
+    public Api<Object> testServer6(@RequestBody MultipartFile mFile){
+        // 1. 파일을 받는다.
+        // 2. 해당 파일을 FastApiService에게 보낸다.
+        Api<Object> res = fastApiService.requestRembg("사용자아이디", mFile);
+
+        // 3. 응답을 받은걸 변환한다.
+        RequestRembgRes remRes = (RequestRembgRes) res.getBody();
+
+        // 4. S3에 저장한다.
+        s3Service.uploadFile(remRes.getYesBgName() + ".jpg", remRes.getYesBg());
+        s3Service.uploadFile(remRes.getNoBgName() + ".png", remRes.getNoBg());
+
+        // 5. URL을 생성하여 반환한다.
+        String noBg = s3Service.generatePresignedUrl(remRes.getYesBgName() + ".jpg");
+        String yesBg = s3Service.generatePresignedUrl(remRes.getNoBgName() + ".png");
+        System.out.println(noBg);
+        System.out.println(yesBg);
+
+        return Api.OK(TempResDto.builder().yesBg(yesBg).noBg(noBg).build());
     }
 }
