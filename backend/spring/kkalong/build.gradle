@@ -50,6 +50,7 @@ dependencies {
 	implementation group: 'org.json', name: 'json', version: '20160810'
 	//https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+	implementation 'commons-io:commons-io:2.15.0'
 }
 
 tasks.named('test') {
