@@ -122,15 +122,68 @@ public class SocialController {
         return Api.OK("잠금설정이 변경되었습니다.");
     }
 
-    @Operation(summary = "내가 저장한 코디 사진 목록 조회")
-    @PutMapping("/list/fashion")
-    public Api<Object> getMyListFashion( ){
-        Member member = memberService.getLoginUserInfo();
-        if (member == null) {
+    @Operation(summary = "저장한 코디 사진 목록 조회")
+    @GetMapping("/list/fashion/{nickName}")
+    public Api<Object> getListFashion(@PathVariable String nickName){
+        Member loginMember = memberService.getLoginUserInfo();
+        if (loginMember == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
         }
 
-        return Api.OK(socialService.getListFashion(member.getMemberSeq()));
+        Member member = memberService.checkNickName(nickName);
+        if (member==null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST,String.format("해당 닉네임[%s]을/를 가진 회원을 찾지 못했습니다.", nickName));
+        }
+        if(loginMember.getMemberNickname().equals(nickName)){
+            return Api.OK(socialService.getMyListFashion(member.getMemberSeq()));
+        }
+        else{
+            return Api.OK(socialService.getListFashion(member.getMemberSeq()));
+        }
+
+
+
     }
+
+    @Operation(summary = "옷 사진 목록 조회")
+    @GetMapping("/list/cloth/{nickName}")
+    public Api<Object> getListCloth( @PathVariable String nickName){
+        Member loginMember = memberService.getLoginUserInfo();
+        if (loginMember == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+        Member member = memberService.checkNickName(nickName);
+        if (member==null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST,String.format("해당 닉네임[%s]을/를 가진 회원을 찾지 못했습니다.", nickName));
+        }
+
+        if(loginMember.getMemberNickname().equals(nickName)){
+            return Api.OK(socialService.getMyListCloth(member.getMemberSeq()));
+        }
+        else{
+            return Api.OK(socialService.getListCloth(member.getMemberSeq()));
+        }
+    }
+
+    @Operation(summary = "사용자 프로필 조회")
+    @GetMapping("/{nickName}")
+    public Api<Object> getProfile( @PathVariable String nickName){
+        Member loginMember = memberService.getLoginUserInfo();
+        if (loginMember == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+        Member member = memberService.checkNickName(nickName);
+        if (member==null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST,String.format("해당 닉네임[%s]을/를 가진 회원을 찾지 못했습니다.", nickName));
+        }
+
+        if(loginMember.getMemberNickname().equals(nickName)){
+            return Api.OK(socialService.getMyProfile(member));
+        }
+        else{
+            return Api.OK(socialService.getListProfile(member));
+        }
+    }
+
 
 }
