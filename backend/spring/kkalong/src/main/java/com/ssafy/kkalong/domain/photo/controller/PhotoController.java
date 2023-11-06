@@ -16,6 +16,7 @@ import com.ssafy.kkalong.fastapi.FastApiService;
 import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.util.StringUtils;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.util.*;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/photo")
 public class PhotoController {
     @Autowired
@@ -56,8 +58,8 @@ public class PhotoController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "파일을 보내주십시오");
         }
         // 확장자 유효성 검사
-        String extension = photoReq.getContentType();;
-        if (extension != null && !extension.equals("jpg") && !extension.equals("png")){
+        String extension = photoReq.getContentType();
+        if (extension != null && !extension.equals("image/jpeg") && !extension.equals("image/jpg")){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "유효한 확장자가 아닙니다");
         }
 
