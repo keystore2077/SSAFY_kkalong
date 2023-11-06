@@ -42,7 +42,7 @@ public class ClosetService {
     public Closet createCloset(ClosetCreateRequest request, Member member) {
         Closet newCloset = new Closet();
         newCloset.setClosetName(request.getClosetName());
-        newCloset.setClosetImgName(request.getClosetImageName());
+//        newCloset.setClosetImgName(request.getClosetImageName());
         newCloset.setMember(member);
 
         // DB에 저장하고, 저장된 엔티티 반환
@@ -66,10 +66,10 @@ public class ClosetService {
         return sectionRepository.saveAll(sectionsToSave);
     }
     //db에 저장할 정보들 저장할라고 하는거임
-    public Closet testcloset(ClosetCreateRequest request, Member member) {
+    public Closet testcloset(ClosetCreateRequest request, Member member, String closetImageName) {
         Closet newCloset = new Closet();
         newCloset.setClosetName(request.getClosetName());
-        newCloset.setClosetImgName(request.getClosetImageName());
+        newCloset.setClosetImgName(closetImageName);
         newCloset.setMember(member);
         newCloset.setClosetRegData(LocalDateTime.now());
 

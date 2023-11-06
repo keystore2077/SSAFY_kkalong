@@ -6,10 +6,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 
 
 //dto request
@@ -24,15 +24,18 @@ public class ClosetCreateRequest {
     @Schema(description = "옷장구성 섹션")
     private List<SectionCreateRequestItem> closetSectionList ;
 
-    @Schema(description = "옷장사진이름")
-    private String closetImageName;
+//    @Schema(description = "옷장사진이름")
+//    private String closetImageName;
+
+    @Schema(description = "옷장사진 파일")
+    private MultipartFile closetImageFile;
 
     //2번 dto를 entity로 변환시키기(엔티티에서 필요한 데이터를 가공하기)
-    public Closet toEntity(Member member, ClosetCreateRequest closetCreateRequest) {
+    public Closet toEntity(Member member, ClosetCreateRequest closetCreateRequest, String closetImgName) {
         Closet closet = new Closet();
         closet.setMember(member);
         closet.setClosetName(closetCreateRequest.getClosetName());
-        closet.setClosetImgName(closetCreateRequest.getClosetImageName());
+        closet.setClosetImgName(closetImgName);
         closet.setClosetRegData(LocalDateTime.now());
         closet.setClosetDeleted(false);
         return closet;

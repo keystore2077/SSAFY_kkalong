@@ -137,7 +137,7 @@ public class ClosetController {
     //1번
     @PostMapping("/test")
     @Operation(summary = "옷장등록 연습")
-    public Api<Object> createClosetPrac(@RequestBody ClosetCreateRequest closetCreateRequest){
+    public Api<Object> createClosetPrac(ClosetCreateRequest closetCreateRequest){
         Member member = memberService.getLoginUserInfo(); //멤버를 반환해주는거(서비스에서 작성된것)
         if (member == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
@@ -146,12 +146,20 @@ public class ClosetController {
         System.out.println(closetCreateRequest.toString());
         //1번 dto를 entity로 변환하기(toEntitiy라는 것을 통해서 )
         // ((reponse변환해서 보내줘야함))
-         Closet closet = closetCreateRequest.toEntity(member,closetCreateRequest);  //dto인 closetCreatRequest에서 toEntitiy라는 메소드를 만들어줘야함
+        String closetImgName = FileNameGenerator.generateFileName("closet",member.getMemberId(),"jpg");
+         Closet closet = closetCreateRequest.toEntity(member,closetCreateRequest,closetImgName);  //dto인 closetCreatRequest에서 toEntitiy라는 메소드를 만들어줘야함
         //2.db저장을 위해 repository에게 entity를 db에 저장하게함 (옷장사진이름,섹션구조)
 
-        closetService.testcloset(closetCreateRequest,member);
-        Closet closetResult = closetService.testcloset(closetCreateRequest,member);
+        try {
+            s3Service.uploadFile("closet/" + closetImgName,closetCreateRequest.getClosetImageFile());
+        } catch (IOException e) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
+        }
+
+//        closetService.testcloset(closetCreateRequest,member,closetImgName);
+        Closet closetResult = closetService.testcloset(closetCreateRequest,member,closetImgName);
         String imgUrl = s3Service.generatePresignedUrl("closet/" + closetResult.getClosetImgName());
+        System.out.println("closet/" + closetResult.getClosetImgName());
         ClosetSaveResponse closetsaveresponse = new ClosetSaveResponse();
         closetsaveresponse.setClosetSeq(closetResult.getClosetSeq());
         closetsaveresponse.setClosetName(closetResult.getClosetName());
@@ -203,6 +211,7 @@ public class ClosetController {
         // 5. S3서비스한테 있는 generatePresignedUrl 이 메서드한테 앞에서 생성한 파일이름 그거를 달라고 요청을하기
 //            String downloadUrl = s3Service.generatePresignedUrl("경로와 파일 이름과 확장자명까지 함꼐 보내주세요");
         // 아래 경로는 임시입니다
+
         String downloadUrl = s3Service.generatePresignedUrl("photo/original/photo_tester_231103_145931_789464.jpg");
 
         // 6. 그걸 프론트에 보내기

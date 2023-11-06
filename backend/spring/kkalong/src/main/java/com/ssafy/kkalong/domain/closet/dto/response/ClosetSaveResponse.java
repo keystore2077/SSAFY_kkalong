@@ -27,4 +27,5 @@ public class ClosetSaveResponse
 
     @Schema(description = "소유주 이름")
     private String membernickname;
+
 }
