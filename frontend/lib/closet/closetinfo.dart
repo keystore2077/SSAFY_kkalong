@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(
@@ -18,34 +20,56 @@ class ClosetInfo extends StatefulWidget {
 
 class _MyAppState extends State<ClosetInfo> {
   final TextEditingController inputController = TextEditingController();
-  List<Widget> hangarList = [];
+  final List<String> sections = ['행거', '수납장', '선반', '박스'];
+  List<Widget> hangars = [];
   List<Widget> drawers = [];
   List<Widget> shelves = [];
   List<Widget> boxes = [];
 
+  getData() async {
+    var result = await http.get(Uri.parse('https://codingapple1.github.io/app/data.json'));
+    print(result.body);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
   void _addHangar() {
     setState(() {
-      int index = hangarList.length + 1;
-      hangarList.add(
-        Container(
-          margin: EdgeInsets.all(8.0),
-          padding: EdgeInsets.all(8.0),
-          width: 70,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Color(0xFFF5BEB5),
-              width: 1.5,
+      int index = hangars.length + 1;
+      hangars.add(
+        GestureDetector(
+          onTap: _removeHangar,
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Color(0xFFF5BEB5),
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(30.0),
             ),
-            borderRadius: BorderRadius.circular(30.0),
+            child: Center(child: Text(
+              '행거$index X',
+              style: TextStyle(
+                color: Color(0xFFF5BEB5),
+              ),
+            )),
           ),
-          child: Center(child: Text(
-              '행거$index',
-            style: TextStyle(
-              color: Color(0xFFF5BEB5),
-            ),
-          )),
         ),
       );
+    });
+  }
+
+  void _removeHangar() {
+    setState(() {
+      if (hangars.isNotEmpty) {
+        hangars.removeLast();
+      }
     });
   }
 
@@ -53,25 +77,35 @@ class _MyAppState extends State<ClosetInfo> {
     setState(() {
       int index = drawers.length + 1;
       drawers.add(
-        Container(
-          margin: EdgeInsets.all(8.0),
-          padding: EdgeInsets.all(8.0),
-          width: 70,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Color(0xFFF5BEB5),
-              width: 1.5,
+        GestureDetector(
+          onTap: _removeDrawer,
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Color(0xFFF5BEB5),
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(30.0),
             ),
-            borderRadius: BorderRadius.circular(30.0),
+            child: Center(child: Text(
+              '수납장$index X',
+              style: TextStyle(
+                color: Color(0xFFF5BEB5),
+              ),
+            )),
           ),
-          child: Center(child: Text(
-            '수납장$index',
-            style: TextStyle(
-              color: Color(0xFFF5BEB5),
-            ),
-          )),
         ),
       );
+    });
+  }
+
+  void _removeDrawer() {
+    setState(() {
+      if (drawers.isNotEmpty) {
+        drawers.removeLast();
+      }
     });
   }
 
@@ -79,25 +113,35 @@ class _MyAppState extends State<ClosetInfo> {
     setState(() {
       int index = shelves.length + 1;
       shelves.add(
-        Container(
-          margin: EdgeInsets.all(8.0),
-          padding: EdgeInsets.all(8.0),
-          width: 70,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Color(0xFFF5BEB5),
-              width: 1.5,
+        GestureDetector(
+          onTap: _removeShelf,
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Color(0xFFF5BEB5),
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(30.0),
             ),
-            borderRadius: BorderRadius.circular(30.0),
+            child: Center(child: Text(
+              '선반$index X',
+              style: TextStyle(
+                color: Color(0xFFF5BEB5),
+              ),
+            )),
           ),
-          child: Center(child: Text(
-            '선반$index',
-            style: TextStyle(
-              color: Color(0xFFF5BEB5),
-            ),
-          )),
         ),
       );
+    });
+  }
+
+  void _removeShelf() {
+    setState(() {
+      if (shelves.isNotEmpty) {
+        shelves.removeLast();
+      }
     });
   }
 
@@ -105,26 +149,97 @@ class _MyAppState extends State<ClosetInfo> {
     setState(() {
       int index = boxes.length + 1;
       boxes.add(
-        Container(
-          margin: EdgeInsets.all(8.0),
-          padding: EdgeInsets.all(8.0),
-          width: 70,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Color(0xFFF5BEB5),
-              width: 1.5,
+        GestureDetector(
+          onTap: _removeBox,
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Color(0xFFF5BEB5),
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(30.0),
             ),
-            borderRadius: BorderRadius.circular(30.0),
+            child: Center(child: Text(
+              '박스$index X',
+              style: TextStyle(
+                color: Color(0xFFF5BEB5),
+              ),
+            )),
           ),
-          child: Center(child: Text(
-            '박스$index',
-            style: TextStyle(
-              color: Color(0xFFF5BEB5),
-            ),
-          )),
         ),
       );
     });
+  }
+
+  void _removeBox() {
+    setState(() {
+      if (boxes.isNotEmpty) {
+        boxes.removeLast();
+      }
+    });
+  }
+
+  List<Widget> _getListForSection(String section) {
+    switch (section) {
+      case '행거':
+        return hangars;
+      case '수납장':
+        return drawers;
+      case '선반':
+        return shelves;
+      case '박스':
+        return boxes;
+      default:
+        return [];
+    }
+  }
+
+  Widget _buildSection(String section) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              // 해당 섹션의 추가 메소드를 호출
+              switch (section) {
+                case '행거':
+                  _addHangar();
+                  break;
+                case '수납장':
+                  _addDrawer();
+                  break;
+                case '선반':
+                  _addShelf();
+                  break;
+                case '박스':
+                  _addBox();
+                  break;
+                default:
+                  break;
+              }
+            },
+            child: Text('$section+'),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _getListForSection(section),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -173,116 +288,7 @@ class _MyAppState extends State<ClosetInfo> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          width: 0.5,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: _addHangar,
-                          child: Text('행거+'),
-                        ),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                ...hangarList,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          width: 0.5,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: _addDrawer,
-                          child: Text('수납장+'),
-                        ),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                ...drawers,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          width: 0.5,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: _addShelf,
-                          child: Text('선반+'),
-                        ),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                ...shelves,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          width: 0.5,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: _addBox,
-                          child: Text('박스+'),
-                        ),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                ...boxes,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                children: sections.map((section) => _buildSection(section)).toList(),
               ),
               SizedBox(
                 height: 60,
