@@ -11,11 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 //컨트롤러 비지니스 로직
-
+//closetservice
 @RequiredArgsConstructor
 @Service
 public class ClosetService {
@@ -45,6 +46,7 @@ public class ClosetService {
         newCloset.setMember(member);
 
         // DB에 저장하고, 저장된 엔티티 반환
+        // dto를 저장
         return closetRepository.save(newCloset);
     }
 
@@ -63,6 +65,17 @@ public class ClosetService {
         }
         return sectionRepository.saveAll(sectionsToSave);
     }
+    //db에 저장할 정보들 저장할라고 하는거임
+    public Closet testcloset(ClosetCreateRequest request, Member member) {
+        Closet newCloset = new Closet();
+        newCloset.setClosetName(request.getClosetName());
+        newCloset.setClosetImgName(request.getClosetImageName());
+        newCloset.setMember(member);
+        newCloset.setClosetRegData(LocalDateTime.now());
+
+        return closetRepository.save(newCloset);
+    }
+
 }
 
 

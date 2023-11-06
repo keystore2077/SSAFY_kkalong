@@ -7,9 +7,11 @@ import com.ssafy.kkalong.domain.closet.dto.request.ClosetCreateRequest;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetRequest;
 import com.ssafy.kkalong.domain.closet.dto.response.ClosetRembgResponse;
 import com.ssafy.kkalong.domain.closet.dto.response.ClosetResponse;
+import com.ssafy.kkalong.domain.closet.dto.response.ClosetSaveResponse;
 import com.ssafy.kkalong.domain.closet.dto.response.SectionResponse;
 import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.entity.Section;
+import com.ssafy.kkalong.domain.closet.repository.ClosetRepository;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
@@ -35,6 +37,10 @@ public class ClosetController {
     private MemberService memberService;
     @Autowired
     private S3Service s3Service;
+    @Autowired
+    private ClosetRepository closetRepository;
+
+
 
     //옷장 상세정보 및 소속구역 리스트 보기
     @GetMapping("/{closetSeq}")
@@ -113,6 +119,11 @@ public class ClosetController {
         Closet newCloset = closetService.createCloset(closetCreateRequest, member); //closetSeq 를 저장 할라고
         closetService.createSection(closetCreateRequest.getClosetSectionList(), newCloset);
 
+
+        // 1.dto 변환 entity
+
+        // 2. repository에게 entity를 db안에 저장하게 하기
+
         return Api.OK("이건 서비스에서 return된 값");
     }
 
@@ -122,6 +133,37 @@ public class ClosetController {
     //db에 옷장저장, 그옷장에 해당 섹션저장
     //api ok반환
 
+    //옷장생성 연습
+    //1번
+    @PostMapping("/test")
+    @Operation(summary = "옷장등록 연습")
+    public Api<Object> createClosetPrac(@RequestBody ClosetCreateRequest closetCreateRequest){
+        Member member = memberService.getLoginUserInfo(); //멤버를 반환해주는거(서비스에서 작성된것)
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
+        }
+
+        System.out.println(closetCreateRequest.toString());
+        //1번 dto를 entity로 변환하기(toEntitiy라는 것을 통해서 )
+        // ((reponse변환해서 보내줘야함))
+         Closet closet = closetCreateRequest.toEntity(member,closetCreateRequest);  //dto인 closetCreatRequest에서 toEntitiy라는 메소드를 만들어줘야함
+        //2.db저장을 위해 repository에게 entity를 db에 저장하게함 (옷장사진이름,섹션구조)
+
+        closetService.testcloset(closetCreateRequest,member);
+        Closet closetResult = closetService.testcloset(closetCreateRequest,member);
+        String imgUrl = s3Service.generatePresignedUrl("closet/" + closetResult.getClosetImgName());
+        ClosetSaveResponse closetsaveresponse = new ClosetSaveResponse();
+        closetsaveresponse.setClosetSeq(closetResult.getClosetSeq());
+        closetsaveresponse.setClosetName(closetResult.getClosetName());
+        closetsaveresponse.setClosetPictureUrl(imgUrl);
+//        closetsaveresponse.setClosetSectionList(closetResult.get);
+        closetsaveresponse.setClosetRegData(closetResult.getClosetRegData());
+        closetsaveresponse.setMembernickname(closetResult.getMember().getMemberNickname());
+
+        return Api.OK(closetsaveresponse);
+    }
+
+
 
 
 
@@ -129,13 +171,19 @@ public class ClosetController {
     @Operation(summary = "옷장 등록전 사진 배경제거")
     public Api<Object> postRembgReq(@RequestBody MultipartFile file) {
         //1.사진 유효성검사 (null,jpg,png)
+
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
+        }
+
         if (file.isEmpty() || (!file.getContentType().equalsIgnoreCase("image/jpg") &&
                 !file.getContentType().equalsIgnoreCase("image/png"))) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "Invalid file type or empty file.");
         }
-        // 2.gpu에 사진 변환 요청(누끼변환 요청)
+        // 2.gpu에 사진 변환 요청(누끼변환 요청) 누끼변환요청 자체는 없음
         
-        // 여기서붙터
+        // 3. 여기서붙터
         File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
         // 임시 파일을 삭제하도록 설정합니다. 프로그램 종료 시 삭제됩니다.
         convFile.deleteOnExit();
@@ -147,10 +195,7 @@ public class ClosetController {
         }
         //여기까지는 임시코드. FastApiService 기능 완성하면 바꿀것
 
-        Member member = memberService.getLoginUserInfo();
-        if (member == null) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
-        }
+
         //파일 이름 생성 로직을 호출
         String transformedImageName = FileNameGenerator.generateFileName("closet/original/", member.getMemberId(), "jpg");
 
