@@ -3,7 +3,7 @@ import base64
 
 from fastapi import FastAPI
 from CIHP import inference_pgn as cihp
-# from U2Net.u2net_test import main as u2test
+from U2Net.u2net_test import main as u2test
 from RemBg.rb import remove_yes_bg, remove_no_bg
 import os
 import tempfile
@@ -57,32 +57,32 @@ def run_cihp(file: dict):
         os.remove(r"./CIHP/output/cihp_parsing_maps/" + file_name + ".png")
 
 
-# @app.post("/u2net")
-# def run_u2net(file: dict):
-#     print("run_u2net called")
-#     # 1. 바이트 코드를 임시 저장한다.
-#     temp_file_path = ".\\U2Net\\test_data\\test_images\\"
-#     file_name = "temp"
-#     with tempfile.NamedTemporaryFile(suffix=".png", delete=False, dir=temp_file_path) as temp_file:
-#         temp_file.write(base64.b64decode(file["file"]))
-#         temp_file_path = temp_file.name
-#
-#     # 2. 해당 파일에 대해 u2net을 돌린다.
-#     u2test()
-#
-#     # 3. Json으로 변환하여 반환한다.
-#     try:
-#         u2net = ""
-#         temp_path = ".\\U2Net\\test_data\\u2net_results\\" + file_name + ".jpg"
-#         if os.path.exists(temp_path):
-#             with open(temp_path, "rb") as file:
-#                 yes_bg = base64.b64encode(file.read()).decode('utf-8')
-#         no_bg = ""
-#         return json.dumps({"result": "성공", "u2net": u2net})
-#     finally:
-#         # 4. 파일을 삭제한다.
-#         os.remove(temp_file_path)
-#         os.remove(r".\\U2Net\\test_data\\u2net_results\\" + file_name + ".jpg")
+@app.post("/u2net")
+def run_u2net(file: dict):
+    print("run_u2net called")
+    # 1. 바이트 코드를 임시 저장한다.
+    temp_file_path = ".\\U2Net\\test_data\\test_images\\"
+    file_name = "temp"
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False, dir=temp_file_path) as temp_file:
+        temp_file.write(base64.b64decode(file["file"]))
+        temp_file_path = temp_file.name
+
+    # 2. 해당 파일에 대해 u2net을 돌린다.
+    u2test()
+
+    # 3. Json으로 변환하여 반환한다.
+    try:
+        u2net = ""
+        temp_path = ".\\U2Net\\test_data\\u2net_results\\" + file_name + ".jpg"
+        if os.path.exists(temp_path):
+            with open(temp_path, "rb") as file:
+                yes_bg = base64.b64encode(file.read()).decode('utf-8')
+        no_bg = ""
+        return json.dumps({"result": "성공", "u2net": u2net})
+    finally:
+        # 4. 파일을 삭제한다.
+        os.remove(temp_file_path)
+        os.remove(r".\\U2Net\\test_data\\u2net_results\\" + file_name + ".jpg")
 
 
 @app.post("/rembg")
