@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ public class ClosetCreateRequest {
     private String closetName ;
 
     @Schema(description = "옷장구성 섹션")
-    private List<String> closetSectionNameList ;
+    private List<SectionCreateRequestItem> closetSectionList ;
 
     @Schema(description = "옷장사진이름")
     private String closetImageName;

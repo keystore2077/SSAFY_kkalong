@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -111,7 +110,8 @@ public class ClosetController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
         }
         int memberSeq = member.getMemberSeq();  //멤버의 일련번호 받아오는 과정
-        closetService.createCloset(closetCreateRequest, member);
+        Closet newCloset = closetService.createCloset(closetCreateRequest, member); //closetSeq 를 저장 할라고
+        closetService.createSection(closetCreateRequest.getClosetSectionList(), newCloset);
 
         return Api.OK("이건 서비스에서 return된 값");
     }
@@ -122,25 +122,12 @@ public class ClosetController {
     //db에 옷장저장, 그옷장에 해당 섹션저장
     //api ok반환
 
-    // 옷장 삭제
-    @PutMapping("/{closetSeq}")
-    @Operation(summary = "옷장 삭제")
-    public Api<Object> deleteCloset(@PathVariable int closetSeq) {
-        return Api.OK("옷장 삭제");
 
-    }
-
-    // 옷장 정보 수정
-    @PutMapping("")
-    @Operation(summary = "옷장 정보 수정")
-    public Api<Object> putCloset(@RequestBody ClosetRequest closetRename) {
-        return Api.OK("옷장 정보 수정");
-    }
 
 
     @PostMapping("/rembg_req")
     @Operation(summary = "옷장 등록전 사진 배경제거")
-    public Api<Object> postRembgReq(@RequestParam("file") MultipartFile file) {
+    public Api<Object> postRembgReq(@RequestBody MultipartFile file) {
         //1.사진 유효성검사 (null,jpg,png)
         if (file.isEmpty() || (!file.getContentType().equalsIgnoreCase("image/jpg") &&
                 !file.getContentType().equalsIgnoreCase("image/png"))) {
@@ -176,6 +163,21 @@ public class ClosetController {
         // 6. 그걸 프론트에 보내기
         return Api.OK(new ClosetRembgResponse(transformedImageName,downloadUrl));
 
+    }
+
+    // 옷장 삭제
+    @PutMapping("/{closetSeq}")
+    @Operation(summary = "옷장 삭제")
+    public Api<Object> deleteCloset(@PathVariable int closetSeq) {
+        return Api.OK("옷장 삭제");
+
+    }
+
+    // 옷장 정보 수정
+    @PutMapping("")
+    @Operation(summary = "옷장 정보 수정")
+    public Api<Object> putCloset(@RequestBody ClosetRequest closetRename) {
+        return Api.OK("옷장 정보 수정");
     }
 
 }
