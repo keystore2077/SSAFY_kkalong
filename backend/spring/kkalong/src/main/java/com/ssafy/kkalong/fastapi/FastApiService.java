@@ -20,6 +20,10 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 
+// 테스트용 import. GPU 서버와 연동 성공 후 삭제해야함
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 @Service
 public class FastApiService {
     private String url = "http://222.107.238.44:4050";
@@ -36,8 +40,20 @@ public class FastApiService {
     }
 
     public Api<Object> callWelcome() {
+        System.out.println("callWelcome called.....");
+
+        try {
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            String ipv4 = inetAddress.getHostAddress();
+            System.out.println("IPv4 Address: " + ipv4);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            System.out.println("Unable to retrieve IPv4 address");
+        }
+
         String apiUrl = url;
         String response = restTemplate.getForObject(apiUrl, String.class); // GET 요청 보내기
+        System.out.println("response: " + response);
         return Api.OK(response);
     }
 
