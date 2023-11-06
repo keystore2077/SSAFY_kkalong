@@ -407,7 +407,7 @@ class _AvataPictureState extends State<AvataPicture> {
           if (isInitialized) {
             final image = await _controller.takePicture();
             setState(() {
-              capturedImage = File(image.path); // Set captured image path
+              capturedImage = File(image.path);
             });
           }
         },
@@ -438,12 +438,12 @@ class _AvataPictureState extends State<AvataPicture> {
               capturedImage = null;
             });
 
-            if (isInitialized) {
-              final image = await _controller.takePicture();
-              setState(() {
-                capturedImage = File(image.path);
-              });
-            }
+            // if (isInitialized) {
+            //   final image = await _controller.takePicture();
+            //   setState(() {
+            //     capturedImage = File(image.path);
+            //   });
+            // }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFF5BEB5),

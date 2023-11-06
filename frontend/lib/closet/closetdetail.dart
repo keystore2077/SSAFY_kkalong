@@ -218,6 +218,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_mycloset/user/mypage.dart';
 import 'package:flutter_mycloset/user/nampage.dart';
 import '../closet/closetcloth.dart';
+import './clothcamera.dart';
 
 class ClosetDetail extends StatefulWidget {
   const ClosetDetail({super.key, this.category});
@@ -314,18 +315,24 @@ class _ClosetDetailState extends State<ClosetDetail> {
         // )
 
         floatingActionButton: ElevatedButton(
-          onPressed: () async {
-            final ImagePicker picker = ImagePicker();
-            final XFile? image =
-                await picker.pickImage(source: ImageSource.camera);
-
-            if (image != null) {
-              // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
-              // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
-            } else {
-              // 이미지가 선택되지 않았을 때 처리할 작업을 추가합니다.
-            }
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ClothCamera()),
+            );
           },
+          // onPressed: () async {
+          //   final ImagePicker picker = ImagePicker();
+          //   final XFile? image =
+          //       await picker.pickImage(source: ImageSource.camera);
+
+          //   if (image != null) {
+          //     // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
+          //     // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
+          //   } else {
+          //     // 이미지가 선택되지 않았을 때 처리할 작업을 추가합니다.
+          //   }
+          // },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey[50],
             shape: RoundedRectangleBorder(

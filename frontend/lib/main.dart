@@ -86,12 +86,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mycloset/avata/choicepicture.dart';
-import 'package:flutter_mycloset/user/mypage.dart';
 // import 'package:animated_splash_screen/animated_splash_screen.dart';
 import '../user/login.dart';
 // import '../user/mypage.dart';
 import './reafeat/bottom.dart';
-import './closet/mycloset.dart';
 import './closet/closetdetail.dart';
 import './category/category.dart';
 import 'package:camera/camera.dart';
