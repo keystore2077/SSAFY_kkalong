@@ -262,4 +262,3 @@ ALTER TABLE `chat_room` ADD CONSTRAINT `FK_member_TO_chat_room_2` FOREIGN KEY (
 REFERENCES `member` (
 	`member_seq`
 );
-
