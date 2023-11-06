@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class PhotoController {
     // 4. 성공을 반환한다.
     @PostMapping("")
     @Operation(summary = "AI용 원본 사진 저장")
-    public Api<Object> savePhotoOriginal(@RequestBody SavePhotoOriginalReq photoReq) {
+    public Api<Object> savePhotoOriginal(MultipartFile photoReq) {
         // 사용자 유효성 검사
         Member member = memberService.getLoginUserInfo();
         if (member == null){
@@ -51,11 +52,11 @@ public class PhotoController {
         }
 
         // 파일 유효성 검사
-        if (photoReq == null || photoReq.getFile() == null){
+        if (photoReq == null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "파일을 보내주십시오");
         }
         // 확장자 유효성 검사
-        String extension = photoReq.getFile().getContentType();;
+        String extension = photoReq.getContentType();;
         if (extension != null && !extension.equals("jpg") && !extension.equals("png")){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "유효한 확장자가 아닙니다");
         }
@@ -69,12 +70,12 @@ public class PhotoController {
 
         // S3서버에 사진을 저장
         try {
-            String res = s3Service.uploadFile(path + fileName, photoReq.getFile());
+            String res = s3Service.uploadFile(path + fileName, photoReq);
         } catch (IOException e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "업로드 실패");
         }
         //rembg 호출
-        Api<Object> rembgRes = fastApiService.requestRembg(member.getMemberId(), photoReq.getFile());
+        Api<Object> rembgRes = fastApiService.requestRembg(member.getMemberId(), photoReq);
         if (!Objects.equals(rembgRes.getResult().getResultCode(), Result.OK().getResultCode())){
             return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생했습니다.(Rembg)");
         }
@@ -89,7 +90,7 @@ public class PhotoController {
         }
 
         //cihp 호출
-        Api<Object> cihpRes = fastApiService.requestCihp(member.getMemberId(), photoReq.getFile());
+        Api<Object> cihpRes = fastApiService.requestCihp(member.getMemberId(), photoReq);
         if (!Objects.equals(cihpRes.getResult().getResultCode(), Result.OK().getResultCode())){
             return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생했습니다.(cihp)");
         }
@@ -206,7 +207,15 @@ public class PhotoController {
     // 4. viton이 완료 되면 성공을 반환한다.
     @PostMapping("/mix")
     @Operation(summary = "합성 요청")
-    public Api<Object> PhotoMixRequest(@RequestBody PhotoMixRequestReq req) {
+    public Api<Object> PhotoMixRequest(PhotoMixRequestReq req) {
+        // 사용자 유효성 검사
+        Member member = memberService.getLoginUserInfo();
+        if (member == null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않은 사용자 정보입니다");
+        }
+        // DB에서 전처리 여부 가져오기
+
+
         return Api.OK(new PhotoMixRequestRes());
     }
 }

@@ -26,11 +26,13 @@ import java.net.UnknownHostException;
 
 @Service
 public class FastApiService {
-    private String url = "http://222.107.238.44:4050";
-//    private String url = "http://localhost:4050";
+        private final String preprocessUrl = "http://222.107.238.44:4050";
+//    private final String url = "http://localhost:4050";
 
-        private String openposeUrl = "http://192.168.100.37:4051";
-//    private String openposeUrl = "http://localhost:4051";
+        private final String vitonHdUrl = "http://222.107.238.44:4051";
+
+        private final String openposeUrl = "http://192.168.100.37:4052";
+//    private final String openposeUrl = "http://localhost:4052";
 
     private final RestTemplate restTemplate;
 
@@ -51,14 +53,14 @@ public class FastApiService {
             System.out.println("Unable to retrieve IPv4 address");
         }
 
-        String apiUrl = url;
+        String apiUrl = preprocessUrl;
         String response = restTemplate.getForObject(apiUrl, String.class); // GET 요청 보내기
         System.out.println("response: " + response);
         return Api.OK(response);
     }
 
     public Api<Object> requestRembg(String memberId, MultipartFile mFile){
-        String apiUrl = url + "/rembg";  // GPU서버의 URL
+        String apiUrl = preprocessUrl + "/rembg";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -110,7 +112,7 @@ public class FastApiService {
     }
     
     public Api<Object> requestCihp(String memberId, MultipartFile mFile){
-        String apiUrl = url + "/cihp";  // GPU서버의 URL
+        String apiUrl = preprocessUrl + "/cihp";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -157,7 +159,7 @@ public class FastApiService {
 
     // 미완성
     public Api<Object> requestU2Net(String memberId, MultipartFile mFile){
-        String apiUrl = url + "/u2net";  // GPU서버의 URL
+        String apiUrl = preprocessUrl + "/u2net";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
