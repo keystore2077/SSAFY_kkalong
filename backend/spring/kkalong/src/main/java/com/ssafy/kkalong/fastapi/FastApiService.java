@@ -1,13 +1,13 @@
 package com.ssafy.kkalong.fastapi;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
+import com.ssafy.kkalong.domain.member.entity.Member;
+import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -18,17 +18,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class FastApiService {
 //    private String url = "http://222.107.238.44:4050";
     private String url = "http://localhost:4050";
 
+        private String openposeUrl = "http://192.168.100.37:4051";
+//    private String openposeUrl = "http://localhost:4051";
+
     private final RestTemplate restTemplate;
 
     @Autowired
     public FastApiService(RestTemplate restTemplate){
         this.restTemplate = restTemplate;
+    }
+
+    public Api<Object> callWelcome() {
+        String apiUrl = url;
+        String response = restTemplate.getForObject(apiUrl, String.class); // GET 요청 보내기
+        return Api.OK(response);
     }
 
     public Api<Object> requestRembg(String memberId, MultipartFile mFile){
@@ -72,7 +82,6 @@ public class FastApiService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("oh!!");
             return Api.OK(new RequestRembgRes(fileName, yesBgTempFile, fileName, noBgTempFile, "./"));
         } catch (JSONException  | IOException e) {
             // JSON 파싱 오류 처리
@@ -83,6 +92,117 @@ public class FastApiService {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "알 수 없는 오류");
         }
     }
+    
+    public Api<Object> requestCihp(String memberId, MultipartFile mFile){
+        String apiUrl = url + "/cihp";  // GPU서버의 URL
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String mFileBase64;
+        try {
+            mFileBase64 = Base64.getEncoder().encodeToString(mFile.getBytes());
+        } catch (IOException e) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않은 파일");
+        }
+
+        // ObjectMapper 초기화
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonStringReq = "{\"file\": \"" + mFileBase64 + "\"}";
+
+        // 변환 요청
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(apiUrl, new HttpEntity<>(jsonStringReq, headers), String.class);
+
+        // response에서 json 추출
+        try {
+            String jsonStr = responseEntity.getBody();
+            jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
+            jsonStr = unescapeJsonString(jsonStr);
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {});
+            byte[] cihp = Base64.getDecoder().decode((String)jsonMap.get("file"));
+            // 파일 임시 저장
+            String fileName = FileNameGenerator.generateFileNameNoExtension("temp", memberId);
+
+            File tempFile = File.createTempFile(fileName, ".jpg");
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(cihp);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return Api.OK(new FastApiRequestGeneralRes(fileName, tempFile, "./"));
+        } catch (JSONException  | IOException e) {
+            // JSON 파싱 오류 처리
+            e.printStackTrace();
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+        } catch (Exception e){
+            e.printStackTrace();
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "알 수 없는 오류");
+        }
+    }
+
+    // 미완성
+    public Api<Object> requestU2Net(String memberId, MultipartFile mFile){
+        String apiUrl = url + "/u2net";  // GPU서버의 URL
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String mFileBase64;
+        try {
+            mFileBase64 = Base64.getEncoder().encodeToString(mFile.getBytes());
+        } catch (IOException e) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않은 파일");
+        }
+
+        // ObjectMapper 초기화
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonStringReq = "{\"file\": \"" + mFileBase64 + "\"}";
+        // 변환 요청
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(apiUrl, new HttpEntity<>(jsonStringReq, headers), String.class);
+
+        // response에서 json 추출
+        try {
+            String jsonStr = responseEntity.getBody();
+            jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
+            jsonStr = unescapeJsonString(jsonStr);
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {});
+            byte[] u2net = Base64.getDecoder().decode((String)jsonMap.get("u2net"));
+            // 파일 임시 저장
+            String fileName = FileNameGenerator.generateFileNameNoExtension("temp", memberId);
+
+            File tempFile = File.createTempFile(fileName, ".jpg");
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(u2net);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return Api.OK(new FastApiRequestGeneralRes(fileName, tempFile, "./"));
+        } catch (JSONException  | IOException e) {
+            // JSON 파싱 오류 처리
+            e.printStackTrace();
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+        } catch (Exception e){
+            e.printStackTrace();
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "알 수 없는 오류");
+        }
+    }
+
+    public Api<Object> requestOpenpose(Member member, String photoImgName){
+        String apiUrl = openposeUrl + "/openpose";  // GPU서버의 URL
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String requestJson = "{\"member_id\":\"" + member.getMemberId() +
+                "\",\"photo_img_name\":\"" + photoImgName + "\"}";
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestJson, headers);
+
+        // RestTemplate을 사용하여 FastAPI 서버에 POST 요청 보내기
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, String.class).getBody();
+        if (!Objects.requireNonNull(response).equals("success")){
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "처리중 문제 발생");
+        }
+
+        return Api.OK("success");
+    }
+
 
     // 이스케이프된 문자열을 복원
     private String unescapeJsonString(String escapedString) {
@@ -108,44 +228,4 @@ public class FastApiService {
         }
         return unescapedString.toString();
     }
-
-//private static File getFile(String fileName, String response) throws IOException {
-//        JSONObject jsonObject = new JSONObject(response); // JSON 문자열을 JSONObject로 파싱
-//
-//        // "image_data" 값을 string 타입의 textData로 추출
-//        String textData = jsonObject.getString("image_data");
-//
-//        // textData를 바이트 배열로 변환
-//        byte[] content = textData.getBytes();
-//
-//        // 바이트 배열을 File로 변경
-//        File file = new File("temp/images/" + fileName);
-//        // 디렉토리가 존재하지 않으면 생성
-//        if (!file.getParentFile().exists()) {
-//            file.getParentFile().mkdirs();
-//        }
-//        try (FileOutputStream fos = new FileOutputStream(file)) {
-//            fos.write(content);
-//        }
-//        return file;
-//    }
-//
-//    private File convertBinaryIOToFile(String jsonStr, String key) throws IOException {
-//        ObjectMapper mapper = new ObjectMapper();
-//        JsonNode rootNode = mapper.readTree(jsonStr);
-//
-//        if (rootNode.has(key)) {
-//            String binaryData = rootNode.get(key).asText();
-//            byte[] fileData = binaryData.getBytes();
-//
-//            File outputFile = new File(key + ".bin"); // 파일 확장자에 따라 적절히 수정
-//
-//            try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-//                outputStream.write(fileData);
-//                return outputFile;
-//            }
-//        }
-//
-//        return null;
-//    }
 }
