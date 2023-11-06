@@ -8,6 +8,8 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 //DB랑 통신하는 곣
+// 옷장 entity
+//여기서 필요한 정보룰
 @Entity
 @Data
 @Table(name = "closet")
