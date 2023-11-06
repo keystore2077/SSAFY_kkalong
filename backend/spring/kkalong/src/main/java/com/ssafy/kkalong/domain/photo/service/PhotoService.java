@@ -1,51 +1,42 @@
 package com.ssafy.kkalong.domain.photo.service;
 
+import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.repository.PhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class PhotoService {
     @Autowired
     private PhotoRepository photoRepository;
 
-    public String getPhotoURL(){
-        return "접근용 url";
+    public List<Photo> getPhotoList(Member member){
+        return photoRepository.findAllByMemberMemberSeqAndIsPhotoDeleted(member, false);
     }
 
-    public boolean savePhotoOriginal(){
-        return true;
+    public Photo getPhotoBySeq(int photoSeq){
+        return photoRepository.findByPhotoSeqAndIsPhotoDeleted(photoSeq, false);
     }
 
-    public boolean callRembg(){
-        return true;
+    @Transactional
+    public boolean deletePhotoBySeq(Photo photo){
+        Optional<Object> foundPhoto = photoRepository.findByPhotoSeq(photo.getPhotoSeq());
+
+        if (Objects.requireNonNull(foundPhoto).isPresent()) {
+            // 엔티티의 상태를 변경
+            photo.setPhotoDeleted(true);
+            return true;
+        }
+        return false;
     }
 
-    public List<Photo> getPhotoList(){
-        return new ArrayList<Photo>();
-    }
-
-    public Photo getPhotoBySeq(){
-        return new Photo();
-    }
-
-    public boolean deletePhotoBySeq(){
-        return true;
-    }
-
-    public boolean callOpenpose(){
-        return true;
-    }
-
-    public boolean callCIHP(){
-        return true;
-    }
-
-    public String callVITON(){
-        return "반환용URL";
+    public Photo savePhoto(Photo photo) {
+        return photoRepository.save(photo);
     }
 }

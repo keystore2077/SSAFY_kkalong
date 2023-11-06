@@ -15,8 +15,7 @@ connection = pymysql.connect(
     host=config('MYSQL_HOST'),
     user=config('MYSQL_USER'),
     password=config('MYSQL_PASSWORD'),
-    database=config('MYSQL_DB'),
-    charset='utf-8'
+    database=config('MYSQL_DB')
 )
 
 # DB 커서 생성
@@ -44,7 +43,7 @@ def get_dummy():
     return "download succeed"
 
 ## Openpose를 돌려주는 API
-@app.get("/openpose")
+@app.post("/openpose")
 async def run_openpose(rb: orb):
     print("run_openpose called")
     print(rb)
@@ -56,8 +55,8 @@ async def run_openpose(rb: orb):
 
     # 2. 없다면 에러 보내고, 있다면 해당 파일을 다운 받는다.
     results = cursor.fetchall()
-    if (len(results) == 0):
-        return {"result": "실패", "stdout": "검색결과 없음"}
+    if len(results) == 0:
+        return "검색결과 없음"
     member_seq = results[0][1]
     s3.download_file(bucket_name, r"photo/" + rb.photo_img_name + ".png", r"./examples/" + rb.photo_img_name + ".png")
 
@@ -89,10 +88,10 @@ async def run_openpose(rb: orb):
         return "S3 엔드포인트에 연결할 수 없습니다. 리전을 확인하세요."
 
     # 5. DB에 작업이 되어 있음으로 업데이트 한다.
-    sql = ("update photo"
-           "set photo_img_openpose = 1, photo_json_openpose = 1"
-           "where photo_img_name = %s and member_seq = %s")
-    cursor.execute(sql, (rb.photo_img_name, member_seq))
+    # sql = ("update photo"
+    #        "set photo_img_openpose = 1, photo_json_openpose = 1"
+    #        "where photo_img_name = %s and member_seq = %s")
+    # cursor.execute(sql, (rb.photo_img_name, member_seq))
 
     # 6. 다운 받았던 파일과 결과 파일을 삭제한다.
     try:
@@ -100,9 +99,13 @@ async def run_openpose(rb: orb):
         os.remove(r"./output_images" + rb.photo_img_name + "_rendered.png")
         os.remove(r"./output_jsons" + rb.photo_img_name + "_keypoints.json")
     except FileNotFoundError:
-        print(f"파일이 존재하지 않습니다")
+        return f"파일이 존재하지 않습니다"
     except Exception as e:
-        print(f"파일 삭제 중 오류 발생: {e}")
+        return f"파일 삭제 중 오류 발생: {e}"
 
     # 7. 호출자에게 완료를 반환한다.
-    return {"result": "성공", "stdout": stdout}
+    return "success"
+
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=4051)

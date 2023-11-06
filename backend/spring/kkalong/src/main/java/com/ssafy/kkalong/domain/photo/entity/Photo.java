@@ -3,15 +3,11 @@ package com.ssafy.kkalong.domain.photo.entity;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@ToString
-@Getter
+@Data
 @Entity
 @NoArgsConstructor
 @Table(name = "photo")
@@ -54,4 +50,12 @@ public class Photo {
     @Column(name = "photo_reg_date")
     @Schema(description = "등록일")
     private LocalDateTime photoRegDate;
+
+    @Column(name = "is_photo_deleted")
+    @Schema(description = "삭제여부")
+    private boolean isPhotoDeleted;
+
+    @Column(name = "photo_del_date")
+    @Schema(description = "삭제일시")
+    private LocalDateTime PhotoDelDate;
 }

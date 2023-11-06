@@ -7,7 +7,6 @@ import com.ssafy.kkalong.fastapi.FastApiService;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +18,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/test")
-public class testcontroller {
+public class testController {
     @Autowired
     private S3Service s3Service;
 
@@ -28,20 +27,20 @@ public class testcontroller {
 
     @Operation(summary = "test")
     @GetMapping("/test1")
-    public Api<Object> testsever(){
+    public Api<Object> testserver(){
 
         return Api.OK("test 성공");
     }
 
     @Operation(summary = "test 용")
     @GetMapping("/test2")
-    public Api<Object> testsever2(){
+    public Api<Object> testserver2(){
 
         return Api.OK("test2 성공");
     }
 
     @PostMapping("/s3/test1")
-    public Api<Object> testsever3(@RequestBody MultipartFile mFile){
+    public Api<Object> testserver3(@RequestBody MultipartFile mFile){
         System.out.println("test1 called");
         String key = FileNameGenerator.generateFileName("photo/original/photo", "tester", "jpg");
         String res = null;
@@ -55,7 +54,7 @@ public class testcontroller {
     }
 
     @PostMapping("/s3/test2")
-    public Api<Object> testsever4(){
+    public Api<Object> testserver4(){
         System.out.println(("test2 called"));
         byte[] byteCode = null;
         try{
@@ -75,7 +74,7 @@ public class testcontroller {
     }
 
     @GetMapping("/s3/test3")
-    public Api<Object> testsever5(@RequestParam String key){
+    public Api<Object> testserver5(@RequestParam String key){
         System.out.println("test3 called");
         try{
             return Api.OK(s3Service.generatePresignedUrl(key));
@@ -105,5 +104,10 @@ public class testcontroller {
         System.out.println(yesBg);
 
         return Api.OK(TempResDto.builder().yesBg(yesBg).noBg(noBg).build());
+    }
+
+    @GetMapping("fast/welcome")
+    public Api<Object> testServer7(){
+        return fastApiService.callWelcome();
     }
 }
