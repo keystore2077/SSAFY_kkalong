@@ -22,8 +22,8 @@ import java.util.Objects;
 
 @Service
 public class FastApiService {
-//    private String url = "http://222.107.238.44:4050";
-    private String url = "http://localhost:4050";
+    private String url = "http://222.107.238.44:4050";
+//    private String url = "http://localhost:4050";
 
         private String openposeUrl = "http://192.168.100.37:4051";
 //    private String openposeUrl = "http://localhost:4051";
