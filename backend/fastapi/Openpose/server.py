@@ -106,6 +106,6 @@ async def run_openpose(rb: orb):
     # 7. 호출자에게 완료를 반환한다.
     return "success"
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=4051)
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=4051)

@@ -117,7 +117,7 @@ public class PhotoController {
         photo.setPhotoImgName(fileName);
         photo.setPhotoImgYesBg(true);
         photo.setPhotoImgNoBg(true);
-//        photo.setPhotoImgMasking(true);
+        photo.setPhotoImgMasking(true);
         photo.setPhotoImgOpenpose(true);
         photo.setPhotoJsonOpenpose(true);
 
