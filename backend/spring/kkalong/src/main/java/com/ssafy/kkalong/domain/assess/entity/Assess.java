@@ -40,7 +40,4 @@ public class Assess {
     @JoinColumn(name = "member_seq", referencedColumnName = "member_seq", insertable = false, updatable = false)
     @Schema(description = "좋아요를 누른 회원")
     private Member member;
-
-    public static void toRes(Assess v) {
-    }
 }
