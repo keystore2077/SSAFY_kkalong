@@ -21,10 +21,29 @@ class ClosetInfo extends StatefulWidget {
 class _MyAppState extends State<ClosetInfo> {
   final TextEditingController inputController = TextEditingController();
   final List<String> sections = ['행거', '수납장', '선반', '박스'];
-  List<Widget> hangars = [];
-  List<Widget> drawers = [];
-  List<Widget> shelves = [];
-  List<Widget> boxes = [];
+  Map<String, List<String>> sectionItems = {
+    '행거': [],
+    '수납장': [],
+    '선반': [],
+    '박스': [],
+  };
+
+  // 항목을 추가하는 메소드
+  void _addItem(String sectionType) {
+    setState(() {
+      int index = sectionItems[sectionType]!.length + 1;
+      sectionItems[sectionType]!.add('$sectionType$index');
+    });
+  }
+
+  // 항목을 제거하는 메소드
+  void _removeItem(String sectionType) {
+    setState(() {
+      if (sectionItems[sectionType]!.isNotEmpty) {
+        sectionItems[sectionType]!.removeLast();
+      }
+    });
+  }
 
   getData() async {
     var result = await http.get(Uri.parse('https://codingapple1.github.io/app/data.json'));
@@ -37,165 +56,37 @@ class _MyAppState extends State<ClosetInfo> {
     getData();
   }
 
-  void _addHangar() {
-    setState(() {
-      int index = hangars.length + 1;
-      hangars.add(
-        GestureDetector(
-          onTap: _removeHangar,
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xFFF5BEB5),
-                width: 1.5,
+  // 리스트에 저장된 항목을 바탕으로 위젯을 생성하는 함수
+  List<Widget> _buildItemList(String sectionType) {
+    return sectionItems[sectionType]!
+        .map(
+            (item) => GestureDetector(
+            onTap: () => _removeItem(sectionType),
+            child: Container(
+                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Color(0xFFF5BEB5),
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+              child: Center(
+                child: Text(
+                  '$item X',
+                  style: TextStyle(
+                    color: Color(0xFFF5BEB5),
+                  ),
+                ),
               ),
-              borderRadius: BorderRadius.circular(30.0),
             ),
-            child: Center(child: Text(
-              '행거$index X',
-              style: TextStyle(
-                color: Color(0xFFF5BEB5),
-              ),
-            )),
-          ),
-        ),
-      );
-    });
-  }
-
-  void _removeHangar() {
-    setState(() {
-      if (hangars.isNotEmpty) {
-        hangars.removeLast();
-      }
-    });
-  }
-
-  void _addDrawer() {
-    setState(() {
-      int index = drawers.length + 1;
-      drawers.add(
-        GestureDetector(
-          onTap: _removeDrawer,
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xFFF5BEB5),
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(30.0),
             ),
-            child: Center(child: Text(
-              '수납장$index X',
-              style: TextStyle(
-                color: Color(0xFFF5BEB5),
-              ),
-            )),
-          ),
-        ),
-      );
-    });
-  }
+          )
+              .toList();
+        }
 
-  void _removeDrawer() {
-    setState(() {
-      if (drawers.isNotEmpty) {
-        drawers.removeLast();
-      }
-    });
-  }
-
-  void _addShelf() {
-    setState(() {
-      int index = shelves.length + 1;
-      shelves.add(
-        GestureDetector(
-          onTap: _removeShelf,
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xFFF5BEB5),
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(30.0),
-            ),
-            child: Center(child: Text(
-              '선반$index X',
-              style: TextStyle(
-                color: Color(0xFFF5BEB5),
-              ),
-            )),
-          ),
-        ),
-      );
-    });
-  }
-
-  void _removeShelf() {
-    setState(() {
-      if (shelves.isNotEmpty) {
-        shelves.removeLast();
-      }
-    });
-  }
-
-  void _addBox() {
-    setState(() {
-      int index = boxes.length + 1;
-      boxes.add(
-        GestureDetector(
-          onTap: _removeBox,
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xFFF5BEB5),
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(30.0),
-            ),
-            child: Center(child: Text(
-              '박스$index X',
-              style: TextStyle(
-                color: Color(0xFFF5BEB5),
-              ),
-            )),
-          ),
-        ),
-      );
-    });
-  }
-
-  void _removeBox() {
-    setState(() {
-      if (boxes.isNotEmpty) {
-        boxes.removeLast();
-      }
-    });
-  }
-
-  List<Widget> _getListForSection(String section) {
-    switch (section) {
-      case '행거':
-        return hangars;
-      case '수납장':
-        return drawers;
-      case '선반':
-        return shelves;
-      case '박스':
-        return boxes;
-      default:
-        return [];
-    }
-  }
-
+// 선반항목 쁘라스버튼
   Widget _buildSection(String section) {
     return Container(
       decoration: BoxDecoration(
@@ -208,32 +99,14 @@ class _MyAppState extends State<ClosetInfo> {
       child: Row(
         children: [
           ElevatedButton(
-            onPressed: () {
-              // 해당 섹션의 추가 메소드를 호출
-              switch (section) {
-                case '행거':
-                  _addHangar();
-                  break;
-                case '수납장':
-                  _addDrawer();
-                  break;
-                case '선반':
-                  _addShelf();
-                  break;
-                case '박스':
-                  _addBox();
-                  break;
-                default:
-                  break;
-              }
-            },
+            onPressed: () => _addItem(section),
             child: Text('$section+'),
           ),
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: _getListForSection(section),
+                children: _buildItemList(section),
               ),
             ),
           ),
