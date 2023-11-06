@@ -264,7 +264,7 @@
 //   }
 // }
 
-import 'dart:io'; // Import this for File handling
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import '../avata/wearcloth.dart';
@@ -280,7 +280,7 @@ class _AvataPictureState extends State<AvataPicture> {
   late CameraController _controller;
   late List<CameraDescription> cameras;
   bool isInitialized = false;
-  File? capturedImage; // Variable to store captured image
+  File? capturedImage;
 
   @override
   void initState() {
@@ -314,29 +314,70 @@ class _AvataPictureState extends State<AvataPicture> {
       body: Stack(
         children: [
           isInitialized
-              ? FittedBox(
-                  fit: BoxFit.cover,
-                  child: SizedBox(
-                    width: _controller.value.previewSize!.height,
-                    height: _controller.value.previewSize!.width,
-                    child: CameraPreview(_controller),
-                  ),
+              ? SizedBox(
+                  width: MediaQuery.of(context).size.width, // 화면의 전체 너비를 사용합니다.
+                  height: MediaQuery.of(context).size.height *
+                      0.95, // 화면 높이의 75%를 사용합니다.
+                  child: CameraPreview(_controller),
                 )
+              // ? FittedBox(
+              //     fit: BoxFit.cover,
+              //     child: SizedBox(
+              //       width: _controller.value.previewSize!.height,
+              //       height: _controller.value.previewSize!.width,
+              //       child: CameraPreview(_controller),
+              //     ),
+              //   )
               : const Center(child: CircularProgressIndicator()),
 
           // Display captured image
           capturedImage != null
-              ? Image.file(capturedImage!, fit: BoxFit.cover)
+              ? SizedBox(
+                  width: MediaQuery.of(context).size.width, // 화면의 전체 너비를 사용합니다.
+                  height: MediaQuery.of(context).size.height *
+                      0.95, // 화면 높이의 95%를 사용합니다.
+                  child: Image.file(capturedImage!, fit: BoxFit.cover),
+                )
               : Container(),
+          // ? Image.file(capturedImage!, fit: BoxFit.cover)
+          // : Container(),
 
-          // Display guide image only if capturedImage is null
+          // capturedImage == null
+          //     ? Positioned.fill(
+          //         child: Opacity(
+          //           opacity: 1,
+          //           child: Image.asset(
+          //             'Assets/Image/guide.png',
+          //             fit: BoxFit.cover,
+          //           ),
+          //         ),
+          //       )
+          //     : Container(),
           capturedImage == null
-              ? Positioned.fill(
-                  child: Opacity(
-                    opacity: 0.8,
-                    child: Image.asset(
-                      'Assets/Image/guide.png',
-                      fit: BoxFit.fitHeight,
+              ?
+              // Align(
+              //     alignment: Alignment.center,
+              //     child: Opacity(
+              //       opacity: 1,
+              //       child: Image.asset(
+              //         'Assets/Image/guide.png',
+              //         width: 700.0,
+              //         height: 800.0,
+              //       ),
+              //     ),
+              //   )
+              //가이드라인이미지 가운데 정렬
+              Align(
+                  // alignment: Alignment.center,
+                  alignment: const Alignment(0, 3.0),
+                  child: Container(
+                    width: 600.0,
+                    height: 700.0,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('Assets/Image/guide.png'),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 )
@@ -393,17 +434,14 @@ class _AvataPictureState extends State<AvataPicture> {
       children: [
         ElevatedButton(
           onPressed: () async {
-            // Reset the captured image
             setState(() {
               capturedImage = null;
             });
 
-            // Check if the camera is initialized and then capture a new image
             if (isInitialized) {
               final image = await _controller.takePicture();
               setState(() {
-                capturedImage =
-                    File(image.path); // Set the new captured image path
+                capturedImage = File(image.path);
               });
             }
           },
@@ -422,9 +460,7 @@ class _AvataPictureState extends State<AvataPicture> {
           ),
         ),
         ElevatedButton(
-          onPressed: () {
-            // Add logic to save the captured image
-          },
+          onPressed: () {},
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFF5BEB5),
             shape: RoundedRectangleBorder(
