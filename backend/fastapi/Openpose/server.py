@@ -15,7 +15,8 @@ connection = pymysql.connect(
     host=config('MYSQL_HOST'),
     user=config('MYSQL_USER'),
     password=config('MYSQL_PASSWORD'),
-    database=config('MYSQL_DB')
+    database=config('MYSQL_DB'),
+    autocommit=True
 )
 
 # DB 커서 생성
@@ -48,10 +49,10 @@ async def run_openpose(rb: orb):
     print("run_openpose called")
     print(rb)
     # 1. 요청한 계정에 요청받은 파일명이 존재하는지 DB에서 확인한다
-    sql = ("select photo_img_name, member_seq"
-           "from member join photo using member_seq"
-           "where member_id = %s and photo_img_name = %s")
-    cursor.execute(sql, (rb.member_id, rb.photo_img_name))
+    sql = ("select photo_img_name, member_seq "
+           "from member join photo using (member_seq) "
+           "where member_id = %s and photo_seq = %s ")
+    cursor.execute(sql, (rb.member_id, rb.photo_seq))
 
     # 2. 없다면 에러 보내고, 있다면 해당 파일을 다운 받는다.
     results = cursor.fetchall()
@@ -79,25 +80,27 @@ async def run_openpose(rb: orb):
     # 4. 작업이 끝나면 파일을 S3서버에 올린다
     try:
         s3.upload_file(r"./output_images/" + rb.photo_img_name + "_rendered.png", bucket_name,
-                       "openpose/img/" + rb.photo_img_name + ".png")
+                       "photo/openpose/img/" + rb.photo_img_name + ".png")
         s3.upload_file(r"./output_jsons/" + rb.photo_img_name + "_keypoints.json", bucket_name,
-                       "openpose/json/" + rb.photo_img_name + ".json")
+                       "photo/openpose/json/" + rb.photo_img_name + ".json")
     except boto3.exceptions.NoCredentialsError:
         return "AWS 자격 증명을 찾을 수 없습니다. 자격 증명을 설정하세요."
     except boto3.exceptions.EndpointConnectionError:
         return "S3 엔드포인트에 연결할 수 없습니다. 리전을 확인하세요."
 
     # 5. DB에 작업이 되어 있음으로 업데이트 한다.
-    sql = ("update photo"
-           "set photo_img_openpose = 1, photo_json_openpose = 1"
-           "where photo_img_name = %s and member_seq = %s")
-    cursor.execute(sql, (rb.photo_img_name, member_seq))
+    sql = ("update photo "
+           "set photo_img_openpose = 1, photo_json_openpose = 1 "
+           "where photo_seq = %s and member_seq = %s ")
+    cursor.execute(sql, (rb.photo_seq, member_seq))
+    affected_rows = cursor.rowcount
+    print(f"결과: {affected_rows}")
 
     # 6. 다운 받았던 파일과 결과 파일을 삭제한다.
     try:
-        os.remove(r"./examples" + rb.photo_img_name + ".jpg")
-        os.remove(r"./output_images" + rb.photo_img_name + "_rendered.png")
-        os.remove(r"./output_jsons" + rb.photo_img_name + "_keypoints.json")
+        os.remove(r"./examples/" + rb.photo_img_name + ".png")
+        os.remove(r"./output_images/" + rb.photo_img_name + "_rendered.png")
+        os.remove(r"./output_jsons/" + rb.photo_img_name + "_keypoints.json")
     except FileNotFoundError:
         return f"파일이 존재하지 않습니다"
     except Exception as e:
