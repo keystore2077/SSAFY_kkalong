@@ -8,6 +8,7 @@ import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
 import com.ssafy.kkalong.fastapi.FastApiService;
+import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
@@ -132,5 +133,29 @@ public class testController {
     @GetMapping("fast/welcome")
     public Api<Object> testServer7(){
         return fastApiService.callWelcome();
+    }
+
+    @PostMapping("/s3/fast/u2net")
+    public Api<Object> testServer8(MultipartFile mFile){
+        // 1. 파일을 받는다.
+        // 2. 해당 파일을 FastApiService에게 보낸다.
+        Api<Object> res = null;
+        try {
+            res = fastApiService.requestU2Net("사용자아이디", mFile);
+        } catch (IOException e) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "IOError 발생");
+        }
+
+        // 3. 응답을 받은걸 변환한다.
+        FastApiRequestGeneralRes u2netRes = (FastApiRequestGeneralRes) res.getBody();
+
+        // 4. S3에 저장한다.
+        s3Service.uploadFile(u2netRes.getImgName() + ".jpg", u2netRes.getImg());
+
+        // 5. URL을 생성하여 반환한다.
+        u2netRes.setPath(s3Service.generatePresignedUrl("cloth/masking/" + u2netRes + ".jpg"));
+        System.out.println(u2netRes.getPath());
+
+        return Api.OK(u2netRes);
     }
 }
