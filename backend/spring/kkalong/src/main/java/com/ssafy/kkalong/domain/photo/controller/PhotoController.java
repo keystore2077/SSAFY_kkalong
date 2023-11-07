@@ -17,6 +17,7 @@ import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.multipart.MultipartFile;
@@ -104,11 +105,11 @@ public class PhotoController {
         // DB에 저장
         Photo photoResult = photoService.savePhoto(photo);
 
-        try{
-            return Api.OK("성공");
-        } finally {
-            callPreprocessing(member, photoResult).join();
-        }
+        // 비동기로 openpose, cihp 호출
+        callOpenpose(member, photoResult);
+        callCihp(member, photoResult);
+
+        return Api.OK("성공");
     }
 
     // 1. 사용자 인증 정보를 확인한다
@@ -202,27 +203,7 @@ public class PhotoController {
         return Api.OK(new PhotoMixRequestRes());
     }
 
-    private CompletableFuture<Void> callPreprocessing(Member member, Photo photo) {
-        return CompletableFuture.allOf(
-                callCihpAsync(member, photo),
-                callOpenposeAsync(member, photo)
-        );
-    }
-
-    private CompletableFuture<Void> callCihpAsync(Member member, Photo photo) {
-        return CompletableFuture.runAsync(() -> {
-            // cihp 호출
-            callCihp(member, photo);
-        });
-    }
-
-    private CompletableFuture<Void> callOpenposeAsync(Member member, Photo photo) {
-        return CompletableFuture.runAsync(() -> {
-            // Openpose 호출
-            callOpenpose(member, photo);
-        });
-    }
-
+    @Async
     private void callOpenpose(Member member, Photo photo){
         // Openpose는 독자적인 과정을 거치므로 결과 저장 과정이 필요 없음
         try{
@@ -235,6 +216,7 @@ public class PhotoController {
         }
     }
 
+    @Async
     private void callCihp(Member member, Photo photo){
         // s3에서 파일 가져오기
         byte[] byteFile = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
