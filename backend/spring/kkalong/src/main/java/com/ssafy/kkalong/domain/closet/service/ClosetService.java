@@ -7,6 +7,8 @@ import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.repository.ClosetRepository;
 import com.ssafy.kkalong.domain.closet.repository.SectionRepository;
 import com.ssafy.kkalong.domain.member.entity.Member;
+import com.ssafy.kkalong.domain.sort.entity.Sort;
+import com.ssafy.kkalong.domain.sort.service.SortService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,13 +21,15 @@ import java.util.List;
 //closetservice
 @RequiredArgsConstructor
 @Service
+
 public class ClosetService {
 
     @Autowired
     private ClosetRepository closetRepository;
     @Autowired
     private SectionRepository sectionRepository;
-
+    @Autowired
+    private SortService sortService;
 
 
     public List<Closet> findClosetsByMemberSeq(int memberSeq) {
@@ -39,28 +43,27 @@ public class ClosetService {
         return sectionRepository.findAllByClosetClosetSeqAndIsSectionDeleted(closetSeq,false);
     }
 
-    public Closet createCloset(ClosetCreateRequest request, Member member, String imgUrl) {
+    public Closet createCloset(ClosetCreateRequest request, Member member, String filename) {
         Closet newCloset = new Closet();
-        newCloset.setClosetName(request.getClosetName());
-//        newCloset.setClosetImgName(request.getClosetImageName());
         newCloset.setMember(member);
+        newCloset.setClosetName(request.getClosetName());
+        newCloset.setClosetImgName(filename);
+        newCloset.setClosetRegData(LocalDateTime.now());
 
-
-        // DB에 저장하고, 저장된 엔티티 반환
-        // dto를 저장
         return closetRepository.save(newCloset);
     }
 
     public List<Section> createSection(List<SectionCreateRequestItem> requests, Closet newCloset) {
         List<Section> sectionsToSave = new ArrayList<>();
 
+
         for (SectionCreateRequestItem request : requests) {
+            Sort sort = sortService.getSort(request.getSort());
             Section section = new Section();
             section.setSectionName(request.getSectionName());
             section.setCloset(newCloset);
-            section.setSort(request.getSort());
+            section.setSort(sort);
             sectionsToSave.add(section);
-
         }
         return sectionRepository.saveAll(sectionsToSave);
     }

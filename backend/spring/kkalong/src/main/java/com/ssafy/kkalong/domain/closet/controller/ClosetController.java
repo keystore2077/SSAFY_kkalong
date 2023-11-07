@@ -5,6 +5,7 @@ import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetCreateRequest;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetRequest;
+import com.ssafy.kkalong.domain.closet.dto.request.SectionCreateRequestItem;
 import com.ssafy.kkalong.domain.closet.dto.response.ClosetRembgResponse;
 import com.ssafy.kkalong.domain.closet.dto.response.ClosetResponse;
 import com.ssafy.kkalong.domain.closet.dto.response.ClosetSaveResponse;
@@ -15,10 +16,13 @@ import com.ssafy.kkalong.domain.closet.repository.ClosetRepository;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
+import com.ssafy.kkalong.domain.sort.entity.Sort;
+import com.ssafy.kkalong.domain.sort.service.SortService;
 import com.ssafy.kkalong.fastapi.FastApiService;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +49,9 @@ public class ClosetController {
 
     @Autowired
     private FastApiService fastApiService;
+
+    @Autowired
+    private SortService sortService;
 
 
 
@@ -148,7 +155,7 @@ public class ClosetController {
         if (!file.isEmpty()) {
 
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
-//                //1.사진 파일명 생성
+
                 fileName= FileNameGenerator.generateFileName("closet", member.getMemberId(), "png");
                 String filePath = "closet/" + fileName;
 
@@ -166,12 +173,22 @@ public class ClosetController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "업로드된 파일이 없습니다.");
         }
 
-
-
         //옷장 상세종류 인덱스 유효성검사(2)
-        
+        List<SectionCreateRequestItem> list = closetCreateRequest.getClosetSectionList();
+        for (SectionCreateRequestItem closetList : list){
+            Sort sort = sortService.getSort(closetList.getSort());
+            if (sort == null){
+                return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷 종류입니다. Top, Pants, Outer, Skirt, Dress, Etc 중에서 보내주세요.", closetList.getSort()));
+            }
+        }
+        //1.옷장 엔티티를 만들어서 db에 넣는작업(로직은 service에서 만들기)
+        Closet closetSave = closetService.createCloset(closetCreateRequest,member,fileName);
 
-        closetService.createSection(closetCreateRequest.getClosetSectionList(), newCloset);
+        //2.섹션 생성
+
+
+
+        closetService.createSection(closetCreateRequest.getClosetSectionList(),closetSave);
         System.out.println(closetCreateRequest.toString());
         String closetImgName = FileNameGenerator.generateFileName("closet",member.getMemberId(),"jpg");
         //FileNameGenerator(common/util)를 사용하여 저장할 옷장 이미지 파일의 이름을 생성 -> 이 이름은 사용자의 ID와 "jpg" 확장자를 사용

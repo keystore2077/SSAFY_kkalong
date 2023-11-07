@@ -36,7 +36,7 @@ public class Section {
     private Closet closet ;
 
     @ManyToOne
-    @JoinColumn(name = "sort_seq", referencedColumnName = "sort_seq")
+    @JoinColumn(name = "sort_seq", referencedColumnName = "sort_seq",nullable = false)
     @Schema(description = "옷장 상세 종류 인덱스")
     private Sort sort ;
 
