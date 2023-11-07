@@ -4,6 +4,7 @@ import com.ssafy.kkalong.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -47,11 +48,12 @@ public class Photo {
     @Schema(description = "Openpose 처리된 json의 존재여부")
     private boolean photoJsonOpenpose;
 
-    @Column(name = "photo_reg_date")
+    @CreationTimestamp
+    @Column(name = "photo_reg_date", nullable = false)
     @Schema(description = "등록일")
     private LocalDateTime photoRegDate;
 
-    @Column(name = "is_photo_deleted")
+    @Column(name = "is_photo_deleted", nullable = false)
     @Schema(description = "삭제여부")
     private boolean isPhotoDeleted;
 
