@@ -11,13 +11,12 @@ import com.ssafy.kkalong.domain.photo.dto.response.PhotoMixRequestRes;
 import com.ssafy.kkalong.domain.photo.dto.response.PhotoRes;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
+import com.ssafy.kkalong.fastapi.FastApiCallerService;
 import com.ssafy.kkalong.fastapi.FastApiService;
-import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @Slf4j
@@ -35,6 +33,8 @@ public class PhotoController {
     private S3Service s3Service;
     @Autowired
     private FastApiService fastApiService;
+    @Autowired
+    private FastApiCallerService fastApiCallerService;
     @Autowired
     private MemberService memberService;
     @Autowired
@@ -87,8 +87,8 @@ public class PhotoController {
         RequestRembgRes res;
         try{
             res = (RequestRembgRes)rembgRes.getBody();
-            s3Service.uploadFile("photo/yes_bg/" + res.getYesBgName() + ".jpg", res.getYesBg());
-            s3Service.uploadFile("photo/no_bg/" + res.getNoBgName() + ".png", res.getNoBg());
+            s3Service.uploadFile("photo/yes_bg/" + fileName + ".jpg", res.getYesBg());
+            s3Service.uploadFile("photo/no_bg/" + fileName + ".png", res.getNoBg());
         } catch (Exception e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "저장 중 문제가 발생 했습니다.(Rembg)");
         }
@@ -109,8 +109,8 @@ public class PhotoController {
         System.out.println("DB 저장 완료");
 
         // 비동기로 openpose, cihp 호출
-        callOpenpose(member, photoResult);
-        callCihp(member, photoResult);
+        fastApiCallerService.callOpenpose(member, photoResult);
+        fastApiCallerService.callCihp(member, photoResult);
         System.out.println("비동기 호출 완료");
         
         return Api.OK("성공");
@@ -205,44 +205,5 @@ public class PhotoController {
 
 
         return Api.OK(new PhotoMixRequestRes());
-    }
-
-    @Async
-    private void callOpenpose(Member member, Photo photo){
-        System.out.println("callOpenpose called...");
-        // Openpose는 독자적인 과정을 거치므로 결과 저장 과정이 필요 없음
-        try{
-            Api<Object> openposeRes = fastApiService.requestOpenpose(member, photo);
-            if (!openposeRes.getResult().equals(Result.OK())){
-                System.out.println("내부 처리중 문제가 발생했습니다.(Openpose)");
-            }
-        } catch (Exception e) {
-            System.out.println("저장중 문제가 발생했습니다.(Openpose)");
-        }
-    }
-
-    @Async
-    private void callCihp(Member member, Photo photo){
-        System.out.println("callCihp called...");
-        System.out.println("요청 경로: photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
-        // s3에서 파일 가져오기
-        byte[] byteFile = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
-
-        Api<Object> cihpRes = fastApiService.requestCihp(member.getMemberId(), byteFile);
-        if (!Objects.equals(cihpRes.getResult().getResultCode(), Result.OK().getResultCode())){
-            System.out.println("내부 처리중 문제가 발생했습니다.(cihp)");
-        }
-        // cihp 결과 저장
-        try{
-            FastApiRequestGeneralRes cihpResBody = (FastApiRequestGeneralRes)cihpRes.getBody();
-            System.out.println("저장 경로: photo/masking/" + cihpResBody.getImgName() + ".png");
-            s3Service.uploadFile("photo/masking/" + cihpResBody.getImgName() + ".png", cihpResBody.getImg());
-        } catch (Exception e) {
-            System.out.println("저장중 문제가 발생했습니다.(cihp)");
-        }
-        // DB 업데이트
-        photoService.updatePhotoImgMasking(photo.getPhotoSeq());
-
-        System.out.println("cihp 완료");
     }
 }
