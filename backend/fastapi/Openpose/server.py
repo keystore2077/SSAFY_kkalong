@@ -58,7 +58,7 @@ async def run_openpose(rb: orb):
     if len(results) == 0:
         return "검색결과 없음"
     member_seq = results[0][1]
-    s3.download_file(bucket_name, r"photo/" + rb.photo_img_name + ".png", r"./examples/" + rb.photo_img_name + ".png")
+    s3.download_file(bucket_name, r"photo/original/" + rb.photo_img_name + ".jpg", r"./examples/" + rb.photo_img_name + ".png")
 
     # 3. 해당 파일에 대해서 openpose를 돌린다.
     command = r".\bin\OpenPoseDemo.exe --image_dir examples --hand --write_json output_jsons --write_images output_images --disable_blending"
@@ -88,10 +88,10 @@ async def run_openpose(rb: orb):
         return "S3 엔드포인트에 연결할 수 없습니다. 리전을 확인하세요."
 
     # 5. DB에 작업이 되어 있음으로 업데이트 한다.
-    # sql = ("update photo"
-    #        "set photo_img_openpose = 1, photo_json_openpose = 1"
-    #        "where photo_img_name = %s and member_seq = %s")
-    # cursor.execute(sql, (rb.photo_img_name, member_seq))
+    sql = ("update photo"
+           "set photo_img_openpose = 1, photo_json_openpose = 1"
+           "where photo_img_name = %s and member_seq = %s")
+    cursor.execute(sql, (rb.photo_img_name, member_seq))
 
     # 6. 다운 받았던 파일과 결과 파일을 삭제한다.
     try:

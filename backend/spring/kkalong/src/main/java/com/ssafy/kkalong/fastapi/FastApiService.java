@@ -136,7 +136,7 @@ public class FastApiService {
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
-            System.out.println(jsonStr);
+//            System.out.println(jsonStr);
             Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {});
             byte[] cihp = Base64.getDecoder().decode((String)jsonMap.get("cihp"));
             // 파일 임시 저장
