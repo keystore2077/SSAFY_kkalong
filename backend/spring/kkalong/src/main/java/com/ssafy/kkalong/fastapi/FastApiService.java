@@ -5,6 +5,7 @@ import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.member.entity.Member;
+import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import org.json.JSONException;
@@ -18,48 +19,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.util.Base64;
 import java.util.Map;
-import java.util.Objects;
-
-// 테스트용 import. GPU 서버와 연동 성공 후 삭제해야함
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 @Service
 public class FastApiService {
-        private final String preprocessUrl = "http://222.107.238.44:4050";
+    private final String preprocessUrl = "http://222.107.238.44:4050";
 //    private final String url = "http://localhost:4050";
 
-        private final String vitonHdUrl = "http://222.107.238.44:4051";
+    private final String vitonHdUrl = "http://222.107.238.44:4051";
 
-        private final String openposeUrl = "http://192.168.100.37:4052";
+    private final String openposeUrl = "http://192.168.100.37:4052";
 //    private final String openposeUrl = "http://localhost:4052";
 
     private final RestTemplate restTemplate;
 
     @Autowired
-    public FastApiService(RestTemplate restTemplate){
+    public FastApiService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
     public Api<Object> callWelcome() {
         System.out.println("callWelcome called.....");
-
-        try {
-            InetAddress inetAddress = InetAddress.getLocalHost();
-            String ipv4 = inetAddress.getHostAddress();
-            System.out.println("IPv4 Address: " + ipv4);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            System.out.println("Unable to retrieve IPv4 address");
-        }
-
         String apiUrl = preprocessUrl;
         String response = restTemplate.getForObject(apiUrl, String.class); // GET 요청 보내기
         System.out.println("response: " + response);
         return Api.OK(response);
     }
 
-    public Api<Object> requestRembg(String memberId, MultipartFile mFile){
+    public Api<Object> requestRembg(String memberId, MultipartFile mFile) {
         String apiUrl = preprocessUrl + "/rembg";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -81,9 +67,10 @@ public class FastApiService {
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
-            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {});
-            byte[] yesBg = Base64.getDecoder().decode((String)jsonMap.get("file_yes_bg"));
-            byte[] noBg = Base64.getDecoder().decode((String)jsonMap.get("file_no_bg"));
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
+            });
+            byte[] yesBg = Base64.getDecoder().decode((String) jsonMap.get("file_yes_bg"));
+            byte[] noBg = Base64.getDecoder().decode((String) jsonMap.get("file_no_bg"));
             // 파일 임시 저장
             String fileName = FileNameGenerator.generateFileNameNoExtension("temp", memberId);
 
@@ -101,27 +88,30 @@ public class FastApiService {
                 e.printStackTrace();
             }
             return Api.OK(new RequestRembgRes(fileName, yesBgTempFile, fileName, noBgTempFile, "./"));
-        } catch (JSONException  | IOException e) {
+        } catch (JSONException | IOException e) {
             // JSON 파싱 오류 처리
             e.printStackTrace();
             return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return Api.ERROR(ErrorCode.SERVER_ERROR, "알 수 없는 오류");
         }
     }
-    
-    public Api<Object> requestCihp(String memberId, MultipartFile mFile){
+
+    public Api<Object> requestCihp(String memberId, MultipartFile mFile) {
+        try {
+            return requestCihp(memberId, mFile.getBytes());
+        } catch (IOException e) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않은 파일");
+        }
+    }
+
+    public Api<Object> requestCihp(String memberId, byte[] mFile) {
         String apiUrl = preprocessUrl + "/cihp";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String mFileBase64;
-        try {
-            mFileBase64 = Base64.getEncoder().encodeToString(mFile.getBytes());
-        } catch (IOException e) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않은 파일");
-        }
+        String mFileBase64 = Base64.getEncoder().encodeToString(mFile);
 
         // ObjectMapper 초기화
         ObjectMapper objectMapper = new ObjectMapper();
@@ -137,8 +127,9 @@ public class FastApiService {
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
 //            System.out.println(jsonStr);
-            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {});
-            byte[] cihp = Base64.getDecoder().decode((String)jsonMap.get("cihp"));
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
+            });
+            byte[] cihp = Base64.getDecoder().decode((String) jsonMap.get("cihp"));
             // 파일 임시 저장
             System.out.println("임시 저장중...");
             String fileName = FileNameGenerator.generateFileNameNoExtension("temp", memberId);
@@ -151,12 +142,12 @@ public class FastApiService {
                 return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
             }
             return Api.OK(new FastApiRequestGeneralRes(fileName, tempFile, "./"));
-        } catch (JSONException  | IOException e) {
+        } catch (JSONException | IOException e) {
             // JSON 파싱 오류 처리
             e.printStackTrace();
             System.out.println("변환 중 실패");
             return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             System.out.println("알 수 없는 오류 발생: " + e.getMessage());
             return Api.ERROR(ErrorCode.SERVER_ERROR, "알 수 없는 오류");
@@ -164,7 +155,7 @@ public class FastApiService {
     }
 
     // 미완성
-    public Api<Object> requestU2Net(String memberId, MultipartFile mFile){
+    public Api<Object> requestU2Net(String memberId, MultipartFile mFile) {
         String apiUrl = preprocessUrl + "/u2net";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -187,8 +178,9 @@ public class FastApiService {
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
-            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {});
-            byte[] u2net = Base64.getDecoder().decode((String)jsonMap.get("u2net"));
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
+            });
+            byte[] u2net = Base64.getDecoder().decode((String) jsonMap.get("u2net"));
             // 파일 임시 저장
             String fileName = FileNameGenerator.generateFileNameNoExtension("temp", memberId);
 
@@ -199,28 +191,34 @@ public class FastApiService {
                 e.printStackTrace();
             }
             return Api.OK(new FastApiRequestGeneralRes(fileName, tempFile, "./"));
-        } catch (JSONException  | IOException e) {
+        } catch (JSONException | IOException e) {
             // JSON 파싱 오류 처리
             e.printStackTrace();
             return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return Api.ERROR(ErrorCode.SERVER_ERROR, "알 수 없는 오류");
         }
     }
 
-    public Api<Object> requestOpenpose(Member member, String photoImgName){
+    public Api<Object> requestOpenpose(Member member, Photo photo) {
+        return requestOpenpose(member, photo.getPhotoImgName(), photo.getPhotoSeq());
+    }
+
+    public Api<Object> requestOpenpose(Member member, String photoImgName, int photoSeq) {
         String apiUrl = openposeUrl + "/openpose";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         String requestJson = "{\"member_id\":\"" + member.getMemberId() +
-                "\",\"photo_img_name\":\"" + photoImgName + "\"}";
+                "\",\"photo_img_name\":\"" + photoImgName +
+                "\",\"photo_seq\":\"" + photoSeq + "\"}";
         HttpEntity<String> requestEntity = new HttpEntity<>(requestJson, headers);
 
         // RestTemplate을 사용하여 FastAPI 서버에 POST 요청 보내기
         RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, String.class).getBody();
-        if (!Objects.requireNonNull(response).equals("success")){
+        System.out.println(response);
+        if (!response.equals("\"success\"")) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "처리중 문제 발생");
         }
 
