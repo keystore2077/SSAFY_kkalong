@@ -10,22 +10,23 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mysql://${DB_HOST}:${MYSQL_PORT}/kkalong
+    url: jdbc:mysql://k9c105.p.ssafy.io:3306/kkalong
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${MYSQL_USERNAME}
-    password: ${MYSQL_PASSWORD}
+    username: kkalong
+    password: c105ssafykkalong
   data:
     mongodb:
-      uri: mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${DB_HOST}:${MONGODB_PORT}/kkalong
+      uri: mongodb://admin:c105ssafykkalong@k9c105.p.ssafy.io:27017/kkalong
     redis:
-      host: ${DB_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
+      host: k9c105.p.ssafy.io
+      port: 6379
+      password: c105ssafykkalong
 
   security:
     user:
-      name: ${SECURITY_NAME}
-      password: ${SECURITY_PASSWORD}
+      name: ssafy
+      password: ssafy
+
   servlet:
     multipart:
       max-file-size: 2MB
@@ -54,18 +55,19 @@ logging.level:
 
 server:
   port: 8761
+
 jwt:
-  secret-key: ${JWT_SECRET_KEY}
-  expiration-minutes: ${JWT_EXPIRATION_MINUTES}
-  refresh-expiration-hours: ${JWT_REFRESH_EXPIRATION_HOURS}
-  issuer: ${JWT_ISSUER}
+  secret-key: Sfi49D0N1Gqo10bPgUyTFsRMkJpGLXSvGP0UJN56EB30r5TcrtlSXfQ7TndvYjNvfkEKLqILn0j1SmKODOSDSF098BBgI3nVPEahqxeY8qbPSFGyzyEVxnl4AQcrnVneI
+  expiration-minutes: 30
+  refresh-expiration-hours: 24
+  issuer: ssafy
 
 cloud:
   aws:
     credentials:
       instance-profile: false
-      access-key: ${S3_ACCESS_KEY}
-      secret-key: ${S3_SECRET_KEY}
+      access-key: AKIA5RRQZSI64T25QVH5
+      secret-key: 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
     region:
       static: ap-northeast-2
     stack:
