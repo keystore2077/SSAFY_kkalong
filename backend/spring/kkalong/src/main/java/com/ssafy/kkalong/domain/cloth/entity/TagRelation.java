@@ -19,21 +19,21 @@ public class TagRelation {
     @EmbeddedId
     private TagRelationKey tagRelationKey;
 
-    @Column(name = "is_tag_deleted ")
+    @Column(name = "is_tag_relation_delete")
     @Schema(description = "삭제여부")
-    private boolean isTagDeleted ;
+    private boolean isTagRelationDelete ;
 
     @Column(name = "tag_relation_del_date ")
     @Schema(description = "삭제일시")
     private LocalDateTime tagRelationDelDate ;
 
     @ManyToOne
-    @JoinColumn(name = "cloth_seq ", referencedColumnName = "cloth_seq ", insertable = false, updatable = false)
+    @JoinColumn(name = "cloth_seq", referencedColumnName = "cloth_seq", insertable = false, updatable = false)
     @Schema(description = "옷")
     private Cloth cloth ;
 
     @ManyToOne
-    @JoinColumn(name = "tag_seq ", referencedColumnName = "tag_seq ", insertable = false, updatable = false)
+    @JoinColumn(name = "tag_seq", referencedColumnName = "tag_seq", insertable = false, updatable = false)
     @Schema(description = "태그")
     private Tag tag ;
 

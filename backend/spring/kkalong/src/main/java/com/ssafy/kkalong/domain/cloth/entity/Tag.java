@@ -17,7 +17,7 @@ public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)//오토이크리먼트 db에서 하는거 그래서 쓰는거임
-    @Column(name = "tag_seq ",nullable = false)
+    @Column(name = "tag_seq",nullable = false)
     @Schema(description = "인덱스")
     private int tagSeq ;
 
