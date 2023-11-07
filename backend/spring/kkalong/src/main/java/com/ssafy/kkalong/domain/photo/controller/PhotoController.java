@@ -62,20 +62,22 @@ public class PhotoController {
         if (extension != null && !extension.equals("image/jpeg") && !extension.equals("image/jpg")){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "유효한 확장자가 아닙니다");
         }
-
+        System.out.println("유효성 검사 완료");
         // key 생성
         // photo_소유자아이디_현재시간_무작위숫자6개
         String fileName = FileNameGenerator.generateFileNameNoExtension("photo", member.getMemberId());
-
+        System.out.println("fileName: " + fileName);
         // 저장할 장소 지정
         String path = "photo/original/";
 
         // S3서버에 사진을 저장
         try {
             String res = s3Service.uploadFile(path + fileName + ".jpg", photoReq);
+            System.out.println(res);
         } catch (IOException e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "업로드 실패");
         }
+        System.out.println("저장 완료");
         //rembg 호출
         Api<Object> rembgRes = fastApiService.requestRembg(member.getMemberId(), photoReq);
         if (!Objects.equals(rembgRes.getResult().getResultCode(), Result.OK().getResultCode())){
@@ -104,11 +106,13 @@ public class PhotoController {
 
         // DB에 저장
         Photo photoResult = photoService.savePhoto(photo);
+        System.out.println("DB 저장 완료");
 
         // 비동기로 openpose, cihp 호출
         callOpenpose(member, photoResult);
         callCihp(member, photoResult);
-
+        System.out.println("비동기 호출 완료");
+        
         return Api.OK("성공");
     }
 
@@ -205,6 +209,7 @@ public class PhotoController {
 
     @Async
     private void callOpenpose(Member member, Photo photo){
+        System.out.println("callOpenpose called...");
         // Openpose는 독자적인 과정을 거치므로 결과 저장 과정이 필요 없음
         try{
             Api<Object> openposeRes = fastApiService.requestOpenpose(member, photo);
@@ -218,6 +223,7 @@ public class PhotoController {
 
     @Async
     private void callCihp(Member member, Photo photo){
+        System.out.println("callCihp called...");
         // s3에서 파일 가져오기
         byte[] byteFile = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
 
