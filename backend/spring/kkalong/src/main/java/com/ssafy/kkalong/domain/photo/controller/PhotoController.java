@@ -90,6 +90,7 @@ public class PhotoController {
         } catch (Exception e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "저장중중 문제가 발생했습니다.(Rembg)");
         }
+        System.out.println("rembg 완료");
 
         //cihp 호출
         Api<Object> cihpRes = fastApiService.requestCihp(member.getMemberId(), photoReq);
@@ -103,17 +104,18 @@ public class PhotoController {
         } catch (Exception e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "저장중 문제가 발생했습니다.(cihp)");
         }
+        System.out.println("cihp 완료");
 
-        //Openpose 호출
+        // Openpose 호출
         // Openpose는 독자적인 과정을 거치므로 결과 저장 과정이 필요 없음
-        try{
-            Api<Object> openposeRes = fastApiService.requestOpenpose(member, fileName);
-            if (!openposeRes.getResult().equals(Result.OK())){
-               return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생했습니다.(Openpose)");
-            }
-        } catch (Exception e) {
-            return Api.ERROR(ErrorCode.SERVER_ERROR, "저장중 문제가 발생했습니다.(Openpose)");
-        }
+//        try{
+//            Api<Object> openposeRes = fastApiService.requestOpenpose(member, fileName);
+//            if (!openposeRes.getResult().equals(Result.OK())){
+//               return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생했습니다.(Openpose)");
+//            }
+//        } catch (Exception e) {
+//            return Api.ERROR(ErrorCode.SERVER_ERROR, "저장중 문제가 발생했습니다.(Openpose)");
+//        }
 
         Photo photo = new Photo();
         photo.setMember(member);
@@ -121,8 +123,8 @@ public class PhotoController {
         photo.setPhotoImgYesBg(true);
         photo.setPhotoImgNoBg(true);
         photo.setPhotoImgMasking(true);
-        photo.setPhotoImgOpenpose(true);
-        photo.setPhotoJsonOpenpose(true);
+//        photo.setPhotoImgOpenpose(true);
+//        photo.setPhotoJsonOpenpose(true);
 
         // DB에 저장
         photoService.savePhoto(photo);
