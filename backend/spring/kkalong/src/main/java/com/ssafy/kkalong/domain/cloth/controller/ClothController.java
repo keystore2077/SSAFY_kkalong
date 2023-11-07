@@ -46,6 +46,7 @@ public class ClothController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
         }
 
+        System.out.println(request.toString());
         //sectionSeq 유효성 검사
         Section section = closetService.getSection(request.getSectionSeq());
         if (section == null) {
