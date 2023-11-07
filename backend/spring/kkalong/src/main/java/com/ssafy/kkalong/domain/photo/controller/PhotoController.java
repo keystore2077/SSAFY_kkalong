@@ -85,10 +85,10 @@ public class PhotoController {
         RequestRembgRes res;
         try{
             res = (RequestRembgRes)rembgRes.getBody();
-            s3Service.uploadFile(res.getYesBgName(), res.getYesBg());
-            s3Service.uploadFile(res.getNoBgName(), res.getNoBg());
+            s3Service.uploadFile("photo/yes_bg/" + res.getYesBgName() + ".jpg", res.getYesBg());
+            s3Service.uploadFile("photo/no_bg/" + res.getNoBgName() + ".png", res.getNoBg());
         } catch (Exception e) {
-            return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생했습니다.(Rembg)");
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "저장중중 문제가 발생했습니다.(Rembg)");
         }
 
         //cihp 호출
@@ -99,9 +99,9 @@ public class PhotoController {
         // cihp 결과 저장
         try{
             FastApiRequestGeneralRes cihpResBody = (FastApiRequestGeneralRes)cihpRes.getBody();
-            s3Service.uploadFile(cihpResBody.getImgName(), cihpResBody.getImg());
+            s3Service.uploadFile("photo/masking/" + cihpResBody.getImgName() + ".png", cihpResBody.getImg());
         } catch (Exception e) {
-            return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생했습니다.(cihp)");
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "저장중 문제가 발생했습니다.(cihp)");
         }
 
         //Openpose 호출
@@ -112,7 +112,7 @@ public class PhotoController {
                return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생했습니다.(Openpose)");
             }
         } catch (Exception e) {
-            return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생했습니다.(Openpose)");
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "저장중 문제가 발생했습니다.(Openpose)");
         }
 
         Photo photo = new Photo();
