@@ -37,7 +37,7 @@ public class ClothController {
     private final MemberService memberService;
     private final ClosetService closetService;
     private final SortService sortService;
-    private FastApiService fastApiService;
+    private final FastApiService fastApiService;
     @Operation(summary = "옷 저장")
     @PostMapping(value = "" )
     public Api<Object> saveCloth(@RequestParam("mFile") MultipartFile file, @ModelAttribute ClothSaveReq request) {
