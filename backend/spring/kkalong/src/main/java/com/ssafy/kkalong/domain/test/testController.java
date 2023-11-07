@@ -3,6 +3,10 @@ package com.ssafy.kkalong.domain.test;
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
+import com.ssafy.kkalong.domain.member.entity.Member;
+import com.ssafy.kkalong.domain.member.service.MemberService;
+import com.ssafy.kkalong.domain.photo.entity.Photo;
+import com.ssafy.kkalong.domain.photo.service.PhotoService;
 import com.ssafy.kkalong.fastapi.FastApiService;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
@@ -24,6 +28,10 @@ public class testController {
 
     @Autowired
     private FastApiService fastApiService;
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private PhotoService photoService;
 
     @Operation(summary = "test")
     @GetMapping("/test1")
@@ -85,7 +93,7 @@ public class testController {
     }
 
     @PostMapping("/s3/fast/rembg")
-    public Api<Object> testServer6(@RequestBody MultipartFile mFile){
+    public Api<Object> testServer6(MultipartFile mFile){
         // 1. 파일을 받는다.
         // 2. 해당 파일을 FastApiService에게 보낸다.
         Api<Object> res = fastApiService.requestRembg("사용자아이디", mFile);
@@ -104,6 +112,21 @@ public class testController {
         System.out.println(yesBg);
 
         return Api.OK(TempResDto.builder().yesBg(yesBg).noBg(noBg).build());
+    }
+
+    @PostMapping("/s3/fast/openpose")
+    public Api<Object> testServer8(int photoSeq){
+        System.out.println("testServer8 called");
+        // 0. 요청자의 데이터를 받는다.
+        Member member = memberService.getLoginUserInfo();
+        if (member == null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "사용자 데이터가 없습니다");
+        }
+        // 1. photo의 데이터를 가져온다.
+        Photo photo = photoService.getPhotoBySeq(photoSeq);
+
+        // 2. openpose 서버에 처리를 요청한다.
+        return fastApiService.requestOpenpose(member, photo.getPhotoImgName(), photo.getPhotoSeq());
     }
 
     @GetMapping("fast/welcome")

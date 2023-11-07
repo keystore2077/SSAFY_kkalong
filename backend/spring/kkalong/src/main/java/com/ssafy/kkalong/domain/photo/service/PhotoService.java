@@ -3,6 +3,8 @@ package com.ssafy.kkalong.domain.photo.service;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.repository.PhotoRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,9 @@ import java.util.Optional;
 public class PhotoService {
     @Autowired
     private PhotoRepository photoRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public List<Photo> getPhotoList(Member member){
         return photoRepository.findAllByMemberMemberSeqAndIsPhotoDeleted(member, false);
@@ -38,5 +43,16 @@ public class PhotoService {
 
     public Photo savePhoto(Photo photo) {
         return photoRepository.save(photo);
+    }
+
+    public void updatePhotoImgMasking(int photoSeq) {
+        // 엔티티를 조회
+        Photo photo = entityManager.find(Photo.class, photoSeq);
+
+        if (photo != null) {
+            // 필드 수정
+            photo.setPhotoImgMasking(true);
+            // 변경 내용은 JPA에 의해 데이터베이스에 반영됨
+        }
     }
 }

@@ -33,7 +33,7 @@ public class ClosetService {
 
     }
     public Closet findCloset(int closetSeq){
-        return closetRepository.findByClosetSeqAndIsClosetDeleted(closetSeq, false).get();
+        return closetRepository.findByClosetSeqAndIsClosetDeleted(closetSeq, false).orElse(null);
     }
     public List<Section> findSection(int closetSeq){
         return sectionRepository.findAllByClosetClosetSeqAndIsSectionDeleted(closetSeq,false);
@@ -75,6 +75,10 @@ public class ClosetService {
         return closetRepository.save(newCloset);
     }
 
+
+    public Section getSection(int sectionSeg){
+        return sectionRepository.findById(sectionSeg).orElse(null);
+    }
 }
 
 
