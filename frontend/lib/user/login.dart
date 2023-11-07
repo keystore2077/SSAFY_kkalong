@@ -1,28 +1,3 @@
-// import 'package:flutter/material.dart';
-
-// void main() {
-//   runApp(const Mylogin());
-// }
-
-// class Mylogin extends StatelessWidget {
-//   const Mylogin({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter Demo',
-//       theme: ThemeData(
-//         colorScheme: ColorScheme.fromSeed(
-//             seedColor: const Color.fromARGB(255, 255, 255, 255)),
-//         useMaterial3: true,
-//       ),
-//       home: const Mylogin(),
-//     );
-//   }
-// }
-
-// import 'package:fe/store/userstore.dart';
-
 import 'package:flutter/material.dart';
 import '../user/signup.dart';
 
@@ -209,45 +184,6 @@ class _LogInState extends State<LogIn> {
                                           ))),
                                 ),
                               ),
-                              // SizedBox(
-                              //   height: 20.0,
-                              //   child: Row(
-                              //       mainAxisAlignment: MainAxisAlignment.center,
-                              //       children: [
-                              //         GestureDetector(
-                              //           child: const Text('아이디 찾기'),
-                              //         ),
-                              //         const Text(' | '),
-                              //         GestureDetector(
-                              //           child: const Text('비밀번호 찾기'),
-                              //         ),
-                              //         const Text(' | '),
-                              //         GestureDetector(
-                              //           child: const Text('회원가입'),
-                              //         ),
-                              //       ]),
-                              // ),
-
-                              // Container(
-                              //   margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                              //   child: const Column(children: [
-                              //     Row(
-                              //       mainAxisAlignment: MainAxisAlignment.center,
-                              //       crossAxisAlignment:
-                              //           CrossAxisAlignment.center,
-                              //       children: [
-                              //         Text('아직 깔롱쟁이 회원이 아니라면?'),
-                              //         Text(
-                              //           '회원가입',
-                              //           style: TextStyle(
-                              //             fontWeight: FontWeight.w600,
-                              //           ),
-                              //         )
-                              //       ],
-                              //     ),
-                              //   ]),
-                              // )
-
                               GestureDetector(
                                 onTap: () {
                                   Navigator.push(
@@ -281,35 +217,6 @@ class _LogInState extends State<LogIn> {
                                   ),
                                 ),
                               )
-
-                              // Padding(
-                              //   padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                              //   child: Row(
-                              //     mainAxisAlignment: MainAxisAlignment.center,
-                              //     crossAxisAlignment: CrossAxisAlignment.center,
-                              //     children: [
-                              //       const Text(
-                              //         '아직 회원이 아니신가요?      ',
-                              //       ),
-                              //       GestureDetector(
-                              //         onTap: () {
-                              //           Navigator.push(
-                              //             context,
-                              //             MaterialPageRoute(
-                              //                 builder: (BuildContext context) =>
-                              //                     const Signup()),
-                              //           );
-                              //         },
-                              //         child: const Text(
-                              //           '회원가입',
-                              //           style: TextStyle(
-                              //             fontWeight: FontWeight.w700,
-                              //           ),
-                              //         ),
-                              //       )
-                              //     ],
-                              //   ),
-                              // ),
                             ],
                           ),
                         );
