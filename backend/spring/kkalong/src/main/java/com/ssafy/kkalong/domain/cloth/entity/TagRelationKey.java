@@ -20,7 +20,7 @@ public class TagRelationKey implements Serializable {
     @Column(name = "cloth_seq")
     @Schema(description = "옷 인덱스")
     private int clothSeq;
-    @Column(name = "tag_seq ")
+    @Column(name = "tag_seq")
     @Schema(description = "태그 인덱스")
     private int tagSeq;
 }

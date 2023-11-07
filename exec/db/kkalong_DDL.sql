@@ -42,11 +42,11 @@ CREATE TABLE `cloth` (
 	`sort_seq`	int	NOT NULL	COMMENT '옷 종류 인덱스',
 	`member_seq`	int	NOT NULL	COMMENT '소유자 인덱스'
 );
-
+use kkalong;
 DROP TABLE IF EXISTS `tag`;
 
 CREATE TABLE `tag` (
-	`seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
+	`tag_seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`tag`	varchar(40)	NOT NULL	COMMENT '태그명'
 );
 
@@ -107,7 +107,7 @@ CREATE TABLE `sort` (
 DROP TABLE IF EXISTS `tag_relation`;
 
 CREATE TABLE `tag_relation` (
-	`is_delete`	boolean	NOT NULL	DEFAULT false	COMMENT '삭제여부',
+	`is_tag_relation_delete`	boolean	NOT NULL	DEFAULT false	COMMENT '삭제여부',
 	`tag_relation_del_date`	datetime	NULL	COMMENT '삭제일시',
 	`cloth_seq`	int	NOT NULL	COMMENT '옷 인덱스',
 	`tag_seq`	int	NOT NULL	COMMENT '인덱스'
@@ -239,7 +239,7 @@ ALTER TABLE `tag_relation` ADD CONSTRAINT `FK_tag_TO_tag_relation_1` FOREIGN KEY
 	`tag_seq`
 )
 REFERENCES `tag` (
-	`seq`
+	`tag_seq`
 );
 
 ALTER TABLE `photo` ADD CONSTRAINT `FK_member_TO_photo_1` FOREIGN KEY (
