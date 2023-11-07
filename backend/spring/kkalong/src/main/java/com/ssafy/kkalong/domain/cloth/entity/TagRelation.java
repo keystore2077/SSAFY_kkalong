@@ -30,12 +30,12 @@ public class TagRelation {
     @ManyToOne
     @JoinColumn(name = "cloth_seq ", referencedColumnName = "cloth_seq ", insertable = false, updatable = false)
     @Schema(description = "옷")
-    private Member clothSeq ;
+    private Cloth cloth ;
 
     @ManyToOne
     @JoinColumn(name = "tag_seq ", referencedColumnName = "tag_seq ", insertable = false, updatable = false)
     @Schema(description = "태그")
-    private Member tagSeq ;
+    private Tag tag ;
 
 
 }

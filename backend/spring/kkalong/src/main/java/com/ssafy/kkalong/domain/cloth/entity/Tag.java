@@ -24,4 +24,9 @@ public class Tag {
     @Column(name="tag",nullable = false,length = 40)
     @Schema(description = "태그")
     private String tag;
+
+    public  Tag(String tag){
+        this.tag = tag;
+    }
+
 }
