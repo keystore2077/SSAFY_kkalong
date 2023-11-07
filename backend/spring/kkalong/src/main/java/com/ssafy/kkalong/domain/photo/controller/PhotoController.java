@@ -224,6 +224,7 @@ public class PhotoController {
     @Async
     private void callCihp(Member member, Photo photo){
         System.out.println("callCihp called...");
+        System.out.println("요청 경로: photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
         // s3에서 파일 가져오기
         byte[] byteFile = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
 
@@ -234,6 +235,7 @@ public class PhotoController {
         // cihp 결과 저장
         try{
             FastApiRequestGeneralRes cihpResBody = (FastApiRequestGeneralRes)cihpRes.getBody();
+            System.out.println("저장 경로: photo/masking/" + cihpResBody.getImgName() + ".png");
             s3Service.uploadFile("photo/masking/" + cihpResBody.getImgName() + ".png", cihpResBody.getImg());
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(cihp)");
