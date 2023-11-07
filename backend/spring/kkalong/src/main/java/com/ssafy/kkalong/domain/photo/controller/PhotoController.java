@@ -65,14 +65,14 @@ public class PhotoController {
 
         // key 생성
         // photo_소유자아이디_현재시간_무작위숫자6개
-        String fileName = FileNameGenerator.generateFileName("photo", member.getMemberId(), "jpg");
+        String fileName = FileNameGenerator.generateFileNameNoExtension("photo", member.getMemberId());
 
         // 저장할 장소 지정
         String path = "photo/original/";
 
         // S3서버에 사진을 저장
         try {
-            String res = s3Service.uploadFile(path + fileName, photoReq);
+            String res = s3Service.uploadFile(path + fileName + ".jpg", photoReq);
         } catch (IOException e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "업로드 실패");
         }
@@ -123,8 +123,8 @@ public class PhotoController {
         photo.setPhotoImgYesBg(true);
         photo.setPhotoImgNoBg(true);
         photo.setPhotoImgMasking(true);
-//        photo.setPhotoImgOpenpose(true);
-//        photo.setPhotoJsonOpenpose(true);
+        photo.setPhotoImgOpenpose(false);
+        photo.setPhotoJsonOpenpose(false);
 
         // DB에 저장
         photoService.savePhoto(photo);
