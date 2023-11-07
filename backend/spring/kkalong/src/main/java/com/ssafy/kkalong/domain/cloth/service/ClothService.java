@@ -66,4 +66,6 @@ public class ClothService {
         }
         return ClothSaveRes.toRes(clothSave, imgUrl, tagList);
     }
+
+  // public Cloth (int clothSeq)
 }

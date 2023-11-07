@@ -109,5 +109,15 @@ public class ClothController {
         return Api.OK(clothService.saveCloth(member, section, sort, request, imgUrl,fileName ));
     }
 
+//    @Operation(summary = "옷 상세정보")
+//    @PostMapping(value = "/{clothSeq}" )
+//    public Api<Object> getCloth(@PathVariable int clothSeq) {
+//        Member member = memberService.getLoginUserInfo();
+//        if (member == null) {
+//            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+//        }
+//
+//    }
+
 
 }
