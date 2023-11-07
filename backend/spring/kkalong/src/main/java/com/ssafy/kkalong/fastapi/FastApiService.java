@@ -132,27 +132,33 @@ public class FastApiService {
 
         // response에서 json 추출
         try {
+            System.out.println("추출 시작");
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
+            System.out.println(jsonStr);
             Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {});
             byte[] cihp = Base64.getDecoder().decode((String)jsonMap.get("file"));
             // 파일 임시 저장
+            System.out.println("임시 저장중...");
             String fileName = FileNameGenerator.generateFileNameNoExtension("temp", memberId);
 
             File tempFile = File.createTempFile(fileName, ".jpg");
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 fos.write(cihp);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("fos 변환 실패");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
             }
             return Api.OK(new FastApiRequestGeneralRes(fileName, tempFile, "./"));
         } catch (JSONException  | IOException e) {
             // JSON 파싱 오류 처리
             e.printStackTrace();
+            System.out.println("변환 중 실패");
             return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
         } catch (Exception e){
             e.printStackTrace();
+            System.out.println("알 수 없는 오류 발생");
             return Api.ERROR(ErrorCode.SERVER_ERROR, "알 수 없는 오류");
         }
     }
