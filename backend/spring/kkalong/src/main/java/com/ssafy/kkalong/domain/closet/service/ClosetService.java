@@ -39,11 +39,12 @@ public class ClosetService {
         return sectionRepository.findAllByClosetClosetSeqAndIsSectionDeleted(closetSeq,false);
     }
 
-    public Closet createCloset(ClosetCreateRequest request, Member member) {
+    public Closet createCloset(ClosetCreateRequest request, Member member, String imgUrl) {
         Closet newCloset = new Closet();
         newCloset.setClosetName(request.getClosetName());
 //        newCloset.setClosetImgName(request.getClosetImageName());
         newCloset.setMember(member);
+
 
         // DB에 저장하고, 저장된 엔티티 반환
         // dto를 저장
@@ -58,9 +59,7 @@ public class ClosetService {
             section.setSectionName(request.getSectionName());
             section.setCloset(newCloset);
             section.setSort(request.getSort());
-
             sectionsToSave.add(section);
-
 
         }
         return sectionRepository.saveAll(sectionsToSave);

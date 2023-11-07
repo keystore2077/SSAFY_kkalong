@@ -15,8 +15,11 @@ import com.ssafy.kkalong.domain.closet.repository.ClosetRepository;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
+import com.ssafy.kkalong.fastapi.FastApiService;
+import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +42,9 @@ public class ClosetController {
     private S3Service s3Service;
     @Autowired
     private ClosetRepository closetRepository;
+
+    @Autowired
+    private FastApiService fastApiService;
 
 
 
@@ -130,12 +136,42 @@ public class ClosetController {
 
     @PostMapping("/test")
     @Operation(summary = "옷장등록 연습")
-    public Api<Object> createClosetPrac(ClosetCreateRequest closetCreateRequest){ //ClosetCreateRequest 타입의 객체를 매개변수로 받아 처리
+    public Api<Object> createClosetPrac(MultipartFile file, ClosetCreateRequest closetCreateRequest){ //ClosetCreateRequest 타입의 객체를 매개변수로 받아 처리
         Member member = memberService.getLoginUserInfo(); //현재 로그인한 사용자의 정보를 가져오기 위해 memberService의 getLoginUserInfo 메소드를 호출
+
         if (member == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
         }
+        String s3imgUrl="";
+        String fileName="";
+        //옷장 사진파일에 대한 유효성검사 해주기(1)
+        if (!file.isEmpty()) {
 
+            if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
+//                //1.사진 파일명 생성
+                fileName= FileNameGenerator.generateFileName("closet", member.getMemberId(), "png");
+                String filePath = "closet/" + fileName;
+
+                Api<Object>result = fastApiService.requestRembg(member.getMemberId(),file);
+                RequestRembgRes reRes = (RequestRembgRes)result.getBody();
+                s3Service.uploadFile(filePath,reRes.getNoBg());
+                //누끼를 딴거를 올려야함
+                s3imgUrl = s3Service.generatePresignedUrl(filePath);
+
+            }
+            else {
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "지원하지 않는 파일 형식입니다.");
+            }
+        } else {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "업로드된 파일이 없습니다.");
+        }
+
+
+
+        //옷장 상세종류 인덱스 유효성검사(2)
+        
+
+        closetService.createSection(closetCreateRequest.getClosetSectionList(), newCloset);
         System.out.println(closetCreateRequest.toString());
         String closetImgName = FileNameGenerator.generateFileName("closet",member.getMemberId(),"jpg");
         //FileNameGenerator(common/util)를 사용하여 저장할 옷장 이미지 파일의 이름을 생성 -> 이 이름은 사용자의 ID와 "jpg" 확장자를 사용
@@ -181,7 +217,6 @@ public class ClosetController {
     @Operation(summary = "옷장 등록전 사진 배경제거")
     public Api<Object> postRembgReq(@RequestBody MultipartFile file) {
         //1.사진 유효성검사 (null,jpg,png)
-
         Member member = memberService.getLoginUserInfo();
         if (member == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
