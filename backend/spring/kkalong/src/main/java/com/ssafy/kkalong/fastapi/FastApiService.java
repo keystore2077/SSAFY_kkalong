@@ -154,18 +154,16 @@ public class FastApiService {
         }
     }
 
-    // 미완성
-    public Api<Object> requestU2Net(String memberId, MultipartFile mFile) {
+    public Api<Object> requestU2Net(String memberId, MultipartFile mFile) throws IOException {
+        return requestU2Net(memberId, mFile.getBytes());
+    }
+
+    public Api<Object> requestU2Net(String memberId, byte[] mFile) {
         String apiUrl = preprocessUrl + "/u2net";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String mFileBase64;
-        try {
-            mFileBase64 = Base64.getEncoder().encodeToString(mFile.getBytes());
-        } catch (IOException e) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않은 파일");
-        }
+        String mFileBase64 = Base64.getEncoder().encodeToString(mFile);
 
         // ObjectMapper 초기화
         ObjectMapper objectMapper = new ObjectMapper();
