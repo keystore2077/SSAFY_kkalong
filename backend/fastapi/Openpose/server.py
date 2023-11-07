@@ -15,8 +15,7 @@ connection = pymysql.connect(
     host=config('MYSQL_HOST'),
     user=config('MYSQL_USER'),
     password=config('MYSQL_PASSWORD'),
-    database=config('MYSQL_DB'),
-    charset='utf-8'
+    database=config('MYSQL_DB')
 )
 
 # DB 커서 생성
@@ -44,7 +43,7 @@ def get_dummy():
     return "download succeed"
 
 ## Openpose를 돌려주는 API
-@app.get("/openpose")
+@app.post("/openpose")
 async def run_openpose(rb: orb):
     print("run_openpose called")
     print(rb)
@@ -56,10 +55,10 @@ async def run_openpose(rb: orb):
 
     # 2. 없다면 에러 보내고, 있다면 해당 파일을 다운 받는다.
     results = cursor.fetchall()
-    if (len(results) == 0):
-        return {"result": "실패", "stdout": "검색결과 없음"}
+    if len(results) == 0:
+        return "검색결과 없음"
     member_seq = results[0][1]
-    s3.download_file(bucket_name, r"photo/" + rb.photo_img_name + ".png", r"./examples/" + rb.photo_img_name + ".png")
+    s3.download_file(bucket_name, r"photo/original/" + rb.photo_img_name + ".jpg", r"./examples/" + rb.photo_img_name + ".png")
 
     # 3. 해당 파일에 대해서 openpose를 돌린다.
     command = r".\bin\OpenPoseDemo.exe --image_dir examples --hand --write_json output_jsons --write_images output_images --disable_blending"
@@ -100,9 +99,13 @@ async def run_openpose(rb: orb):
         os.remove(r"./output_images" + rb.photo_img_name + "_rendered.png")
         os.remove(r"./output_jsons" + rb.photo_img_name + "_keypoints.json")
     except FileNotFoundError:
-        print(f"파일이 존재하지 않습니다")
+        return f"파일이 존재하지 않습니다"
     except Exception as e:
-        print(f"파일 삭제 중 오류 발생: {e}")
+        return f"파일 삭제 중 오류 발생: {e}"
 
     # 7. 호출자에게 완료를 반환한다.
-    return {"result": "성공", "stdout": stdout}
+    return "success"
+
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=4051)

@@ -380,3 +380,5 @@ cython_debug/
 backend/fastapi/*/bin
 backend/fastapi/*/models
 backend/fastapi/**/saved_models
+backend/fastapi/**/checkpoints
+backend/fastapi/**/checkpoint
