@@ -221,52 +221,6 @@ public class ClosetController {
     }
 
 
-
-
-
-    @PostMapping("/rembg_req")
-    @Operation(summary = "옷장 등록전 사진 배경제거")
-    public Api<Object> postRembgReq(@RequestBody MultipartFile file) {
-        //1.사진 유효성검사 (null,jpg,png)
-        Member member = memberService.getLoginUserInfo();
-        if (member == null) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
-        }
-
-        if (file.isEmpty() || (!file.getContentType().equalsIgnoreCase("image/jpg") &&
-                !file.getContentType().equalsIgnoreCase("image/png"))) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "Invalid file type or empty file.");
-        }
-        // 2.gpu에 사진 변환 요청(누끼변환 요청) 누끼변환요청 자체는 없음
-        
-        // 3. 여기서붙터
-        File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
-        // 임시 파일을 삭제하도록 설정합니다. 프로그램 종료 시 삭제됩니다.
-        convFile.deleteOnExit();
-        // MultipartFile의 내용을 임시 파일로 복사합니다.
-        try {
-            file.transferTo(convFile);
-        } catch (IOException e) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "파이썬 맛감!");
-        }
-        //여기까지는 임시코드. FastApiService 기능 완성하면 바꿀것
-
-
-        //파일 이름 생성 로직을 호출
-        String transformedImageName = FileNameGenerator.generateFileName("closet/original/", member.getMemberId(), "jpg");
-
-        // 4. 완료응답이오면
-        // 5. S3서비스한테 있는 generatePresignedUrl 이 메서드한테 앞에서 생성한 파일이름 그거를 달라고 요청을하기
-//            String downloadUrl = s3Service.generatePresignedUrl("경로와 파일 이름과 확장자명까지 함꼐 보내주세요");
-        // 아래 경로는 임시입니다
-
-        String downloadUrl = s3Service.generatePresignedUrl("photo/original/photo_tester_231103_145931_789464.jpg");
-
-        // 6. 그걸 프론트에 보내기
-        return Api.OK(new ClosetRembgResponse(transformedImageName,downloadUrl));
-
-    }
-
     // 옷장 삭제
     @PutMapping("/{closetSeq}")
     @Operation(summary = "옷장 삭제")

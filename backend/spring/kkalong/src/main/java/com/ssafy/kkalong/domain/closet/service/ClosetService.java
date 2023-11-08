@@ -48,7 +48,7 @@ public class ClosetService {
         newCloset.setMember(member);
         newCloset.setClosetName(request.getClosetName());
         newCloset.setClosetImgName(filename);
-        newCloset.setClosetRegData(LocalDateTime.now());
+
 
         return closetRepository.save(newCloset);
     }
@@ -73,7 +73,7 @@ public class ClosetService {
         newCloset.setClosetName(request.getClosetName());
         newCloset.setClosetImgName(closetImageName);
         newCloset.setMember(member);
-        newCloset.setClosetRegData(LocalDateTime.now());
+
 
         return closetRepository.save(newCloset);
     }
