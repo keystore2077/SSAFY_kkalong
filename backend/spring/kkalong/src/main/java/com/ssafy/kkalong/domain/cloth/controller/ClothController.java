@@ -60,7 +60,7 @@ public class ClothController {
         }
 
         //sortSeq 유효성 검사
-        Sort sort = sortService.getSort(request.getSort());
+        Sort sort = sortService.getClothSort(request.getSort());
         if (sort == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷 종류입니다. Top, Pants, Outer, Skirt, Dress, Etc 중에서 보내주세요.", request.getSort()));
         }
@@ -145,7 +145,7 @@ public class ClothController {
         }
 
         //sortSeq 유효성 검사
-        Sort sort = sortService.getSort(sortName);
+        Sort sort = sortService.getClothSort(sortName);
         if (sort == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷 종류입니다. Top, Pants, Outer, Skirt, Dress, Etc 중에서 보내주세요.", sortName));
         }
