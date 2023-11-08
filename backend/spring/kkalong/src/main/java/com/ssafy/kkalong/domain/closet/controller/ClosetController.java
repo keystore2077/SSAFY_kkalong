@@ -76,6 +76,9 @@ public class ClosetController {
         //3.리스트(섹션)가지고오기
         List<Section> sections = closetService.findSection(closetSeq);
         List<SectionResponse> result = new ArrayList<>();
+
+//        List<ClosetGetDetailResponse> closetGetDetailResponses = new ArrayList<>();
+
         for (Section section : sections) {
             SectionResponse sectionResponse = SectionResponse.builder()
                     .sectionSeq(section.getSectionSeq())
@@ -86,7 +89,18 @@ public class ClosetController {
             result.add(sectionResponse);
 
         }
-        return Api.OK(result);
+        ClosetGetDetailResponse closetGetDetailResponse = new ClosetGetDetailResponse();
+        closetGetDetailResponse.setClosetName(closet.getClosetName());
+
+        String filepath = "closet/" + closet.getClosetImgName();
+
+        String imgUrl = s3Service.generatePresignedUrl(filepath);
+
+        closetGetDetailResponse.setClosetPictureUrl(imgUrl);
+
+        closetGetDetailResponse.setClosetSectionList(result);
+
+        return Api.OK(closetGetDetailResponse);
 
     }
 
@@ -104,14 +118,24 @@ public class ClosetController {
         List<ClosetResponse> result = new ArrayList<>();       //클로젯의 리스트 반환해줄 리스트
 
         for (Closet closet : closets) {
-//            String url = closet.getClosetImgName();  //이부분 수정해야함 개행
-            String url = "String";
-            ClosetResponse closetResponse = ClosetResponse.builder()
-                    .closetSeq(closet.getClosetSeq())       //옷장인덱스
-                    .closetName(closet.getClosetName())     //옷장이름
-                    .closetPictureUrl(url)      //옷장사진 url
-                    .build();
-            result.add(closetResponse);
+            String fileName = closet.getClosetImgName();
+            if (fileName != null && !fileName.isEmpty()) {
+                // 파일 경로를 정확히 지정해야 합니다. "closet/"는 가정한 폴더 경로입니다.
+                String filePath = "closet/" + fileName;
+                String url = s3Service.generatePresignedUrl(filePath);
+                ClosetResponse closetResponse = ClosetResponse.builder()
+                        .closetSeq(closet.getClosetSeq()) // 옷장인덱스
+                        .closetPictureUrl(url) // 옷장사진 url
+                        .build();
+                result.add(closetResponse);
+            } else {
+                // 파일 이름이 없는 경우에 대한 처리
+                ClosetResponse closetResponse = ClosetResponse.builder()
+                        .closetSeq(closet.getClosetSeq()) // 옷장인덱스
+                        .closetPictureUrl(null) // 혹은 적절한 기본 이미지 URL을 설정
+                        .build();
+                result.add(closetResponse);
+            }
         }
         return Api.OK(result);
 
@@ -182,42 +206,6 @@ public class ClosetController {
 
         return Api.OK(closetSaveResponse);
 
-
-//        System.out.println(closetCreateRequest.toString());
-//        String closetImgName = FileNameGenerator.generateFileName("closet",member.getMemberId(),"jpg");
-//        //FileNameGenerator(common/util)를 사용하여 저장할 옷장 이미지 파일의 이름을 생성 -> 이 이름은 사용자의 ID와 "jpg" 확장자를 사용
-//
-//         Closet closet = closetCreateRequest.toEntity(member,closetCreateRequest,closetImgName);  //dto인 closetCreatRequest에서 toEntitiy라는 메소드를 만들어줘야함
-//        //closetCreateRequest 객체의 toEntity 메소드를 호출하여, 제공한 데이터와 생성된 이미지 파일 이름을 사용해 Closet 엔티티(데이터베이스에 저장될 객체)를 생성
-//
-//        try {
-//            s3Service.uploadFile("closet/" + closetImgName,closetCreateRequest.getClosetImageFile());
-//        } catch (IOException e) {
-//            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
-//        }
-//        //이미지 파일을 Amazon S3파일 저장 서비스에 업로드하는 시도
-//
-////        closetService.testcloset(closetCreateRequest,member,closetImgName);
-//
-//        Closet closetResult = closetService.testcloset(closetCreateRequest,member,closetImgName);
-//        //closetService의 testcloset 메소드를 호출하여 데이터베이스에 옷장 정보를 저장. 저장된 결과를 closetResult에 할당.
-//
-//        String imgUrl = s3Service.generatePresignedUrl("closet/" + closetResult.getClosetImgName());
-//        //저장된 이미지 파일을 인터넷에서 접근할 수 있는 URL을 생성.
-//
-//        System.out.println("closet/" + closetResult.getClosetImgName());
-//        ClosetSaveResponse closetsaveresponse = new ClosetSaveResponse();
-//        //클라이언트에 반환할 응답을 담을 ClosetSaveResponse 객체를 생성.
-//
-//        closetsaveresponse.setClosetSeq(closetResult.getClosetSeq());
-//        closetsaveresponse.setClosetName(closetResult.getClosetName());
-//        closetsaveresponse.setClosetPictureUrl(imgUrl);
-////        closetsaveresponse.setClosetSectionList(closetResult.get);
-//        closetsaveresponse.setClosetRegData(closetResult.getClosetRegData());
-//        closetsaveresponse.setMembernickname(closetResult.getMember().getMemberNickname());
-//        //closetsaveresponse 객체에 closetResult에서 얻은 데이터를 설정. 이를 통해 클라이언트에 옷장의 순번, 이름, 이미지 URL, 등록 날짜, 사용자 닉네임 등을 전달
-//
-//        return Api.OK(closetsaveresponse);
     }
 
 
