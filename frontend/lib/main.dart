@@ -168,6 +168,7 @@ import '../user/login.dart';
 import '../user/mypage.dart';
 import './reafeat/bottom.dart';
 import './closet/closetdetail.dart';
+import './closet/mycloset.dart';
 import './category/category.dart';
 import './user/pageapi.dart';
 
@@ -267,15 +268,16 @@ class _MainState extends State<Main> {
         return await onWillPop(); // 기존 onWillPop 함수 호출
       },
       child: DefaultTabController(
-        initialIndex: 3,
-        length: 4,
+        initialIndex: 1,
+        length: 5,
         child: Scaffold(
           body: SafeArea(
             child: TabBarView(
               children: const [
                 ChoicePicture(),
-                CategoryPage(),
+                MyCloset(),
                 ClosetDetail(),
+                CategoryPage(),
                 MyPage(),
                 // userToken == null
                 //     ? LogIn(storage: storage)

@@ -29,6 +29,7 @@ class _BottomState extends State<Bottom> {
             indicatorSize: TabBarIndicatorSize.label,
             indicatorColor: Colors.transparent,
             labelColor: Color(0xFFF5BEB5),
+            labelStyle: TextStyle(fontSize: 13),
             unselectedLabelColor: Color(0xffCACACA),
             tabs: [
               Tab(
@@ -42,13 +43,54 @@ class _BottomState extends State<Bottom> {
                 text: '옷장',
               ),
               Tab(
-                icon: Icon(Icons.perm_identity),
-                text: '내프로필',
+                icon: Icon(Icons.menu),
+                text: '카테고리',
               ),
               Tab(
                 icon: Icon(Icons.checkroom),
                 text: '코디평가',
               ),
+              Tab(
+                icon: Icon(Icons.perm_identity),
+                text: '내프로필',
+              ),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 1.0),
+              //   child: Tab(
+              //     icon: Icon(Icons.accessibility),
+              //     text: '아바타',
+              //   ),
+              // ),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 1.0),
+              //   child: Tab(
+              //     icon: Icon(
+              //       Icons.space_dashboard_outlined,
+              //     ),
+              //     text: '옷장',
+              //   ),
+              // ),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 1.0),
+              //   child: Tab(
+              //     icon: Icon(Icons.menu),
+              //     text: '카테고리',
+              //   ),
+              // ),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 1.0),
+              //   child: Tab(
+              //     icon: Icon(Icons.checkroom),
+              //     text: '코디평가',
+              //   ),
+              // ),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 1.0),
+              //   child: Tab(
+              //     icon: Icon(Icons.perm_identity),
+              //     text: '내프로필',
+              //   ),
+              // ),
             ]),
       ),
     );
