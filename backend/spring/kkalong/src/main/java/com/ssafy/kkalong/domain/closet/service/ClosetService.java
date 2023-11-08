@@ -7,24 +7,29 @@ import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.repository.ClosetRepository;
 import com.ssafy.kkalong.domain.closet.repository.SectionRepository;
 import com.ssafy.kkalong.domain.member.entity.Member;
+import com.ssafy.kkalong.domain.sort.entity.Sort;
+import com.ssafy.kkalong.domain.sort.service.SortService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 //컨트롤러 비지니스 로직
-
+//closetservice
 @RequiredArgsConstructor
 @Service
+
 public class ClosetService {
 
     @Autowired
     private ClosetRepository closetRepository;
     @Autowired
     private SectionRepository sectionRepository;
-
+    @Autowired
+    private SortService sortService;
 
 
     public List<Closet> findClosetsByMemberSeq(int memberSeq) {
@@ -38,31 +43,41 @@ public class ClosetService {
         return sectionRepository.findAllByClosetClosetSeqAndIsSectionDeleted(closetSeq,false);
     }
 
-    public Closet createCloset(ClosetCreateRequest request, Member member) {
+    public Closet createCloset(ClosetCreateRequest request, Member member, String filename) {
         Closet newCloset = new Closet();
-        newCloset.setClosetName(request.getClosetName());
-        newCloset.setClosetImgName(request.getClosetImageName());
         newCloset.setMember(member);
+        newCloset.setClosetName(request.getClosetName());
+        newCloset.setClosetImgName(filename);
 
-        // DB에 저장하고, 저장된 엔티티 반환
+
         return closetRepository.save(newCloset);
     }
 
     public List<Section> createSection(List<SectionCreateRequestItem> requests, Closet newCloset) {
         List<Section> sectionsToSave = new ArrayList<>();
 
+
         for (SectionCreateRequestItem request : requests) {
+            Sort sort = sortService.getSort(request.getSort());
             Section section = new Section();
             section.setSectionName(request.getSectionName());
             section.setCloset(newCloset);
-            section.setSort(request.getSort());
-
+            section.setSort(sort);
             sectionsToSave.add(section);
-
-
         }
         return sectionRepository.saveAll(sectionsToSave);
     }
+    //db에 저장할 정보들 저장할라고 하는거임
+    public Closet testcloset(ClosetCreateRequest request, Member member, String closetImageName) {
+        Closet newCloset = new Closet();
+        newCloset.setClosetName(request.getClosetName());
+        newCloset.setClosetImgName(closetImageName);
+        newCloset.setMember(member);
+
+
+        return closetRepository.save(newCloset);
+    }
+
 
     public Section getSection(int sectionSeg){
         return sectionRepository.findById(sectionSeg).orElse(null);

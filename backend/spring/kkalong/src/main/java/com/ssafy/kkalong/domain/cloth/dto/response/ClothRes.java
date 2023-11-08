@@ -50,7 +50,7 @@ public class ClothRes {
 
     public static ClothRes toRes(Cloth cloth, String imgUrl){
         return ClothRes.builder()
-                .closetSeq(cloth.getClothSeq())
+                .clothSeq(cloth.getClothSeq())
                 .memberNickname(cloth.getMember().getMemberNickname())
                 .closetSeq(cloth.getSection().getCloset().getClosetSeq())
                 .closetName(cloth.getSection().getCloset().getClosetName())
