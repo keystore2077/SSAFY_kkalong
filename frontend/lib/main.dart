@@ -54,9 +54,37 @@
 //   }
 // }
 
+// @override
+// Widget build(BuildContext context) {
+//   return const DefaultTabController(
+//       initialIndex: 2,
+//       length: 4,
+//       child: Scaffold(
+//         body: SafeArea(
+//           child: TabBarView(
+//             children: [
+//               MyPage(),s
+//               LogIn(),
+//               MyPage(),
+//               LogIn(),
+//               // userToken == null
+//               //     ? LogIn(storage: storage)
+//               //     : MyPage(storage: storage)
+//             ],
+//           ),
+//         ),
+//         extendBodyBehindAppBar: true,
+//         bottomNavigationBar: Bottom(),
+//       ));
+// }
+import 'dart:io';
+import 'dart:async';
+
+import 'package:flutter_mycloset/user/pageapi.dart';
 import 'package:provider/provider.dart';
 import 'store/userstore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../user/pageapi.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mycloset/avata/choicepicture.dart';
@@ -69,8 +97,10 @@ import './category/category.dart';
 import './user/pageapi.dart';
 
 void main() {
-  runApp(
-      ChangeNotifierProvider(create: (c) => UserStore(), child: const Main()));
+  runApp(ChangeNotifierProvider(
+          create: (c) => UserStore(),
+          child: const Main())
+    );
 }
 
 class Main extends StatefulWidget {
