@@ -455,11 +455,20 @@ class _LogInState extends State<LogIn> {
                                                     .read<UserStore>()
                                                     .changeAccessToken(
                                                         accessToken);
-                                                Navigator.push(
+                                                // Navigator.push(
+                                                //   context,
+                                                //   MaterialPageRoute(
+                                                //       builder: (context) =>
+                                                //           const Main()),
+                                                // );
+                                                Navigator.pushAndRemoveUntil(
                                                   context,
                                                   MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const Main()),
+                                                    builder: (context) =>
+                                                        const Main(),
+                                                  ),
+                                                  (route) =>
+                                                      false, // 모든 이전 페이지를 제거하려면 false를 반환
                                                 );
                                               } else {
                                                 //  showSnackBar(context,

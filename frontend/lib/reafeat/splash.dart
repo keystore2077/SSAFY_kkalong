@@ -317,6 +317,12 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (_) => LogIn(storage: storage),
         ));
+        // Navigator.of(context).pushReplacementAndRemoveUntil(
+        //   MaterialPageRoute(
+        //     builder: (_) => LogIn(storage: storage), // 이동할 새로운 페이지
+        //   ),
+        //   (route) => false, // 모든 이전 페이지를 제거하려면 false를 반환
+        // );
       }
     });
   }
