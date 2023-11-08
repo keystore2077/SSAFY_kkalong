@@ -40,6 +40,7 @@ public class FastApiCallerService {
             }
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(Openpose)");
+            throw e;
         }
     }
 
@@ -61,6 +62,7 @@ public class FastApiCallerService {
             s3Service.uploadFile("photo/masking/" + cihpResBody.getImgName() + ".png", cihpResBody.getImg());
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(cihp)");
+            throw e;
         }
         // DB 업데이트
         photoService.updatePhotoImgMasking(photo.getPhotoSeq());
@@ -85,6 +87,7 @@ public class FastApiCallerService {
             s3Service.uploadFile("cloth/masking/" + u2NetResBody.getImgName() + ".png", u2NetResBody.getImg());
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(U2Net)");
+            throw e;
         }
         // DB 업데이트
         clothService.updateClothImgMasking(cloth.getClothSeq());

@@ -270,7 +270,7 @@ public class PhotoController {
         System.out.println("VITON 완료");
 
         // 5. S3에서 URL 획득
-        String url = s3Service.generatePresignedUrl("fashion/" + res.getImgName() + ".jpg");
+        String url = s3Service.generatePresignedUrl("temp/" + res.getImgName() + ".jpg");
 
         return Api.OK(new PhotoMixRequestRes(url, "성공"));
     }
