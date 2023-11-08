@@ -1,7 +1,9 @@
 package com.ssafy.kkalong.domain.cloth.service;
 
 import com.ssafy.kkalong.domain.closet.entity.Section;
+import com.ssafy.kkalong.domain.closet.repository.SectionRepository;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothSaveReq;
+import com.ssafy.kkalong.domain.cloth.dto.response.ClothGetRes;
 import com.ssafy.kkalong.domain.cloth.dto.response.ClothSaveRes;
 import com.ssafy.kkalong.domain.cloth.entity.Cloth;
 import com.ssafy.kkalong.domain.cloth.entity.Tag;
@@ -11,13 +13,18 @@ import com.ssafy.kkalong.domain.cloth.repository.ClothRepository;
 import com.ssafy.kkalong.domain.cloth.repository.TagRelaionRepository;
 import com.ssafy.kkalong.domain.cloth.repository.TagRepository;
 import com.ssafy.kkalong.domain.member.entity.Member;
+import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.sort.entity.Sort;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import com.ssafy.kkalong.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -25,9 +32,15 @@ public class ClothService {
     private final ClothRepository clothRepository;
     private final TagRepository tagRepository;
     private final TagRelaionRepository tagRelaionRepository;
+    private final S3Service s3Service;
+    private final SectionRepository sectionRepository;
 
-    public ClothSaveRes saveCloth(Member member, Section section, Sort sort, ClothSaveReq request, String imgUrl, String fileName){
-        //옷 저장
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public ClothSaveRes saveCloth(Member member, Section section, Sort sort, ClothSaveReq request, String imgUrl,
+            String fileName) {
+        // 옷 저장
         Cloth cloth = Cloth.builder()
                 .section(section)
                 .sort(sort)
@@ -42,15 +55,15 @@ public class ClothService {
                 .build();
 
         Cloth clothSave = clothRepository.save(cloth);
-        
+
         List<Tag> tagList = new ArrayList<>();
-        //태그 저장
-        for (String tagName : request.getTagList()){
+        // 태그 저장
+        for (String tagName : request.getTagList()) {
             Tag tag = tagRepository.findByTag(tagName).orElse(null);
-            if(tag==null){
+            if (tag == null) {
                 tag = tagRepository.save(new Tag(tagName));
             }
-            //옷태그 관계 저장
+            // 옷태그 관계 저장
             TagRelationKey tagRelationKey = TagRelationKey.builder()
                     .clothSeq(clothSave.getClothSeq())
                     .tagSeq(tag.getTagSeq())
@@ -67,9 +80,66 @@ public class ClothService {
         return ClothSaveRes.toRes(clothSave, imgUrl, tagList);
     }
 
-   public Cloth getCloth(int clothSeq){
-        return clothRepository.findById(clothSeq).orElse(null);
+    public void updateClothImgMasking(int clothSeq) {
+        // 엔티티를 조회
+        Cloth cloth = entityManager.find(Cloth.class, clothSeq);
 
+        if (cloth != null) {
+            cloth.setClothImgMasking(true);
+        }
+    }
 
-   }
+    public Cloth getCloth(int clothSeq) {
+        return clothRepository.findByClothSeqAndIsClothDeleted(clothSeq, false).orElse(null);
+    }
+
+    public List<Tag> getTagList(int clothSeq) {
+        return tagRelaionRepository.findAllByClothClothSeq(clothSeq).stream()
+                .map(v -> {
+                    return v.getTag();
+                })
+                .toList();
+    }
+
+    public List<ClothGetRes> getClothListBySort(Member member, Sort sort) {
+
+        return clothRepository.findAllByMemberAndSortAndIsClothDeleted(member, sort, false).stream()
+                .map(cloth -> {
+                    String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() + ".png";
+                    String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+                    return ClothGetRes.toRes(cloth, imgUrl);
+                })
+                .toList();
+
+    }
+
+    public Section getSection(int sectionSeq) {
+        return sectionRepository.findById(sectionSeq).orElse(null);
+    }
+
+    public List<ClothGetRes> getClothListBySection(Member member, Section section) {
+
+        return clothRepository.findAllByMemberAndSectionAndIsClothDeleted(member, section, false).stream()
+                .map(cloth -> {
+                    String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() + ".png";
+                    String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+                    return ClothGetRes.toRes(cloth, imgUrl);
+                })
+                .toList();
+    }
+
+    public Tag getTag(int tagSeq) {
+        return tagRepository.findById(tagSeq).orElse(null);
+    }
+
+    public List<ClothGetRes> getClothListByTag(Member member, Tag tag) {
+
+        return clothRepository.findClothsByMemberAndTag(member.getMemberSeq(), tag.getTagSeq()).stream()
+                .map(cloth -> {
+                    String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() + ".png";
+                    String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+                    return ClothGetRes.toRes(cloth, imgUrl);
+                })
+                .toList();
+    }
 }

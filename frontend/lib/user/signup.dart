@@ -16,6 +16,9 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/user/login.dart';
+import 'pageapi.dart';
+
 // import './addinfo.dart';
 
 class SignUp extends StatefulWidget {
@@ -31,11 +34,31 @@ class _SignUpState extends State<SignUp> {
   TextEditingController controller3 = TextEditingController();
   TextEditingController controller4 = TextEditingController();
   TextEditingController controller5 = TextEditingController();
+  TextEditingController controller6 = TextEditingController();
   final _wman = ['남자', '여자']; // 성별선택 드롭다운 리스트
   String? _selectedWman;
 
+  bool idCheck = false;
+  bool nickCheck = false;
+  bool emailCheck = false;
+  bool passwordCheck = false;
+  bool samepasswordCheck = false;
+
+  String? idError;
+  String idMessage = '최소 5자 이상 20자 이하';
+  String? emailError;
+  String emailMessage = '이메일 형식으로 입력해주세요';
+  String? passwordError;
+  String passwordMessage = '영/숫자 한번 이상 사용, 최소 8자에서 20자 이내로 작성';
+  String? samepasswordError;
+  String samepasswordMessage = '비밀번호와 다릅니다.';
+  String? nickError;
+  String nickMessage = '최소 2자 이상 10자 이하';
+
   int? selectedYear;
   List<DropdownMenuItem<int>> yearItems = []; // 태어난 년도 드롭다운 리스트
+
+  final PageApi pageapi = PageApi();
 
   void initYearItems() {
     for (int year = 1980; year <= DateTime.now().year - 10; year++) {
@@ -106,9 +129,22 @@ class _SignUpState extends State<SignUp> {
                                   children: [
                                     Expanded(
                                       child: TextField(
+                                        onChanged: (value) {
+                                          if (!RegExp(
+                                                  r'^(?=.*[A-Za-z])[A-Za-z0-9]{5,20}$')
+                                              .hasMatch(value)) {
+                                            setState(() {
+                                              idError = idMessage;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              idError = null; // 에러 없음
+                                            });
+                                          }
+                                        },
                                         controller: controller,
                                         autofocus: true,
-                                        decoration: const InputDecoration(
+                                        decoration: InputDecoration(
                                           contentPadding: EdgeInsets.symmetric(
                                             vertical: 16.0,
                                             horizontal: 40.0,
@@ -127,6 +163,8 @@ class _SignUpState extends State<SignUp> {
                                             borderSide: BorderSide(),
                                           ),
                                           labelText: '아이디',
+                                          errorText: idError,
+                                          errorStyle: TextStyle(height: 1),
                                           focusColor: Color(0xFFF5BEB5),
                                         ),
                                         keyboardType: TextInputType.text,
@@ -140,9 +178,46 @@ class _SignUpState extends State<SignUp> {
                                       width: 90,
                                       height: 50,
                                       child: OutlinedButton(
-                                        onPressed: () {
-                                          // 중복 확인 작업을 수행하는 코드 추가
-                                        },
+                                        onPressed: () async {
+                                                        final checkid =
+                                                              await pageapi.checkid(
+                                                                  controller
+                                                                      .text
+                                                                      .toString());
+                                                          print(checkid);
+                                                          if (checkid
+                                                                  .toString() ==
+                                                              "true") {
+                                                                print(1);
+                                                                showDialog(context: context, builder: (context) {
+                                                                   return Dialog( child: 
+                                                                   Container(
+                                                                    width: 100,
+                                                                    height: 100,
+                                                                    color: Colors.white,
+                                                                    child: Center(child: Text('사용가능한 아이디입니다.')))
+                                                                   );
+                                                                 }
+                                                                );
+                                                            setState(() {
+                                                              idCheck = true;
+                                                            });
+                                                          } else {
+                                                            showDialog(context: context, builder: (context) {
+                                                                   return Dialog( child: 
+                                                                   Container(
+                                                                    width: 100,
+                                                                    height: 100,
+                                                                    color: Colors.white,
+                                                                    child: Center(child: Text('중복된 아이디입니다.')))
+                                                                   );
+                                                                 }
+                                                                );
+                                                            setState(() {
+                                                              idCheck = false;
+                                                            });
+                                                          }
+                                                        },
                                         style: OutlinedButton.styleFrom(
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
@@ -177,8 +252,44 @@ class _SignUpState extends State<SignUp> {
                               SizedBox(
                                 height: 80,
                                 child: TextField(
+                                  onChanged: (value) {
+                                    if (!RegExp(
+                                            r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$')
+                                        .hasMatch(value)) {
+                                      setState(() {
+                                        passwordError = passwordMessage;
+                                        passwordCheck = false;
+                                        if (controller2.text ==
+                                            controller3.text) {
+                                          setState(() {
+                                            samepasswordError = null;
+                                            samepasswordCheck = true;
+                                          });
+                                        } else {
+                                          samepasswordError =
+                                              samepasswordMessage;
+                                          samepasswordCheck = false;
+                                        }
+                                      });
+                                    } else {
+                                      setState(() {
+                                        passwordError = null; // 에러 없음
+                                        passwordCheck = true;
+                                      });
+                                      if (controller2.text ==
+                                          controller3.text) {
+                                        setState(() {
+                                          samepasswordError = null;
+                                          samepasswordCheck = true;
+                                        });
+                                      } else {
+                                        samepasswordError = samepasswordMessage;
+                                        samepasswordCheck = false;
+                                      }
+                                    }
+                                  },
                                   controller: controller2,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                       contentPadding: EdgeInsets.symmetric(
                                           vertical: 16.0, horizontal: 10.0),
                                       focusedBorder: OutlineInputBorder(
@@ -189,6 +300,8 @@ class _SignUpState extends State<SignUp> {
                                       prefixIcon: Icon(Icons.vpn_key_outlined),
                                       border: OutlineInputBorder(),
                                       labelText: '비밀번호',
+                                      errorText: passwordError,
+                                      errorStyle: TextStyle(height: 1),
                                       focusColor: Color(0xFFF5BEB5)),
                                   keyboardType: TextInputType.visiblePassword,
                                   obscureText: true, // 비밀번호 안보이도록 하는 것
@@ -197,8 +310,25 @@ class _SignUpState extends State<SignUp> {
                               SizedBox(
                                 height: 80,
                                 child: TextField(
+                                  onChanged: (value){
+                                    if (controller2.text ==
+                                            controller3.text) {
+                                          setState(() {
+                                            samepasswordError = null;
+                                            samepasswordCheck = true;
+                                          });
+                                        } else {
+                                          setState(() {
+                                            samepasswordError = samepasswordMessage;
+                                            samepasswordCheck = false;
+                                          });
+                                          // samepasswordError =
+                                          //     samepasswordMessage;
+                                          // samepasswordCheck = false;
+                                        }
+                                  },
                                   controller: controller3,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                       contentPadding: EdgeInsets.symmetric(
                                           vertical: 16.0, horizontal: 10.0),
                                       focusedBorder: OutlineInputBorder(
@@ -209,6 +339,8 @@ class _SignUpState extends State<SignUp> {
                                       prefixIcon: Icon(Icons.key),
                                       border: OutlineInputBorder(),
                                       labelText: '비밀번호 확인',
+                                      errorText: samepasswordError,
+                                      errorStyle: TextStyle(height: 1),
                                       focusColor: Color(0xFFF5BEB5)),
                                   keyboardType: TextInputType.visiblePassword,
                                   obscureText: true, // 비밀번호 안보이도록 하는 것
@@ -219,9 +351,24 @@ class _SignUpState extends State<SignUp> {
                                   children: [
                                     Expanded(
                                       child: TextField(
+                                        onChanged: (value) {
+                                          if (!RegExp(
+                                                  r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$")
+                                              .hasMatch(value)) {
+                                            setState(() {
+                                              emailError = emailMessage;
+                                              emailCheck = false;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              emailError = null; // 에러 없음
+                                              emailCheck = true;
+                                            });
+                                          }
+                                        },
                                         controller: controller4,
                                         autofocus: true,
-                                        decoration: const InputDecoration(
+                                        decoration: InputDecoration(
                                           contentPadding: EdgeInsets.symmetric(
                                             vertical: 16.0,
                                             horizontal: 10.0,
@@ -240,6 +387,8 @@ class _SignUpState extends State<SignUp> {
                                             borderSide: BorderSide(),
                                           ),
                                           labelText: '이메일',
+                                          errorText: emailError,
+                                          errorStyle: TextStyle(height: 1),
                                           focusColor: Color(0xFFF5BEB5),
                                         ),
                                         keyboardType:
@@ -288,9 +437,22 @@ class _SignUpState extends State<SignUp> {
                                   children: [
                                     Expanded(
                                       child: TextField(
+                                        onChanged: (value) {
+                                          if (!RegExp(
+                                                  r'^[A-Za-z가-힣0-9]{2,10}$')
+                                              .hasMatch(value)) {
+                                            setState(() {
+                                              nickError = nickMessage;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              nickError = null; // 에러 없음
+                                            });
+                                          }
+                                        },
                                         controller: controller5,
                                         autofocus: true,
-                                        decoration: const InputDecoration(
+                                        decoration: InputDecoration(
                                           contentPadding: EdgeInsets.symmetric(
                                             vertical: 16.0,
                                             horizontal: 40.0,
@@ -309,6 +471,8 @@ class _SignUpState extends State<SignUp> {
                                             borderSide: BorderSide(),
                                           ),
                                           labelText: '닉네임',
+                                          errorText: nickError,
+                                          errorStyle: TextStyle(height: 1),
                                           focusColor: Color(0xFFF5BEB5),
                                         ),
                                         keyboardType: TextInputType.text,
@@ -322,9 +486,46 @@ class _SignUpState extends State<SignUp> {
                                       width: 90,
                                       height: 50,
                                       child: OutlinedButton(
-                                        onPressed: () {
-                                          // 중복 확인 작업을 수행하는 코드 추가
-                                        },
+                                        onPressed: () async {
+                                                        final checkNick =
+                                                              await pageapi.checkNick(
+                                                                  controller5
+                                                                      .text
+                                                                      .toString());
+                                                          print(checkNick);
+                                                          if (checkNick
+                                                                  .toString() ==
+                                                              "true") {
+                                                                print(11);
+                                                            showDialog(context: context, builder: (context) {
+                                                                   return Dialog( child: 
+                                                                   Container(
+                                                                    width: 100,
+                                                                    height: 100,
+                                                                    color: Colors.white,
+                                                                    child: Center(child: Text('사용가능한 닉네임입니다.')))
+                                                                   );
+                                                                 }
+                                                                );    
+                                                            setState(() {
+                                                              nickCheck = true;
+                                                            });
+                                                          } else {
+                                                            showDialog(context: context, builder: (context) {
+                                                                   return Dialog( child: 
+                                                                   Container(
+                                                                    width: 100,
+                                                                    height: 100,
+                                                                    color: Colors.white,
+                                                                    child: Center(child: Text('중복된 닉네임입니다.')))
+                                                                   );
+                                                                 }
+                                                                );
+                                                            setState(() {
+                                                              nickCheck = false;
+                                                            });
+                                                          }
+                                                        },
                                         style: OutlinedButton.styleFrom(
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
@@ -375,7 +576,7 @@ class _SignUpState extends State<SignUp> {
                               SizedBox(
                                 height: 80,
                                 child: TextField(
-                                  controller: controller2,
+                                  controller: controller6,
                                   decoration: const InputDecoration(
                                       contentPadding: EdgeInsets.symmetric(
                                           vertical: 16.0, horizontal: 10.0),
@@ -477,7 +678,71 @@ class _SignUpState extends State<SignUp> {
                                       const EdgeInsets.fromLTRB(0, 20, 0, 10),
                                   child: ButtonTheme(
                                       child: TextButton(
-                                          onPressed: () {},
+                                          onPressed: idCheck && nickCheck && emailCheck && passwordCheck && samepasswordCheck? 
+                                          () async {
+                                                        final signup =
+                                                              await pageapi.signup(
+                                                                  controller5
+                                                                      .text
+                                                                      .toString(),
+                                                                  controller.text.toString(),
+                                                                  controller2.text,
+                                                                  controller4.text.toString(),
+                                                                  controller6.text,
+                                                                  selectedYear,
+                                                                  _selectedWman
+                                                                  );
+                                                          print(signup);
+                                                          if (signup == 200) {
+                                                          await showDialog(context: context, builder: (context) {
+                                                                   return Dialog( child: 
+                                                                   Container(
+                                                                    width: 100,
+                                                                    height: 100,
+                                                                    color: Colors.white,
+                                                                    child: Center(child: Text('회원가입 성공')))
+                                                                   );
+                                                                 }
+                                                                );
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => const LogIn()),
+                                                          );
+                                                          }
+                                                          // if (signup
+                                                          //         .toString() ==
+                                                          //     "true") {
+                                                          //       print(1);
+                                                          //       showDialog(context: context, builder: (context) {
+                                                          //          return Dialog( child: 
+                                                          //          Container(
+                                                          //           width: 100,
+                                                          //           height: 100,
+                                                          //           color: Colors.white,
+                                                          //           child: Center(child: Text('사용가능한 아이디입니다.')))
+                                                          //          );
+                                                          //        }
+                                                          //       );
+                                                          //   setState(() {
+                                                          //     idCheck = true;
+                                                          //   });
+                                                          // } else {
+                                                          //   showDialog(context: context, builder: (context) {
+                                                          //          return Dialog( child: 
+                                                          //          Container(
+                                                          //           width: 100,
+                                                          //           height: 100,
+                                                          //           color: Colors.white,
+                                                          //           child: Center(child: Text('중복된 아이디입니다.')))
+                                                          //          );
+                                                          //        }
+                                                          //       );
+                                                          //   setState(() {
+                                                          //     idCheck = false;
+                                                          //   });
+                                                          // }
+                                                        } : null,
                                           style: const ButtonStyle(
                                               backgroundColor:
                                                   MaterialStatePropertyAll(

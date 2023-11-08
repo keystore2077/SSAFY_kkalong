@@ -310,14 +310,14 @@ import '../main.dart';
 import '../store/userstore.dart';
 
 class LogIn extends StatefulWidget {
-  const LogIn({super.key});
+  const LogIn({super.key, this.storage});
 
+  final storage;
   @override
   State<LogIn> createState() => _LogInState();
 }
 
 class _LogInState extends State<LogIn> {
-  final storage = FlutterSecureStorage();
   final PageApi pageapi = PageApi();
 
   TextEditingController controller = TextEditingController();
@@ -427,49 +427,58 @@ class _LogInState extends State<LogIn> {
                                   child: ButtonTheme(
                                       child: TextButton(
                                           onPressed: () async {
-                                            // try {
-                                            //   final response =
-                                            //       await pageapi.login(
-                                            //     controller.text.toString(),
-                                            //     controller2.text,
-                                            //   );
-                                            //   print(response['body']
-                                            //       ['accessToken']);
-                                            //   if (response['body']
-                                            //           ['accessToken'] !=
-                                            //       null) {
-                                            //     print(2);
-                                            //     final accessToken =
-                                            //         await response['body']
-                                            //             ['accessToken'];
-                                            //     final refreshToken =
-                                            //         response['body']
-                                            //             ["refreshToken"];
-                                            //     await storage.write(
-                                            //         key: "login",
-                                            //         value:
-                                            //             "accessToken $accessToken refreshToken $refreshToken");
+                                            try {
+                                              final response =
+                                                  await pageapi.login(
+                                                controller.text.toString(),
+                                                controller2.text,
+                                              );
+                                              print(response['body']
+                                                  ['accessToken']);
+                                              if (response['body']
+                                                      ['accessToken'] !=
+                                                  null) {
+                                                print(2);
+                                                final accessToken =
+                                                    await response['body']
+                                                        ['accessToken'];
+                                                final refreshToken =
+                                                    response['body']
+                                                        ["refreshToken"];
+                                                await widget.storage.write(
+                                                    key: "login",
+                                                    value:
+                                                        "accessToken $accessToken refreshToken $refreshToken");
 
-                                            //     print('여기는 로그인 버튼');
-                                            //     await context
-                                            //         .read<UserStore>()
-                                            //         .changeAccessToken(
-                                            //             accessToken);
-                                            //     Navigator.push(
-                                            //       context,
-                                            //       MaterialPageRoute(
-                                            //           builder: (context) =>
-                                            //               const Main()),
-                                            //     );
-                                            //   } else {
-                                            //     //  showSnackBar(context,
-                                            //     //     Text('로그인 실패'));
-                                            //   }
-                                            // } catch (e) {
-                                            //   print('로그인실패');
-                                            //   // showSnackBar(context,
-                                            //   //     Text('로그인 실패'));
-                                            // }
+                                                print('여기는 로그인 버튼');
+                                                await context
+                                                    .read<UserStore>()
+                                                    .changeAccessToken(
+                                                        accessToken);
+                                                // Navigator.push(
+                                                //   context,
+                                                //   MaterialPageRoute(
+                                                //       builder: (context) =>
+                                                //           const Main()),
+                                                // );
+                                                Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const Main(),
+                                                  ),
+                                                  (route) =>
+                                                      false, // 모든 이전 페이지를 제거하려면 false를 반환
+                                                );
+                                              } else {
+                                                //  showSnackBar(context,
+                                                //     Text('로그인 실패'));
+                                              }
+                                            } catch (e) {
+                                              print('로그인실패');
+                                              // showSnackBar(context,
+                                              //     Text('로그인 실패'));
+                                            }
 
                                             // try {
                                             //   final response =
@@ -543,100 +552,165 @@ class _LogInState extends State<LogIn> {
                                             //   );
                                             // }
 
-                                            try {
-                                              final response =
-                                                  await pageapi.login(
-                                                controller.text.trim(),
-                                                controller2.text.trim(),
-                                              );
+                                            // try {
+                                            //   final response =
+                                            //       await pageapi.login(
+                                            //     controller.text.trim(),
+                                            //     controller2.text.trim(),
+                                            //   );
 
-                                              // 결과 코드 확인
-                                              final resultCode =
-                                                  response['result']
-                                                      ['resultCode'];
-                                              if (resultCode == 200) {
-                                                // 성공적으로 토큰을 받았는지 확인
-                                                final body = response['body'];
-                                                final accessToken =
-                                                    body['accessToken'];
-                                                if (accessToken != null) {
-                                                  print(
-                                                      'Access token is available.');
+                                            //   // 결과 코드 확인
+                                            //   final resultCode =
+                                            //       response['result']
+                                            //           ['resultCode'];
+                                            //   if (resultCode == 200) {
+                                            //     // 성공적으로 토큰을 받았는지 확인
+                                            //     final body = response['body'];
+                                            //     final accessToken =
+                                            //         body['accessToken'];
+                                            //     if (accessToken != null) {
+                                            //       print(
+                                            //           'Access token is available.');
 
-                                                  final refreshToken =
-                                                      body['refreshToken'];
+                                            //       final refreshToken =
+                                            //           body['refreshToken'];
 
-                                                  await storage.write(
-                                                    key: "login",
-                                                    value:
-                                                        "accessToken $accessToken refreshToken $refreshToken",
-                                                  );
+                                            //       await storage.write(
+                                            //         key: "login",
+                                            //         value:
+                                            //             "accessToken $accessToken refreshToken $refreshToken",
+                                            //       );
 
-                                                  print(
-                                                      'Here is the login button.');
+                                            //       print(
+                                            //           'Here is the login button.');
 
-                                                  await context
-                                                      .read<UserStore>()
-                                                      .changeAccessToken(
-                                                          accessToken);
+                                            //       await context
+                                            //           .read<UserStore>()
+                                            //           .changeAccessToken(
+                                            //               accessToken);
 
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const Main()),
-                                                  );
-                                                } else {
-                                                  // accessToken이 없을 때의 처리
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                        content: Text(
-                                                            '로그인 실패: 토큰을 받지 못했습니다.')),
-                                                  );
-                                                }
-                                              } else {
-                                                // resultCode가 200이 아닌 경우의 처리
-                                                final resultMessage =
-                                                    response['result']
-                                                        ['resultMessage'];
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                      content: Text(
-                                                          '로그인 실패: $resultMessage')),
-                                                );
-                                              }
-                                            } on DioException catch (dioError) {
-                                              String errorMessage =
-                                                  '로그인 중 문제가 발생했습니다.';
-                                              if (dioError
-                                                      .response?.statusCode ==
-                                                  400) {
-                                                errorMessage =
-                                                    '잘못된 아이디나 비밀번호입니다.';
-                                              } else {
-                                                // 기타 HTTP 에러 처리
-                                                errorMessage +=
-                                                    ' 에러 코드: ${dioError.response?.statusCode}';
-                                              }
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                    content:
-                                                        Text(errorMessage)),
-                                              );
-                                            } catch (e) {
-                                              // 그 외의 예외 처리
-                                              print(
-                                                  'An unexpected error occurred: $e');
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                    content: Text(
-                                                        '예기치 못한 에러가 발생하였습니다.')),
-                                              );
-                                            }
+                                            //       Navigator.push(
+                                            //         context,
+                                            //         MaterialPageRoute(
+                                            //             builder: (context) =>
+                                            //                 const Main()),
+                                            //       );
+                                            //     } else {
+                                            //       // accessToken이 없을 때의 처리
+                                            //       ScaffoldMessenger.of(context)
+                                            //           .showSnackBar(
+                                            //         SnackBar(
+                                            //             content: Text(
+                                            //                 '로그인 실패: 토큰을 받지 못했습니다.')),
+                                            //       );
+                                            //     }
+                                            //   } else {
+                                            //     // resultCode가 200이 아닌 경우의 처리
+                                            //     final resultMessage =
+                                            //         response['result']
+                                            //             ['resultMessage'];
+                                            //     ScaffoldMessenger.of(context)
+                                            //         .showSnackBar(
+                                            //       SnackBar(
+                                            //           content: Text(
+                                            //               '로그인 실패: $resultMessage')),
+                                            //     );
+                                            //   }
+                                            // } on DioException catch (dioError) {
+                                            //   String errorMessage =
+                                            //       '로그인 중 문제가 발생했습니다.';
+                                            //   if (dioError
+                                            //           .response?.statusCode ==
+                                            //       400) {
+                                            //     errorMessage =
+                                            //         '잘못된 아이디나 비밀번호입니다.';
+                                            //   } else {
+                                            //     // 기타 HTTP 에러 처리
+                                            //     errorMessage +=
+                                            //         ' 에러 코드: ${dioError.response?.statusCode}';
+                                            //   }
+                                            //   ScaffoldMessenger.of(context)
+                                            //       .showSnackBar(
+                                            //     SnackBar(
+                                            //         content:
+                                            //             Text(errorMessage)),
+                                            //   );
+                                            // } catch (e) {
+                                            //   // 그 외의 예외 처리
+                                            //   print(
+                                            //       'An unexpected error occurred: $e');
+                                            //   ScaffoldMessenger.of(context)
+                                            //       .showSnackBar(
+                                            //     SnackBar(
+                                            //         content: Text(
+                                            //             '예기치 못한 에러가 발생하였습니다.')),
+                                            //   );
+                                            // }
+
+                                            // try {
+                                            //   final response =
+                                            //       await pageapi.login(
+                                            //     controller.text.toString(),
+                                            //     controller2.text,
+                                            //   );
+                                            //   if (response["accessToken"] !=
+                                            //       null) {
+                                            //     final accessToken =
+                                            //         await response[
+                                            //             "accessToken"];
+                                            //     final refreshToken =
+                                            //         response["refreshToken"];
+                                            //     await widget.storage.write(
+                                            //         key: "login",
+                                            //         value:
+                                            //             "accessToken $accessToken refreshToken $refreshToken");
+
+                                            //     Navigator.push(
+                                            //       context,
+                                            //       MaterialPageRoute(
+                                            //           builder: (context) =>
+                                            //               const Main()),
+                                            //     );
+                                            //   } else if (response == "fail") {
+                                            //     print('fail들어왔다');
+                                            //   }
+                                            // } catch (e) {
+                                            //   print('아이디 비밀번호를 확인 해주세요');
+                                            // }
+
+                                            // try {
+                                            //   final response =
+                                            //       await pageapi.login(
+                                            //     controller.text.toString(),
+                                            //     controller2.text,
+                                            //   );
+
+                                            //   if (response["accessToken"] !=
+                                            //       null) {
+                                            //     final accessToken =
+                                            //         await response[
+                                            //             "accessToken"];
+                                            //     final refreshToken =
+                                            //         response["refreshToken"];
+                                            //     await widget.storage.write(
+                                            //       key: "login",
+                                            //       value:
+                                            //           "accessToken $accessToken refreshToken $refreshToken",
+                                            //     );
+
+                                            //     Navigator.push(
+                                            //       context,
+                                            //       MaterialPageRoute(
+                                            //         builder: (context) =>
+                                            //             const Main(),
+                                            //       ),
+                                            //     );
+                                            //   } else if (response == "fail") {
+                                            //     print('로그인 실패');
+                                            //   }
+                                            // } catch (e) {
+                                            //   print('아이디 비밀번호를 확인해주세요: $e');
+                                            // }
                                           },
                                           style:
                                               // const ButtonStyle(
@@ -717,9 +791,9 @@ class _LogInState extends State<LogIn> {
   }
 }
 
-void showSnackBar(BuildContext context, Text text) {
-  final snackBar =
-      SnackBar(content: text, backgroundColor: const Color(0xFFF5BEB5));
+// void showSnackBar(BuildContext context, Text text) {
+//   final snackBar =
+//       SnackBar(content: text, backgroundColor: const Color(0xFFF5BEB5));
 
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-}
+//   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+// }

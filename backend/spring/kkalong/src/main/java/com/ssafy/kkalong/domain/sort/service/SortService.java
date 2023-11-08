@@ -11,6 +11,9 @@ public class SortService {
     private final SortRepository sortRepository;
 
     public Sort getSort(String sort){
-        return sortRepository.findBySort(sort).orElse(null);
+        return sortRepository.findBySortAndSortGroupSortGroupSeq(sort,2).orElse(null);
+    }
+    public Sort getClothSort(String sort){
+        return sortRepository.findBySortAndSortGroupSortGroupSeq(sort,1).orElse(null);
     }
 }

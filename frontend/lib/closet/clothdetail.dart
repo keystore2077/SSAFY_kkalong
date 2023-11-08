@@ -17,10 +17,10 @@ class ClothDetail extends StatefulWidget {
   const ClothDetail({Key? key, this.clothSeq}) : super(key: key);
 
   @override
-  _MyAppState createState() => _MyAppState();
+  _ClothDetailState createState() => _ClothDetailState();
 }
 
-class _MyAppState extends State<ClothDetail> {
+class _ClothDetailState extends State<ClothDetail> {
   var data = [];
   getData() async{
     var result = await http.get(Uri.parse('https://codingapple1.github.io/app/data.json'));
@@ -123,7 +123,11 @@ class _MyAppState extends State<ClothDetail> {
           elevation: 0,
           leading: const Text(''),
           actions: [
-            IconButton(onPressed: () {}, icon: Icon(
+            IconButton(onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (c) => Text('옷수정하는 창'))
+              );
+            }, icon: Icon(
               Icons.border_color,
               color: Color(0xFFfc6474),
             )),
@@ -216,6 +220,7 @@ class _MyAppState extends State<ClothDetail> {
                     height: 10,
                   ),
                   Container(
+                    width: 75,
                     margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
                     padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
                     decoration: BoxDecoration(
@@ -227,7 +232,7 @@ class _MyAppState extends State<ClothDetail> {
                       color: Color(0xFFF5BEB5),
                     ),
                     child: Center(child: Text(
-                      '#${categories[0]}',
+                      '#${categories[4]}',
                       style: TextStyle(
                         color: Colors.white,
                       ),
@@ -270,5 +275,5 @@ class _MyAppState extends State<ClothDetail> {
       return Center(
         child: CircularProgressIndicator(),
       );
-  }
-}}
+    }
+  }}
