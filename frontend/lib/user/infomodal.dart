@@ -16,7 +16,7 @@ class InfoModal extends StatefulWidget {
 
   @override
   _InfoModalState createState() => _InfoModalState();
-  }
+}
 
 class _InfoModalState extends State<InfoModal> {
 
@@ -63,17 +63,22 @@ class DialogUI extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-              child: Text(
-                '정보수정',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w300,
-                ),
+              padding: EdgeInsets.fromLTRB(30, 15, 0, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start, // 이 부분이 중요합니다
+                children: [
+                  Text(
+                    '정보수정',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(
-              height: 20,
+              height: 15,
             ),
             SizedBox(
               height: 40,
@@ -86,8 +91,8 @@ class DialogUI extends StatelessWidget {
                       autofocus: true,
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
-                          vertical: 16.0,
-                          horizontal: 40.0,
+                          vertical: 10.0,
+                          horizontal: 10.0,
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
@@ -114,7 +119,6 @@ class DialogUI extends StatelessWidget {
                   ),
                   SizedBox(
                     height: 40,
-                    width: 30,
                     child: OutlinedButton(
                       onPressed: () {
                         // 중복 확인 작업을 수행하는 코드 추가
@@ -129,15 +133,19 @@ class DialogUI extends StatelessWidget {
                           Color(0xFFF5BEB5), // 외곽선 색상 설정
                           width: 1, // 외곽선 두께 설정
                         ),
+                        padding: EdgeInsets.all(10), // 모든 방향으로 10px의 패딩 적용
                       ),
-                      child: Text(
-                          '중복 확인',
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown, // 텍스트가 버튼에 맞게 축소됨
+                        child: Text(
+                          '중복확인',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color:
-                            Color(0xFFF5BEB5), // 글자 색상 설정
+                            Color(0xFFF5BEB5),// 글자 색상 설정
                           ),
                         ),
+                      ),
                     ),
                   ),
                 ],
@@ -189,6 +197,88 @@ class DialogUI extends StatelessWidget {
                     focusColor: Color(0xFFF5BEB5)),
                 keyboardType: TextInputType.visiblePassword,
                 obscureText: true, // 비밀번호 안보이도록 하는 것
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              height: 40,
+              width: 250,
+              child: Row(
+                children: [
+                  ButtonTheme(
+                      child: TextButton(
+                          onPressed: () {},
+                          style:
+                          // const ButtonStyle(
+                          //     backgroundColor:
+                          //         MaterialStatePropertyAll(
+                          //             Color(0xFFF5BEB5))),
+                          OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.circular(
+                                  5.0), // 원하는 각진 정도로 설정
+                            ),
+                            backgroundColor:
+                            const Color(0xFFF5BEB5),
+                          ),
+                          child: const SizedBox(
+                            height: 40,
+                            width: 95,
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '정보 수정',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ))),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  ButtonTheme(
+                      child: TextButton(
+                          onPressed: () {},
+                          style:
+                          // const ButtonStyle(
+                          //     backgroundColor:
+                          //         MaterialStatePropertyAll(
+                          //             Color(0xFFF5BEB5))),
+                          OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.circular(
+                                  5.0), // 원하는 각진 정도로 설정
+                            ),
+                            backgroundColor:
+                            const Color(0xFFF5BEB5),
+                          ),
+                          child: const SizedBox(
+                            height: 40,
+                            width: 95,
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '회원 탈퇴',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ))),
+                ],
               ),
             ),
           ],
