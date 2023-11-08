@@ -4,6 +4,7 @@ from decouple import config
 import subprocess
 import pymysql
 import boto3
+import botocore
 import os
 
 from openpose_request_body import orb
@@ -83,9 +84,9 @@ async def run_openpose(rb: orb):
                        "photo/openpose/img/" + rb.photo_img_name + ".png")
         s3.upload_file(r"./output_jsons/" + rb.photo_img_name + "_keypoints.json", bucket_name,
                        "photo/openpose/json/" + rb.photo_img_name + ".json")
-    except boto3.exceptions.NoCredentialsError:
+    except botocore.exceptions.NoCredentialsError:
         return "AWS 자격 증명을 찾을 수 없습니다. 자격 증명을 설정하세요."
-    except boto3.exceptions.EndpointConnectionError:
+    except botocore.exceptions.EndpointConnectionError:
         return "S3 엔드포인트에 연결할 수 없습니다. 리전을 확인하세요."
 
     # 5. DB에 작업이 되어 있음으로 업데이트 한다.

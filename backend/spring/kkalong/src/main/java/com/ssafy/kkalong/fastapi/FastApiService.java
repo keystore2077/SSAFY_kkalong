@@ -10,6 +10,7 @@ import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -22,13 +23,16 @@ import java.util.Map;
 
 @Service
 public class FastApiService {
-    private final String preprocessUrl = "http://222.107.238.44:4050";
+    @Value("${ai-server.gpu.ip}:${ai-server.gpu.preprocess-port}")
+    private String preprocessUrl;
 //    private final String url = "http://localhost:4050";
 
-    private final String vitonHdUrl = "http://222.107.238.44:4051";
+    @Value("${ai-server.gpu.ip}:${ai-server.gpu.viton-port}")
+    private String vitonHdUrl;
 
-    private final String openposeUrl = "http://192.168.100.37:4052";
 //    private final String openposeUrl = "http://localhost:4052";
+    @Value("${ai-server.openpose}")
+    private String openposeUrl;
 
     private final RestTemplate restTemplate;
 
