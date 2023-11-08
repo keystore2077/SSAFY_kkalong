@@ -249,7 +249,7 @@ class _MainState extends State<Main> {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: Color.fromARGB(255, 82, 100, 82),
+          backgroundColor: Color.fromARGB(255, 136, 126, 136),
           content: Text('한번 더 뒤로가기를 누를 시 종료됩니다'),
           duration: Duration(seconds: 2),
         ),
