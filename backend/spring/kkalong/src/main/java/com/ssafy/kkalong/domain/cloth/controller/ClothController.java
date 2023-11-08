@@ -194,8 +194,9 @@ public class ClothController {
     }
 
     @Operation(summary = "옷 정보수정")
-    @PutMapping(value = "/" )
+    @PutMapping(value = "" )
     public Api<Object> updateCloth(@RequestParam("mFile") MultipartFile file, @ModelAttribute ClothUpdateReq request) {
+        System.out.println(request.toString());
 
         Member member = memberService.getLoginUserInfo();
         if (member == null) {
