@@ -158,4 +158,9 @@ public class testController {
 
         return Api.OK(u2netRes);
     }
+
+    @GetMapping("/fast/welcome/viton")
+    public Api<Object> testServer9(){
+        return fastApiService.callWelcomeViton();
+    }
 }

@@ -11,13 +11,17 @@ import com.ssafy.kkalong.domain.cloth.repository.ClothRepository;
 import com.ssafy.kkalong.domain.cloth.repository.TagRelaionRepository;
 import com.ssafy.kkalong.domain.cloth.repository.TagRepository;
 import com.ssafy.kkalong.domain.member.entity.Member;
+import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.sort.entity.Sort;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +29,8 @@ public class ClothService {
     private final ClothRepository clothRepository;
     private final TagRepository tagRepository;
     private final TagRelaionRepository tagRelaionRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public ClothSaveRes saveCloth(Member member, Section section, Sort sort, ClothSaveReq request, String imgUrl, String fileName){
         //옷 저장
@@ -65,5 +71,18 @@ public class ClothService {
             tagList.add(tag);
         }
         return ClothSaveRes.toRes(clothSave, imgUrl, tagList);
+    }
+
+    public Cloth getCloth(int clothSeq){
+        return clothRepository.findByClothSeqAndIsClothDeleted(clothSeq,false).orElse(null);
+    }
+
+    public void updateClothImgMasking(int clothSeq) {
+        // 엔티티를 조회
+        Cloth cloth = entityManager.find(Cloth.class, clothSeq);
+
+        if (cloth != null) {
+            cloth.setClothImgMasking(true);
+        }
     }
 }
