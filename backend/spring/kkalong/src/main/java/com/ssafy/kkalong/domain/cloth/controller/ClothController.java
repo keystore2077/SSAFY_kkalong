@@ -7,6 +7,7 @@ import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothSaveReq;
+import com.ssafy.kkalong.domain.cloth.entity.Cloth;
 import com.ssafy.kkalong.domain.cloth.service.ClothService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
@@ -37,7 +38,7 @@ public class ClothController {
     private final MemberService memberService;
     private final ClosetService closetService;
     private final SortService sortService;
-    private FastApiService fastApiService;
+    private final FastApiService fastApiService;
     @Operation(summary = "옷 저장")
     @PostMapping(value = "" )
     public Api<Object> saveCloth(@RequestParam("mFile") MultipartFile file, @ModelAttribute ClothSaveReq request) {
@@ -108,6 +109,18 @@ public class ClothController {
 
         return Api.OK(clothService.saveCloth(member, section, sort, request, imgUrl,fileName ));
     }
+
+//    @Operation(summary = "옷 상세정보")
+//    @PostMapping(value = "/{clothSeq}" )
+//    public Api<Object> getCloth(@PathVariable int clothSeq) {
+//        Member member = memberService.getLoginUserInfo();
+//        if (member == null) {
+//            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+//        }
+//
+//        Cloth cloth =
+//
+//    }
 
 
 }

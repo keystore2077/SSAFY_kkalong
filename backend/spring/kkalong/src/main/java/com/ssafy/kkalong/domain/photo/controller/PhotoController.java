@@ -11,8 +11,8 @@ import com.ssafy.kkalong.domain.photo.dto.response.PhotoMixRequestRes;
 import com.ssafy.kkalong.domain.photo.dto.response.PhotoRes;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
+import com.ssafy.kkalong.fastapi.FastApiCallerService;
 import com.ssafy.kkalong.fastapi.FastApiService;
-import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @Slf4j
@@ -34,6 +33,8 @@ public class PhotoController {
     private S3Service s3Service;
     @Autowired
     private FastApiService fastApiService;
+    @Autowired
+    private FastApiCallerService fastApiCallerService;
     @Autowired
     private MemberService memberService;
     @Autowired
@@ -61,20 +62,22 @@ public class PhotoController {
         if (extension != null && !extension.equals("image/jpeg") && !extension.equals("image/jpg")){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "유효한 확장자가 아닙니다");
         }
-
+        System.out.println("유효성 검사 완료");
         // key 생성
         // photo_소유자아이디_현재시간_무작위숫자6개
         String fileName = FileNameGenerator.generateFileNameNoExtension("photo", member.getMemberId());
-
+        System.out.println("fileName: " + fileName);
         // 저장할 장소 지정
         String path = "photo/original/";
 
         // S3서버에 사진을 저장
         try {
             String res = s3Service.uploadFile(path + fileName + ".jpg", photoReq);
+            System.out.println(res);
         } catch (IOException e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "업로드 실패");
         }
+        System.out.println("저장 완료");
         //rembg 호출
         Api<Object> rembgRes = fastApiService.requestRembg(member.getMemberId(), photoReq);
         if (!Objects.equals(rembgRes.getResult().getResultCode(), Result.OK().getResultCode())){
@@ -84,8 +87,8 @@ public class PhotoController {
         RequestRembgRes res;
         try{
             res = (RequestRembgRes)rembgRes.getBody();
-            s3Service.uploadFile("photo/yes_bg/" + res.getYesBgName() + ".jpg", res.getYesBg());
-            s3Service.uploadFile("photo/no_bg/" + res.getNoBgName() + ".png", res.getNoBg());
+            s3Service.uploadFile("photo/yes_bg/" + fileName + ".jpg", res.getYesBg());
+            s3Service.uploadFile("photo/no_bg/" + fileName + ".png", res.getNoBg());
         } catch (Exception e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "저장 중 문제가 발생 했습니다.(Rembg)");
         }
@@ -103,12 +106,14 @@ public class PhotoController {
 
         // DB에 저장
         Photo photoResult = photoService.savePhoto(photo);
+        System.out.println("DB 저장 완료");
 
-        try{
-            return Api.OK("성공");
-        } finally {
-            callPreprocessing(member, photoResult).join();
-        }
+        // 비동기로 openpose, cihp 호출
+        fastApiCallerService.callOpenpose(member, photoResult);
+        fastApiCallerService.callCihp(member, photoResult);
+        System.out.println("비동기 호출 완료");
+        
+        return Api.OK("성공");
     }
 
     // 1. 사용자 인증 정보를 확인한다
@@ -200,59 +205,5 @@ public class PhotoController {
 
 
         return Api.OK(new PhotoMixRequestRes());
-    }
-
-    private CompletableFuture<Void> callPreprocessing(Member member, Photo photo) {
-        return CompletableFuture.allOf(
-                callCihpAsync(member, photo),
-                callOpenposeAsync(member, photo)
-        );
-    }
-
-    private CompletableFuture<Void> callCihpAsync(Member member, Photo photo) {
-        return CompletableFuture.runAsync(() -> {
-            // cihp 호출
-            callCihp(member, photo);
-        });
-    }
-
-    private CompletableFuture<Void> callOpenposeAsync(Member member, Photo photo) {
-        return CompletableFuture.runAsync(() -> {
-            // Openpose 호출
-            callOpenpose(member, photo);
-        });
-    }
-
-    private void callOpenpose(Member member, Photo photo){
-        // Openpose는 독자적인 과정을 거치므로 결과 저장 과정이 필요 없음
-        try{
-            Api<Object> openposeRes = fastApiService.requestOpenpose(member, photo);
-            if (!openposeRes.getResult().equals(Result.OK())){
-                System.out.println("내부 처리중 문제가 발생했습니다.(Openpose)");
-            }
-        } catch (Exception e) {
-            System.out.println("저장중 문제가 발생했습니다.(Openpose)");
-        }
-    }
-
-    private void callCihp(Member member, Photo photo){
-        // s3에서 파일 가져오기
-        byte[] byteFile = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
-
-        Api<Object> cihpRes = fastApiService.requestCihp(member.getMemberId(), byteFile);
-        if (!Objects.equals(cihpRes.getResult().getResultCode(), Result.OK().getResultCode())){
-            System.out.println("내부 처리중 문제가 발생했습니다.(cihp)");
-        }
-        // cihp 결과 저장
-        try{
-            FastApiRequestGeneralRes cihpResBody = (FastApiRequestGeneralRes)cihpRes.getBody();
-            s3Service.uploadFile("photo/masking/" + cihpResBody.getImgName() + ".png", cihpResBody.getImg());
-        } catch (Exception e) {
-            System.out.println("저장중 문제가 발생했습니다.(cihp)");
-        }
-        // DB 업데이트
-        photoService.updatePhotoImgMasking(photo.getPhotoSeq());
-
-        System.out.println("cihp 완료");
     }
 }

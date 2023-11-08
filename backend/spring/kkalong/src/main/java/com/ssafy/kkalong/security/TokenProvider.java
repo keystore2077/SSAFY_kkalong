@@ -1,6 +1,6 @@
 package com.ssafy.kkalong.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.security.core.Authentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.kkalong.common.error.TokenErrorCode;
 import com.ssafy.kkalong.common.exception.ApiException;
@@ -23,15 +23,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-/*
-TODO: 회원의 리프레시 토큰을 관리할 엔티티
-       리프레시 토큰을 생성하는 메소드
-       로그인 API 응답에 리프레시 토큰 추가
-       리프레시 토큰을 통해 액세스 토큰을 갱신
-       리프레시 토큰 검증 및 새로운 액세스 토큰 발급
-
- */
 
 @Service
 @Getter
@@ -65,9 +56,13 @@ public class TokenProvider {
                 this.memberRepository = memberRepository;
         }
         public String createAccessToken(String memberId){
+                // 권한 가져오기
+                String authorities = "ROLE_USER";
+
                 return Jwts.builder()
                     .signWith(new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName()))
                     .setSubject(memberId)
+                    .claim("auth", authorities)
                     .setIssuer(issuer)
                     .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
                     .setExpiration(Date.from(Instant.now().plus(expirationMinutes, ChronoUnit.HOURS)))
@@ -111,6 +106,7 @@ public class TokenProvider {
                         .getBody()
                         .getSubject();
         }
+
 //        @Transactional
 //        public String recreateAccessToken(String oldAccessToken) throws JsonProcessingException {
 //                String subject = decodeJwtPayloadSubject(oldAccessToken);

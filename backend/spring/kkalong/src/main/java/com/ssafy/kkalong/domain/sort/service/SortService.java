@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class SortService {
-    private SortRepository sortRepository;
+    private final SortRepository sortRepository;
 
     public Sort getSort(String sort){
         return sortRepository.findBySort(sort).orElse(null);

@@ -12,8 +12,11 @@ import com.ssafy.kkalong.security.TokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.time.*;
+import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
@@ -23,6 +26,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final TokenProvider tokenProvider;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Operation(summary = "회원가입")
     @PostMapping("/sign-up")
@@ -202,7 +206,25 @@ public class MemberController {
         return Api.OK("탈퇴 되었습니다.");
     }
 
+    @PostMapping("/auth/checktoken")
+    @Operation(summary = "토큰 유효성 검사 메서드", description = "토큰 정보를 주면 유효성을 검사한다.", tags = "유저 API")
+    public Api<Object> checkToken(@RequestHeader("Authorization") String tokenWithPrefix) {
+        try {
+            String memberId = tokenProvider.validateTokenAndGetSubject(tokenWithPrefix.substring(7));
+            if (memberId!=null)
+            {
+                if (redisTemplate.opsForValue().get(memberId) != null) {
+                    return Api.OK("success");
+                }
+                return Api.OK("fail");
 
+            } else {
+                return Api.ERROR(ErrorCode.BAD_REQUEST,"fail");
+            }
+        } catch (Exception e) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST,"fail");
+        }
+    }
 
 
 }
