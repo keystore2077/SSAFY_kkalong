@@ -5,9 +5,4 @@ class UserStore extends ChangeNotifier {
   changeAccessToken(accesstoken) {
     accessToken = accesstoken;
   }
-
-  String userId = '';
-  changeUserInfo(userInfo) {
-    userId = userInfo;
-  }
 }

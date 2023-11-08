@@ -154,20 +154,20 @@ class PageApi {
   //   }
   // }
 
-  // Future<dynamic> tokenValidation(token) async {
-  //   try {
-  //     final response = await dio.post('$serverURL/user/auth/checktoken',
-  //         options: Options(
-  //           headers: {
-  //             'Authorization': 'Bearer $token',
-  //           },
-  //         ));
-  //     print('토큰유효 api ${response.data}');
-  //     return response.data;
-  //   } catch (e) {
-  //     print(e.toString());
-  //   }
-  // }
+  Future<dynamic> tokenValidation(token) async {
+    try {
+      final response = await dio.post('$serverURL/api/member/auth/checktoken',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+          ));
+      print('토큰유효 api ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   // Future<dynamic> deleteuser(token, id) async {
   //   try {
