@@ -4,6 +4,8 @@ import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.api.Result;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
+import com.ssafy.kkalong.domain.cloth.entity.Cloth;
+import com.ssafy.kkalong.domain.cloth.service.ClothService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.domain.photo.dto.request.PhotoMixRequestReq;
@@ -14,6 +16,7 @@ import com.ssafy.kkalong.domain.photo.service.PhotoService;
 import com.ssafy.kkalong.fastapi.FastApiCallerService;
 import com.ssafy.kkalong.fastapi.FastApiService;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
+import com.ssafy.kkalong.fastapi.dto.RequestVitonRes;
 import com.ssafy.kkalong.s3.S3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,8 @@ public class PhotoController {
     private MemberService memberService;
     @Autowired
     private PhotoService photoService;
+    @Autowired
+    private ClothService clothService;
 
     // 1. 사용자 인증 정보를 확인한다.
     // 2. 사진을 저장한다.
@@ -196,14 +201,78 @@ public class PhotoController {
     @PostMapping("/mix")
     @Operation(summary = "합성 요청")
     public Api<Object> PhotoMixRequest(PhotoMixRequestReq req) {
-        // 사용자 유효성 검사
+        System.out.println("PhotoMixRequest called");
+        // 1. 사용자 및 요청 파일 유효성 검사
         Member member = memberService.getLoginUserInfo();
         if (member == null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않은 사용자 정보입니다");
         }
-        // DB에서 전처리 여부 가져오기
+        Photo photo = photoService.getPhotoBySeq(req.getPhotoSeq());
+        Cloth cloth = clothService.getCloth(req.getClothSeq());
 
+        // photo가 존재하는지와 요청자와 같은 아이디인지 체크
+        if (photo == null || !member.getMemberId().equals(photo.getMember().getMemberId())){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "요청자의 소유한 사진이 아니거나 사진이 존재하지 않습니다");
+        }
+        // cloth가 존재하는지, 접근 가능한 옷(내 옷이거나 공개된 옷)인지 체크
+        if (cloth == null || !(cloth.getMember().getMemberId().equals(member.getMemberId()) || !cloth.isPrivate())){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "해당 옷에 접근 권한이 없거나 옷이 존재하지 않습니다");
+        }
+        System.out.println("요청 인증 확인 완료");
 
-        return Api.OK(new PhotoMixRequestRes());
+        // 2. DB에서 전처리 여부 가져와서 확인하기
+        boolean returnFlag = false;
+        if (!photo.isPhotoImgMasking()){
+            returnFlag = true;
+            fastApiCallerService.callCihp(member, photo);
+        }
+        if (!photo.isPhotoImgOpenpose() || !photo.isPhotoJsonOpenpose()){
+            returnFlag = true;
+            fastApiCallerService.callOpenpose(member, photo);
+        }
+        if (!cloth.isClothImgMasking()) {
+            returnFlag = true;
+            fastApiCallerService.callU2Net(member, cloth);
+        }
+
+        if (returnFlag){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "아직 전처리가 완료되지 않았습니다. 잠시 기다려주세요.");
+        }
+
+        // 3. 필요한 파일 다운로드 후 VITON 호출
+        byte[] clothImg = s3Service.downloadFile("cloth/yes_bg/" + cloth.getClothImgName() + ".jpg");
+        byte[] clothMaskingImg = s3Service.downloadFile("cloth/masking/" + cloth.getClothName() + ".jpg");
+        byte[] photoImg = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
+        byte[] photoParsingImg = s3Service.downloadFile("photo/masking/" + photo.getPhotoImgName() + ".png");
+        byte[] photoOpenposeImg = s3Service.downloadFile("photo/openpose/img/" + photo.getPhotoImgName() + "_rendered.png");
+        byte[] photoOpenposeJson = s3Service.downloadFile("photo/openpose/json/" + photo.getPhotoImgName() + "_keypoints.json");
+        if (clothImg == null || clothMaskingImg == null || photoImg == null || photoParsingImg == null || photoOpenposeImg == null || photoOpenposeJson == null) {
+            System.out.println("하나 이상의 이미지 다운로드에 실패했습니다.");
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "하나 이상의 이미지 다운로드에 실패했습니다.");
+        }
+        System.out.println("모든 전처리 이미지 다운로드 완료");
+
+        Api<Object> vitonResult = fastApiService.requestViton(member, cloth.getClothImgName(), clothImg,
+                clothMaskingImg, photo.getPhotoImgName(), photoImg, photoParsingImg,
+                photoOpenposeImg, photoOpenposeJson);
+        // 4. VITON 성공 여부에 따라 결과 출력
+        if (!Objects.equals(vitonResult.getResult().getResultCode(), Result.OK().getResultCode())){
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생 했습니다.(VITON)");
+        }
+        //VITON 결과 저장
+        RequestVitonRes res;
+        String fileName = FileNameGenerator.generateFileNameNoExtension("temp", member.getMemberId());
+        try{
+            res = (RequestVitonRes)vitonResult.getBody();
+            s3Service.uploadFile("temp/" + fileName + ".jpg", res.getViton());
+        } catch (Exception e) {
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "저장 중 문제가 발생 했습니다.(VITON)");
+        }
+        System.out.println("VITON 완료");
+
+        // 5. S3에서 URL 획득
+        String url = s3Service.generatePresignedUrl("temp/" + fileName + ".jpg");
+
+        return Api.OK(new PhotoMixRequestRes(url, "성공"));
     }
 }

@@ -13,4 +13,6 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
     Photo findByPhotoSeqAndIsPhotoDeleted(int photoSeq, boolean b);
 
     Optional<Object> findByPhotoSeq(int photoSeq);
+
+//    Photo FindByMemberMemberSeqAndPhotoSeqAndIsPhotoDeleted(Member member, String photoImageSeq, boolean b);
 }

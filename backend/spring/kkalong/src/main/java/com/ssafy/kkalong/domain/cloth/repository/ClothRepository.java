@@ -15,9 +15,11 @@ public interface ClothRepository extends JpaRepository<Cloth, Integer> {
 
     List<Cloth> findAllByMemberMemberSeqAndIsClothDeleted(int memberSeq, boolean isDeleted);
 
-    List<Cloth> findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(int memberSeq, boolean isDeleted, boolean isPrivate);
+    List<Cloth> findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(int memberSeq, boolean isDeleted,
+            boolean isPrivate);
 
     List<Cloth> findAllByMemberAndSortAndIsClothDeleted(Member member, Sort sort, boolean isDeleted);
+
     List<Cloth> findAllByMemberAndSectionAndIsClothDeleted(Member member, Section section, boolean isDeleted);
 
     Optional<Cloth> findByClothSeqAndIsClothDeleted(int clothSeq, boolean isDeleted);

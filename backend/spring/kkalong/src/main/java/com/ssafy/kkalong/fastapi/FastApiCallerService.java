@@ -2,6 +2,8 @@ package com.ssafy.kkalong.fastapi;
 
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.api.Result;
+import com.ssafy.kkalong.domain.cloth.entity.Cloth;
+import com.ssafy.kkalong.domain.cloth.service.ClothService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
@@ -24,6 +26,9 @@ public class FastApiCallerService {
     @Autowired
     private PhotoService photoService;
 
+    @Autowired
+    private ClothService clothService;
+
     @Async
     public void callOpenpose(Member member, Photo photo){
         System.out.println("callOpenpose called...");
@@ -35,6 +40,7 @@ public class FastApiCallerService {
             }
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(Openpose)");
+            throw e;
         }
     }
 
@@ -56,9 +62,35 @@ public class FastApiCallerService {
             s3Service.uploadFile("photo/masking/" + cihpResBody.getImgName() + ".png", cihpResBody.getImg());
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(cihp)");
+            throw e;
         }
         // DB 업데이트
         photoService.updatePhotoImgMasking(photo.getPhotoSeq());
+
+        System.out.println("cihp 완료");
+    }
+
+    @Async
+    public void callU2Net(Member member, Cloth cloth) {
+        System.out.println("callU2Net called...");
+        System.out.println("요청 경로: cloth/yes_bg/" + cloth.getClothImgName() + ".jpg");
+
+        byte[] byteFile = s3Service.downloadFile("photo/yes_bg/" + cloth.getClothImgName() + ".jpg");
+        Api<Object> u2NetRes = fastApiService.requestU2Net(member.getMemberId(), byteFile);
+        if (!Objects.equals(u2NetRes.getResult().getResultCode(), Result.OK().getResultCode())){
+            System.out.println("내부 처리중 문제가 발생했습니다.(U2Net)");
+        }
+        // U2Net 결과 저장
+        try{
+            FastApiRequestGeneralRes u2NetResBody = (FastApiRequestGeneralRes)u2NetRes.getBody();
+            System.out.println("저장 경로: cloth/masking/" + u2NetResBody.getImgName() + ".png");
+            s3Service.uploadFile("cloth/masking/" + u2NetResBody.getImgName() + ".png", u2NetResBody.getImg());
+        } catch (Exception e) {
+            System.out.println("저장중 문제가 발생했습니다.(U2Net)");
+            throw e;
+        }
+        // DB 업데이트
+        clothService.updateClothImgMasking(cloth.getClothSeq());
 
         System.out.println("cihp 완료");
     }
