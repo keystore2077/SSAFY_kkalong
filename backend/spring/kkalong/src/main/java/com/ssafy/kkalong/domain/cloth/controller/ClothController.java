@@ -7,7 +7,9 @@ import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothSaveReq;
+import com.ssafy.kkalong.domain.cloth.dto.response.ClothSaveRes;
 import com.ssafy.kkalong.domain.cloth.entity.Cloth;
+import com.ssafy.kkalong.domain.cloth.entity.Tag;
 import com.ssafy.kkalong.domain.cloth.service.ClothService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -47,7 +50,6 @@ public class ClothController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
         }
 
-        System.out.println(request.toString());
         //sectionSeq 유효성 검사
         Section section = closetService.getSection(request.getSectionSeq());
         if (section == null) {
@@ -58,7 +60,7 @@ public class ClothController {
         }
 
         //sortSeq 유효성 검사
-        Sort sort = sortService.getSort(request.getSort());
+        Sort sort = sortService.getClothSort(request.getSort());
         if (sort == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷 종류입니다. Top, Pants, Outer, Skirt, Dress, Etc 중에서 보내주세요.", request.getSort()));
         }
@@ -110,17 +112,85 @@ public class ClothController {
         return Api.OK(clothService.saveCloth(member, section, sort, request, imgUrl,fileName ));
     }
 
-//    @Operation(summary = "옷 상세정보")
-//    @PostMapping(value = "/{clothSeq}" )
-//    public Api<Object> getCloth(@PathVariable int clothSeq) {
-//        Member member = memberService.getLoginUserInfo();
-//        if (member == null) {
-//            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
-//        }
-//
-//        Cloth cloth =
-//
-//    }
+    @Operation(summary = "옷 상세정보")
+    @GetMapping(value = "/{clothSeq}" )
+    public Api<Object> getCloth(@PathVariable int clothSeq) {
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        Cloth cloth =clothService.getCloth(clothSeq);
+        if(cloth ==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
+        }
+        if(cloth.getMember().getMemberId()!=member.getMemberId() && cloth.isPrivate()){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "비공개 옷 이거나 조회하고자 하는 회원이 옷 주인이 아닙니다.");
+        }
+        List<Tag> tagList = clothService.getTagList(clothSeq);
+
+        String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() +".png";
+        String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+        ClothSaveRes clothSaveRes = ClothSaveRes.toRes(cloth,imgUrl,tagList);
+        return Api.OK(clothSaveRes);
+    }
+
+    @Operation(summary = "옷 종류로 조회")
+    @GetMapping(value = "/sort/{sortName}" )
+    public Api<Object> getClothListBySort(@PathVariable String sortName) {
+
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        //sortSeq 유효성 검사
+        Sort sort = sortService.getClothSort(sortName);
+        if (sort == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷 종류입니다. Top, Pants, Outer, Skirt, Dress, Etc 중에서 보내주세요.", sortName));
+        }
+
+        return Api.OK(clothService.getClothListBySort(member, sort));
+    }
+
+    @Operation(summary = "해당 옷장 구역 내 옷 목록 조회")
+    @GetMapping(value = "/section/{sectionSeq}" )
+    public Api<Object> getClothListBySection(@PathVariable int sectionSeq) {
+
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        //sortSeq 유효성 검사
+        Section section = clothService.getSection(sectionSeq);
+        if (section == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷장 구역 정보를 찾을 수 없습니다.");
+        }
+
+        if(section.getCloset().getMember().getMemberId()!=member.getMemberId()){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "조회하고자 하는 회원이 옷장 구역의 주인이 아닙니다.");
+        }
+
+        return Api.OK(clothService.getClothListBySection(member, section));
+    }
+
+    @Operation(summary = "해당 해시태그 옷 목록 조회")
+    @GetMapping(value = "/tag/{tagSeq}" )
+    public Api<Object> getClothListByTag(@PathVariable int tagSeq) {
+
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        //sortSeq 유효성 검사
+        Tag tag = clothService.getTag(tagSeq);
+        if (tag == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "태그 정보를 찾을 수 없습니다.");
+        }
+        return Api.OK(clothService.getClothListByTag(member, tag));
+    }
 
 
 }

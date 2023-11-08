@@ -1,7 +1,9 @@
 package com.ssafy.kkalong.domain.cloth.service;
 
 import com.ssafy.kkalong.domain.closet.entity.Section;
+import com.ssafy.kkalong.domain.closet.repository.SectionRepository;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothSaveReq;
+import com.ssafy.kkalong.domain.cloth.dto.response.ClothGetRes;
 import com.ssafy.kkalong.domain.cloth.dto.response.ClothSaveRes;
 import com.ssafy.kkalong.domain.cloth.entity.Cloth;
 import com.ssafy.kkalong.domain.cloth.entity.Tag;
@@ -12,6 +14,7 @@ import com.ssafy.kkalong.domain.cloth.repository.TagRelaionRepository;
 import com.ssafy.kkalong.domain.cloth.repository.TagRepository;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.sort.entity.Sort;
+import com.ssafy.kkalong.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,8 @@ public class ClothService {
     private final ClothRepository clothRepository;
     private final TagRepository tagRepository;
     private final TagRelaionRepository tagRelaionRepository;
+    private final S3Service s3Service;
+    private final SectionRepository sectionRepository;
 
     public ClothSaveRes saveCloth(Member member, Section section, Sort sort, ClothSaveReq request, String imgUrl, String fileName){
         //옷 저장
@@ -68,8 +73,57 @@ public class ClothService {
     }
 
    public Cloth getCloth(int clothSeq){
-        return clothRepository.findById(clothSeq).orElse(null);
-
-
+        return clothRepository.findByClothSeqAndIsClothDeleted(clothSeq,false).orElse(null);
    }
+
+
+    public List<Tag>  getTagList(int clothSeq){
+        return tagRelaionRepository.findAllByClothClothSeq(clothSeq).stream()
+                .map(v->{
+                    return v.getTag();
+                })
+                .toList();
+    }
+
+    public List<ClothGetRes> getClothListBySort(Member member,Sort sort){
+
+        return clothRepository.findAllByMemberAndSortAndIsClothDeleted(member,sort,false).stream()
+                .map(cloth->{
+                    String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() +".png";
+                    String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+                    return ClothGetRes.toRes(cloth, imgUrl);
+                })
+                .toList();
+
+    }
+
+    public Section getSection(int sectionSeq){
+        return sectionRepository.findById(sectionSeq).orElse(null);
+    }
+
+    public List<ClothGetRes> getClothListBySection(Member member,Section section){
+
+        return clothRepository.findAllByMemberAndSectionAndIsClothDeleted(member,section,false).stream()
+                .map(cloth->{
+                    String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() +".png";
+                    String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+                    return ClothGetRes.toRes(cloth, imgUrl);
+                })
+                .toList();
+    }
+
+    public Tag getTag(int tagSeq){
+        return tagRepository.findById(tagSeq).orElse(null);
+    }
+
+    public List<ClothGetRes> getClothListByTag(Member member,Tag tag){
+
+        return clothRepository.findClothsByMemberAndTag(member.getMemberSeq(),tag.getTagSeq()).stream()
+                .map(cloth->{
+                    String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() +".png";
+                    String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+                    return ClothGetRes.toRes(cloth, imgUrl);
+                })
+                .toList();
+    }
 }
