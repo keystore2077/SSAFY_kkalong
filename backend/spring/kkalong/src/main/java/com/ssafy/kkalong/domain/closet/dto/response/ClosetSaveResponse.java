@@ -12,6 +12,9 @@ public class ClosetSaveResponse
     @Schema(description = "옷장인덱스")
     private int closetSeq;
 
+    @Schema(description = "옷장정보 조회하는 멤버 시퀀스")
+    private String memberId;
+
     @Schema(description = "옷장이름")
     private String closetName ;
 
@@ -20,7 +23,7 @@ public class ClosetSaveResponse
     private String closetPictureUrl;
 
     @Schema(description = "구역정보")
-    private List<SectionCreateRequestItem> closetSectionList ;
+    private List<SectionSaveResponse> closetSectionList ;
 
     @Schema(description = "등록일")
     private LocalDateTime closetRegData;

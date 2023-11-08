@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+
 public class  SectionCreateRequestItem {
     @Schema(description = "옷장상세구역 이름")
     private String sectionName;

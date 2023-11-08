@@ -6,10 +6,7 @@ import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetCreateRequest;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetRequest;
 import com.ssafy.kkalong.domain.closet.dto.request.SectionCreateRequestItem;
-import com.ssafy.kkalong.domain.closet.dto.response.ClosetRembgResponse;
-import com.ssafy.kkalong.domain.closet.dto.response.ClosetResponse;
-import com.ssafy.kkalong.domain.closet.dto.response.ClosetSaveResponse;
-import com.ssafy.kkalong.domain.closet.dto.response.SectionResponse;
+import com.ssafy.kkalong.domain.closet.dto.response.*;
 import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.repository.ClosetRepository;
@@ -120,30 +117,12 @@ public class ClosetController {
 
     }
 
-    @PostMapping("")
-    @Operation(summary = "옷장 등록")
-    public Api<Object> postCloset(@RequestBody ClosetCreateRequest closetCreateRequest) {
-        //1.회원확인하기
-        Member member = memberService.getLoginUserInfo(); //멤버를 반환해주는거(서비스에서 작성된것)
-        if (member == null) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
-        }
-        int memberSeq = member.getMemberSeq();  //멤버의 일련번호 받아오는 과정
-        Closet newCloset = closetService.createCloset(closetCreateRequest, member); //closetSeq 를 저장 할라고
-        closetService.createSection(closetCreateRequest.getClosetSectionList(), newCloset);
-
-
-        // 1.dto 변환 entity
-
-        // 2. repository에게 entity를 db안에 저장하게 하기
-
-        return Api.OK("이건 서비스에서 return된 값");
-    }
 
 
     @PostMapping("/test")
-    @Operation(summary = "옷장등록 연습")
+    @Operation(summary = "옷장등록")
     public Api<Object> createClosetPrac(MultipartFile file, ClosetCreateRequest closetCreateRequest){ //ClosetCreateRequest 타입의 객체를 매개변수로 받아 처리
+        System.out.println(closetCreateRequest.toString());
         Member member = memberService.getLoginUserInfo(); //현재 로그인한 사용자의 정보를 가져오기 위해 memberService의 getLoginUserInfo 메소드를 호출
 
         if (member == null) {
@@ -155,14 +134,15 @@ public class ClosetController {
         if (!file.isEmpty()) {
 
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
-
+                //db에 사진파일 저장하려고 파일명 만든거
                 fileName= FileNameGenerator.generateFileName("closet", member.getMemberId(), "png");
                 String filePath = "closet/" + fileName;
 
                 Api<Object>result = fastApiService.requestRembg(member.getMemberId(),file);
                 RequestRembgRes reRes = (RequestRembgRes)result.getBody();
                 s3Service.uploadFile(filePath,reRes.getNoBg());
-                //누끼를 딴거를 올려야함
+
+                //프론트에 필요한거
                 s3imgUrl = s3Service.generatePresignedUrl(filePath);
 
             }
@@ -184,46 +164,60 @@ public class ClosetController {
         //1.옷장 엔티티를 만들어서 db에 넣는작업(로직은 service에서 만들기)
         Closet closetSave = closetService.createCloset(closetCreateRequest,member,fileName);
 
-        //2.섹션 생성
-
-
-
-        closetService.createSection(closetCreateRequest.getClosetSectionList(),closetSave);
-        System.out.println(closetCreateRequest.toString());
-        String closetImgName = FileNameGenerator.generateFileName("closet",member.getMemberId(),"jpg");
-        //FileNameGenerator(common/util)를 사용하여 저장할 옷장 이미지 파일의 이름을 생성 -> 이 이름은 사용자의 ID와 "jpg" 확장자를 사용
-
-         Closet closet = closetCreateRequest.toEntity(member,closetCreateRequest,closetImgName);  //dto인 closetCreatRequest에서 toEntitiy라는 메소드를 만들어줘야함
-        //closetCreateRequest 객체의 toEntity 메소드를 호출하여, 제공한 데이터와 생성된 이미지 파일 이름을 사용해 Closet 엔티티(데이터베이스에 저장될 객체)를 생성
-
-        try {
-            s3Service.uploadFile("closet/" + closetImgName,closetCreateRequest.getClosetImageFile());
-        } catch (IOException e) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
+        //2.섹션 db 넣기
+        List<Section> sectionList = closetService.createSection(closetCreateRequest.getClosetSectionList(),closetSave);
+        List<SectionSaveResponse> sectionSaveResponseList = new ArrayList<>();
+        for (Section item : sectionList){
+            sectionSaveResponseList.add(new SectionSaveResponse(item));
         }
-        //이미지 파일을 Amazon S3파일 저장 서비스에 업로드하는 시도
 
-//        closetService.testcloset(closetCreateRequest,member,closetImgName);
+        ClosetSaveResponse closetSaveResponse = new ClosetSaveResponse();
+        closetSaveResponse.setClosetSeq(closetSave.getClosetSeq());
+        closetSaveResponse.setMemberId(closetSave.getMember().getMemberId());
+        closetSaveResponse.setClosetName(closetSave.getClosetName());
+        closetSaveResponse.setClosetPictureUrl(s3imgUrl);
+        closetSaveResponse.setClosetSectionList(sectionSaveResponseList);
+        closetSaveResponse.setClosetRegData(closetSave.getClosetRegData());
+        closetSaveResponse.setMembernickname(closetSave.getMember().getMemberNickname());
 
-        Closet closetResult = closetService.testcloset(closetCreateRequest,member,closetImgName);
-        //closetService의 testcloset 메소드를 호출하여 데이터베이스에 옷장 정보를 저장. 저장된 결과를 closetResult에 할당.
+        return Api.OK(closetSaveResponse);
 
-        String imgUrl = s3Service.generatePresignedUrl("closet/" + closetResult.getClosetImgName());
-        //저장된 이미지 파일을 인터넷에서 접근할 수 있는 URL을 생성.
 
-        System.out.println("closet/" + closetResult.getClosetImgName());
-        ClosetSaveResponse closetsaveresponse = new ClosetSaveResponse();
-        //클라이언트에 반환할 응답을 담을 ClosetSaveResponse 객체를 생성.
-
-        closetsaveresponse.setClosetSeq(closetResult.getClosetSeq());
-        closetsaveresponse.setClosetName(closetResult.getClosetName());
-        closetsaveresponse.setClosetPictureUrl(imgUrl);
-//        closetsaveresponse.setClosetSectionList(closetResult.get);
-        closetsaveresponse.setClosetRegData(closetResult.getClosetRegData());
-        closetsaveresponse.setMembernickname(closetResult.getMember().getMemberNickname());
-        //closetsaveresponse 객체에 closetResult에서 얻은 데이터를 설정. 이를 통해 클라이언트에 옷장의 순번, 이름, 이미지 URL, 등록 날짜, 사용자 닉네임 등을 전달
-
-        return Api.OK(closetsaveresponse);
+//        System.out.println(closetCreateRequest.toString());
+//        String closetImgName = FileNameGenerator.generateFileName("closet",member.getMemberId(),"jpg");
+//        //FileNameGenerator(common/util)를 사용하여 저장할 옷장 이미지 파일의 이름을 생성 -> 이 이름은 사용자의 ID와 "jpg" 확장자를 사용
+//
+//         Closet closet = closetCreateRequest.toEntity(member,closetCreateRequest,closetImgName);  //dto인 closetCreatRequest에서 toEntitiy라는 메소드를 만들어줘야함
+//        //closetCreateRequest 객체의 toEntity 메소드를 호출하여, 제공한 데이터와 생성된 이미지 파일 이름을 사용해 Closet 엔티티(데이터베이스에 저장될 객체)를 생성
+//
+//        try {
+//            s3Service.uploadFile("closet/" + closetImgName,closetCreateRequest.getClosetImageFile());
+//        } catch (IOException e) {
+//            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
+//        }
+//        //이미지 파일을 Amazon S3파일 저장 서비스에 업로드하는 시도
+//
+////        closetService.testcloset(closetCreateRequest,member,closetImgName);
+//
+//        Closet closetResult = closetService.testcloset(closetCreateRequest,member,closetImgName);
+//        //closetService의 testcloset 메소드를 호출하여 데이터베이스에 옷장 정보를 저장. 저장된 결과를 closetResult에 할당.
+//
+//        String imgUrl = s3Service.generatePresignedUrl("closet/" + closetResult.getClosetImgName());
+//        //저장된 이미지 파일을 인터넷에서 접근할 수 있는 URL을 생성.
+//
+//        System.out.println("closet/" + closetResult.getClosetImgName());
+//        ClosetSaveResponse closetsaveresponse = new ClosetSaveResponse();
+//        //클라이언트에 반환할 응답을 담을 ClosetSaveResponse 객체를 생성.
+//
+//        closetsaveresponse.setClosetSeq(closetResult.getClosetSeq());
+//        closetsaveresponse.setClosetName(closetResult.getClosetName());
+//        closetsaveresponse.setClosetPictureUrl(imgUrl);
+////        closetsaveresponse.setClosetSectionList(closetResult.get);
+//        closetsaveresponse.setClosetRegData(closetResult.getClosetRegData());
+//        closetsaveresponse.setMembernickname(closetResult.getMember().getMemberNickname());
+//        //closetsaveresponse 객체에 closetResult에서 얻은 데이터를 설정. 이를 통해 클라이언트에 옷장의 순번, 이름, 이미지 URL, 등록 날짜, 사용자 닉네임 등을 전달
+//
+//        return Api.OK(closetsaveresponse);
     }
 
 
