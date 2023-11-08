@@ -15,8 +15,8 @@ import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
 import com.ssafy.kkalong.fastapi.FastApiCallerService;
 import com.ssafy.kkalong.fastapi.FastApiService;
-import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
+import com.ssafy.kkalong.fastapi.dto.RequestVitonRes;
 import com.ssafy.kkalong.s3.S3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -260,17 +260,18 @@ public class PhotoController {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생 했습니다.(VITON)");
         }
         //VITON 결과 저장
-        FastApiRequestGeneralRes res;
+        RequestVitonRes res;
+        String fileName = FileNameGenerator.generateFileNameNoExtension("temp", member.getMemberId());
         try{
-            res = (FastApiRequestGeneralRes)vitonResult.getBody();
-            s3Service.uploadFile("temp/" + res.getImgName() + ".jpg", res.getImg());
+            res = (RequestVitonRes)vitonResult.getBody();
+            s3Service.uploadFile("temp/" + fileName + ".jpg", res.getViton());
         } catch (Exception e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "저장 중 문제가 발생 했습니다.(VITON)");
         }
         System.out.println("VITON 완료");
 
         // 5. S3에서 URL 획득
-        String url = s3Service.generatePresignedUrl("temp/" + res.getImgName() + ".jpg");
+        String url = s3Service.generatePresignedUrl("temp/" + fileName + ".jpg");
 
         return Api.OK(new PhotoMixRequestRes(url, "성공"));
     }
