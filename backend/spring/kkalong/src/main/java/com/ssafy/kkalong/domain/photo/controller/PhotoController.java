@@ -139,6 +139,10 @@ public class PhotoController {
 
         // s3에서 사진별 url 가져오기
         List<PhotoRes> photoResList = new ArrayList<>();
+        if (photoList == null){
+            return Api.OK(photoResList);
+        }
+        
         for(Photo p : photoList){
             String url = s3Service.generatePresignedUrl("photo/no_bg/" + p.getPhotoImgName() + ".png");
             PhotoRes pRes = PhotoRes.toRes(p, url);
@@ -162,6 +166,14 @@ public class PhotoController {
         }
 
         Photo photo = photoService.getPhotoBySeq(photoSeq);
+        if (photo == null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "해당하는 번호의 옷이 존재하지 않습니다.");
+        }
+        // 전처리가 되어 있는지 확인
+        if (!photo.isPhotoImgMasking() || !photo.isPhotoImgOpenpose() || !photo.isPhotoJsonOpenpose()){
+            return Api.OK("아직 전처리가 끝나지 않았습니다. 나중에 다시 시도해주세요");
+        }
+
         String url = s3Service.generatePresignedUrl("photo/no_bg/" + photo.getPhotoImgName() + ".png");
         PhotoRes photoRes = PhotoRes.toRes(photo, url);
 
