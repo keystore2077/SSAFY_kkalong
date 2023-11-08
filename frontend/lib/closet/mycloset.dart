@@ -303,7 +303,7 @@ class MyClosetState extends State<MyCloset> {
                               child: Text(
                                 '오늘도 깔롱쟁이와 멋쟁이 돼보아요!',
                                 style: TextStyle(
-                                  fontSize: 25,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),

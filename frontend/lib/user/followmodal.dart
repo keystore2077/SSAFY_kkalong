@@ -6,21 +6,21 @@ void main() {
   runApp(
       MaterialApp(
           theme: ThemeData(),
-          home: MyPage()
+          home: FollowModal()
       )
   );
 }
 
-class MyPage extends StatefulWidget {
-  const MyPage({super.key, this.storage});
+class FollowModal extends StatefulWidget {
+  const FollowModal({super.key, this.storage});
 
   final storage;
 
   @override
-  State<MyPage> createState() => MyPageState();
+  State<FollowModal> createState() => FollowModalState();
 }
 
-class MyPageState extends State<MyPage> {
+class FollowModalState extends State<FollowModal> {
   @override
   void initState() {
     super.initState();
