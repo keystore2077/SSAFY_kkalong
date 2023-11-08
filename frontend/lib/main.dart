@@ -276,8 +276,8 @@ class _MainState extends State<Main> {
               children: const [
                 ChoicePicture(),
                 MyCloset(),
-                ClosetDetail(),
                 CategoryPage(),
+                ClosetDetail(),
                 MyPage(),
                 // userToken == null
                 //     ? LogIn(storage: storage)
