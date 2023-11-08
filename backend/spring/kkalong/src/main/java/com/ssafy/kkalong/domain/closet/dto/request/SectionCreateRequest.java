@@ -11,6 +11,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class SectionCreateRequest {
+
     @Schema(description = "옷장상세구역 리스트")
     private List<SectionCreateRequestItem> sectionItem;
 

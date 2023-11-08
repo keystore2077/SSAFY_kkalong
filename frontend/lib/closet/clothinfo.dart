@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(
@@ -14,13 +16,13 @@ class ClothInfo extends StatefulWidget {
   const ClothInfo({Key? key}) : super(key: key);
 
   @override
-  _MyAppState createState() => _MyAppState();
+  _ClothInfoState createState() => _ClothInfoState();
 }
 
-class _MyAppState extends State<ClothInfo> {
+class _ClothInfoState extends State<ClothInfo> {
   final TextEditingController inputController = TextEditingController();
   final TextEditingController inputController2 = TextEditingController();
-  List<Widget> tags = [];
+  final List<String> tags = [];
 
   final List<String> closets = [
     '공주옷장',
@@ -49,36 +51,119 @@ class _MyAppState extends State<ClothInfo> {
   ];
   String? selectedCloth;
 
-  void _addTag() {
+  // 항목을 추가하는 메소드
+  void _addItem() {
     setState(() {
       String tagText = inputController2.text;
 
       if (tagText.isNotEmpty) {
-        tags.add(
-          Container(
-            margin: EdgeInsets.all(8.0),
-            padding: EdgeInsets.all(8.0),
-            width: 70,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xFFF5BEB5),
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(30.0),
-            ),
-            child: Center(child: Text(
-              '#$tagText',
-              style: TextStyle(
-                color: Color(0xFFF5BEB5),
-              ),
-            )),
-          ),
-        );
+        setState(() {
+          tags.add(tagText);
+        });
         inputController2.clear();
       }
     });
   }
 
+  // 항목을 제거하는 메소드
+  void _removeItem(int index) {
+    setState(() {
+      if (tags.isNotEmpty) {
+        tags.removeAt(index);
+      }
+    });
+  }
+
+  //  데이터 보내는 함수
+  var data = [];
+  // sendData() async{
+  //   var request = http.MultipartRequest('POST', Uri.parse('https://example.com/api/closet'));
+  //
+  //   // sectionItems 맵을 순회하면서 closetSectionList를 생성
+  //   List<Map<String, dynamic>> sectionList = sectionItems.entries.map((entry) {
+  //     // 각 섹션명과 그에 해당하는 아이템 목록을 사용해 리스트를 생성
+  //     return {
+  //       'sectionName': entry.key,
+  //       'sort': entry.value.map((itemName) {
+  //         return {
+  //           'sortSeq': entry.value.indexOf(itemName), // 아이템의 인덱스를 sortSeq로 사용
+  //           'sort': itemName,
+  //           'sortGroup': {
+  //             'sortGroupSeq': 2,
+  //             'groupName': 'section'
+  //           }
+  //         };
+  //       }).toList()
+  //     };
+  //   }).toList();
+  //
+  //   request.fields['closetName'] = inputController.text;
+  //   request.fields['closetImageName'] = '';
+  //   request.fields['closetSectionList'] = jsonEncode({'closetSectionList': sectionList});
+  //
+  //   // 요청 전송
+  //   var response = await request.send();
+  //
+  //   if (response.statusCode == 200) {
+  //     var responseData = await response.stream.toBytes();
+  //     var responseString = String.fromCharCodes(responseData);
+  //     var result = jsonDecode(responseString);
+  //     setState(() {
+  //       data = result;
+  //     });
+  //     print(data);
+  //   } else {
+  //     _showErrorDialog('오류 발생: ${response.statusCode}');
+  //   }
+  // }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('오류 발생!'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: Text('확인'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+  // 리스트에 저장된 항목을 바탕으로 위젯을 생성하는 함수
+  List<Widget> _buildItemList() {
+    return tags.asMap().entries.map((entry) {
+      int index = entry.key;
+      String tag = entry.value;
+
+      return GestureDetector(
+        onTap: () => _removeItem(index),
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Color(0xFFF5BEB5),
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          child: Center(
+            child: Text(
+              '#$tag X',
+              style: TextStyle(
+                color: Color(0xFFF5BEB5),
+              ),
+            ),
+          ),
+        ),
+      );
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -375,7 +460,7 @@ class _MyAppState extends State<ClothInfo> {
                           height: 50,
                           child: OutlinedButton(
                             onPressed: () {
-                              _addTag();
+                              _addItem();
                               // 태그 추가 수행하는 코드 추가
                             },
                             style: OutlinedButton.styleFrom(
@@ -412,9 +497,7 @@ class _MyAppState extends State<ClothInfo> {
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: [
-                        ...tags,
-                      ],
+                      children: _buildItemList(),
                     ),
                   ),
                   const SizedBox(

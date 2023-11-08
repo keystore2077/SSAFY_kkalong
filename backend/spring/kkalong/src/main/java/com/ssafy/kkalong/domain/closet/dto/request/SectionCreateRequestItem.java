@@ -8,12 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SectionCreateRequestItem {
+
+public class  SectionCreateRequestItem {
     @Schema(description = "옷장상세구역 이름")
     private String sectionName;
 
 
-    @Schema(description = "옷장 상세 종류 인덱스")
-    private Sort sort;
+    @Schema(description = "옷장 상세 종류 인덱스")  //박스 행거 같은거
+    private String sort;
 
     }
