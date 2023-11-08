@@ -263,7 +263,7 @@ public class PhotoController {
         FastApiRequestGeneralRes res;
         try{
             res = (FastApiRequestGeneralRes)vitonResult.getBody();
-            s3Service.uploadFile("fashion/" + res.getImgName() + ".jpg", res.getImg());
+            s3Service.uploadFile("temp/" + res.getImgName() + ".jpg", res.getImg());
         } catch (Exception e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "저장 중 문제가 발생 했습니다.(VITON)");
         }
