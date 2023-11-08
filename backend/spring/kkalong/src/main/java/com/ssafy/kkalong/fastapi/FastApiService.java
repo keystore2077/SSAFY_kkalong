@@ -10,6 +10,7 @@ import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -22,13 +23,16 @@ import java.util.Map;
 
 @Service
 public class FastApiService {
-    private final String preprocessUrl = "http://222.107.238.44:4050";
+    @Value("${ai-server.gpu.ip}:${ai-server.gpu.preprocess-port}")
+    private String preprocessUrl;
 //    private final String url = "http://localhost:4050";
 
-    private final String vitonHdUrl = "http://222.107.238.44:4051";
+    @Value("${ai-server.gpu.ip}:${ai-server.gpu.viton-port}")
+    private String vitonHdUrl;
 
-    private final String openposeUrl = "http://192.168.100.37:4052";
 //    private final String openposeUrl = "http://localhost:4052";
+    @Value("${ai-server.openpose}")
+    private String openposeUrl;
 
     private final RestTemplate restTemplate;
 
@@ -154,18 +158,16 @@ public class FastApiService {
         }
     }
 
-    // 미완성
-    public Api<Object> requestU2Net(String memberId, MultipartFile mFile) {
+    public Api<Object> requestU2Net(String memberId, MultipartFile mFile) throws IOException {
+        return requestU2Net(memberId, mFile.getBytes());
+    }
+
+    public Api<Object> requestU2Net(String memberId, byte[] mFile) {
         String apiUrl = preprocessUrl + "/u2net";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String mFileBase64;
-        try {
-            mFileBase64 = Base64.getEncoder().encodeToString(mFile.getBytes());
-        } catch (IOException e) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않은 파일");
-        }
+        String mFileBase64 = Base64.getEncoder().encodeToString(mFile);
 
         // ObjectMapper 초기화
         ObjectMapper objectMapper = new ObjectMapper();
