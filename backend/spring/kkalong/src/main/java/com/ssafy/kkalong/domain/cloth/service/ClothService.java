@@ -67,5 +67,9 @@ public class ClothService {
         return ClothSaveRes.toRes(clothSave, imgUrl, tagList);
     }
 
-  // public Cloth (int clothSeq)
+   public Cloth getCloth(int clothSeq){
+        return clothRepository.findById(clothSeq).orElse(null);
+
+
+   }
 }

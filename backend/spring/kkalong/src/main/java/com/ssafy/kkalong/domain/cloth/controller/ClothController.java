@@ -7,6 +7,7 @@ import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothSaveReq;
+import com.ssafy.kkalong.domain.cloth.entity.Cloth;
 import com.ssafy.kkalong.domain.cloth.service.ClothService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
@@ -116,6 +117,8 @@ public class ClothController {
 //        if (member == null) {
 //            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
 //        }
+//
+//        Cloth cloth =
 //
 //    }
 
