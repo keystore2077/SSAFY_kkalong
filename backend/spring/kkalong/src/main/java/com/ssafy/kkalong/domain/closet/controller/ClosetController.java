@@ -104,14 +104,24 @@ public class ClosetController {
         List<ClosetResponse> result = new ArrayList<>();       //클로젯의 리스트 반환해줄 리스트
 
         for (Closet closet : closets) {
-//            String url = closet.getClosetImgName();  //이부분 수정해야함 개행
-            String url = "String";
-            ClosetResponse closetResponse = ClosetResponse.builder()
-                    .closetSeq(closet.getClosetSeq())       //옷장인덱스
-                    .closetName(closet.getClosetName())     //옷장이름
-                    .closetPictureUrl(url)      //옷장사진 url
-                    .build();
-            result.add(closetResponse);
+            String fileName = closet.getClosetImgName();
+            if (fileName != null && !fileName.isEmpty()) {
+                // 파일 경로를 정확히 지정해야 합니다. "closet/"는 가정한 폴더 경로입니다.
+                String filePath = "closet/" + fileName;
+                String url = s3Service.generatePresignedUrl(filePath);
+                ClosetResponse closetResponse = ClosetResponse.builder()
+                        .closetSeq(closet.getClosetSeq()) // 옷장인덱스
+                        .closetPictureUrl(url) // 옷장사진 url
+                        .build();
+                result.add(closetResponse);
+            } else {
+                // 파일 이름이 없는 경우에 대한 처리
+                ClosetResponse closetResponse = ClosetResponse.builder()
+                        .closetSeq(closet.getClosetSeq()) // 옷장인덱스
+                        .closetPictureUrl(null) // 혹은 적절한 기본 이미지 URL을 설정
+                        .build();
+                result.add(closetResponse);
+            }
         }
         return Api.OK(result);
 
