@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 //db연동
-
+//repository
+//jpa상속받아서 crud제공하는곳
 public interface ClosetRepository extends JpaRepository<Closet, Integer> {
     List<Closet> findAllByMemberMemberSeq(int member);
 

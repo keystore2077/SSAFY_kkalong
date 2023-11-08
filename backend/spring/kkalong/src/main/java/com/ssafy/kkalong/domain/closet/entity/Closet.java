@@ -4,10 +4,13 @@ import com.ssafy.kkalong.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 //DB랑 통신하는 곣
+// 옷장 entity
+//여기서 필요한 정보룰
 @Entity
 @Data
 @Table(name = "closet")
@@ -34,6 +37,7 @@ public class Closet {
 
     @Column(name="closet_reg_date",nullable = false)
     @Schema(description = "생성일시")
+    @CreationTimestamp
     private LocalDateTime closetRegData;
 
     @Column(name="is_closet_deleted",nullable = false)
