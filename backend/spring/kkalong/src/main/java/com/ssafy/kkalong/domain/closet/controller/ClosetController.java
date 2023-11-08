@@ -5,16 +5,22 @@ import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetCreateRequest;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetRequest;
-import com.ssafy.kkalong.domain.closet.dto.response.ClosetRembgResponse;
-import com.ssafy.kkalong.domain.closet.dto.response.ClosetResponse;
-import com.ssafy.kkalong.domain.closet.dto.response.SectionResponse;
+import com.ssafy.kkalong.domain.closet.dto.request.SectionCreateRequestItem;
+import com.ssafy.kkalong.domain.closet.dto.response.*;
 import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.entity.Section;
+import com.ssafy.kkalong.domain.closet.repository.ClosetRepository;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
+import com.ssafy.kkalong.domain.sort.entity.Sort;
+import com.ssafy.kkalong.domain.sort.service.SortService;
+import com.ssafy.kkalong.fastapi.FastApiService;
+import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +41,16 @@ public class ClosetController {
     private MemberService memberService;
     @Autowired
     private S3Service s3Service;
+    @Autowired
+    private ClosetRepository closetRepository;
+
+    @Autowired
+    private FastApiService fastApiService;
+
+    @Autowired
+    private SortService sortService;
+
+
 
     //옷장 상세정보 및 소속구역 리스트 보기
     @GetMapping("/{closetSeq}")
@@ -101,69 +117,109 @@ public class ClosetController {
 
     }
 
-    @PostMapping("")
-    @Operation(summary = "옷장 등록")
-    public Api<Object> postCloset(@RequestBody ClosetCreateRequest closetCreateRequest) {
-        //1.회원확인하기
-        Member member = memberService.getLoginUserInfo(); //멤버를 반환해주는거(서비스에서 작성된것)
+
+
+    @PostMapping("/test")
+    @Operation(summary = "옷장등록")
+    public Api<Object> createClosetPrac(MultipartFile file, ClosetCreateRequest closetCreateRequest){ //ClosetCreateRequest 타입의 객체를 매개변수로 받아 처리
+        System.out.println(closetCreateRequest.toString());
+        Member member = memberService.getLoginUserInfo(); //현재 로그인한 사용자의 정보를 가져오기 위해 memberService의 getLoginUserInfo 메소드를 호출
+
         if (member == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
         }
-        int memberSeq = member.getMemberSeq();  //멤버의 일련번호 받아오는 과정
-        Closet newCloset = closetService.createCloset(closetCreateRequest, member); //closetSeq 를 저장 할라고
-        closetService.createSection(closetCreateRequest.getClosetSectionList(), newCloset);
+        String s3imgUrl="";
+        String fileName="";
+        //옷장 사진파일에 대한 유효성검사 해주기(1)
+        if (!file.isEmpty()) {
 
-        return Api.OK("이건 서비스에서 return된 값");
+            if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
+                //db에 사진파일 저장하려고 파일명 만든거
+                fileName= FileNameGenerator.generateFileName("closet", member.getMemberId(), "png");
+                String filePath = "closet/" + fileName;
+
+                Api<Object>result = fastApiService.requestRembg(member.getMemberId(),file);
+                RequestRembgRes reRes = (RequestRembgRes)result.getBody();
+                s3Service.uploadFile(filePath,reRes.getNoBg());
+
+                //프론트에 필요한거
+                s3imgUrl = s3Service.generatePresignedUrl(filePath);
+
+            }
+            else {
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "지원하지 않는 파일 형식입니다.");
+            }
+        } else {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "업로드된 파일이 없습니다.");
+        }
+
+        //옷장 상세종류 인덱스 유효성검사(2)
+        List<SectionCreateRequestItem> list = closetCreateRequest.getClosetSectionList();
+        for (SectionCreateRequestItem closetList : list){
+            Sort sort = sortService.getSort(closetList.getSort());
+            if (sort == null){
+                return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷 종류입니다. Top, Pants, Outer, Skirt, Dress, Etc 중에서 보내주세요.", closetList.getSort()));
+            }
+        }
+        //1.옷장 엔티티를 만들어서 db에 넣는작업(로직은 service에서 만들기)
+        Closet closetSave = closetService.createCloset(closetCreateRequest,member,fileName);
+
+        //2.섹션 db 넣기
+        List<Section> sectionList = closetService.createSection(closetCreateRequest.getClosetSectionList(),closetSave);
+        List<SectionSaveResponse> sectionSaveResponseList = new ArrayList<>();
+        for (Section item : sectionList){
+            sectionSaveResponseList.add(new SectionSaveResponse(item));
+        }
+
+        ClosetSaveResponse closetSaveResponse = new ClosetSaveResponse();
+        closetSaveResponse.setClosetSeq(closetSave.getClosetSeq());
+        closetSaveResponse.setMemberId(closetSave.getMember().getMemberId());
+        closetSaveResponse.setClosetName(closetSave.getClosetName());
+        closetSaveResponse.setClosetPictureUrl(s3imgUrl);
+        closetSaveResponse.setClosetSectionList(sectionSaveResponseList);
+        closetSaveResponse.setClosetRegData(closetSave.getClosetRegData());
+        closetSaveResponse.setMembernickname(closetSave.getMember().getMemberNickname());
+
+        return Api.OK(closetSaveResponse);
+
+
+//        System.out.println(closetCreateRequest.toString());
+//        String closetImgName = FileNameGenerator.generateFileName("closet",member.getMemberId(),"jpg");
+//        //FileNameGenerator(common/util)를 사용하여 저장할 옷장 이미지 파일의 이름을 생성 -> 이 이름은 사용자의 ID와 "jpg" 확장자를 사용
+//
+//         Closet closet = closetCreateRequest.toEntity(member,closetCreateRequest,closetImgName);  //dto인 closetCreatRequest에서 toEntitiy라는 메소드를 만들어줘야함
+//        //closetCreateRequest 객체의 toEntity 메소드를 호출하여, 제공한 데이터와 생성된 이미지 파일 이름을 사용해 Closet 엔티티(데이터베이스에 저장될 객체)를 생성
+//
+//        try {
+//            s3Service.uploadFile("closet/" + closetImgName,closetCreateRequest.getClosetImageFile());
+//        } catch (IOException e) {
+//            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
+//        }
+//        //이미지 파일을 Amazon S3파일 저장 서비스에 업로드하는 시도
+//
+////        closetService.testcloset(closetCreateRequest,member,closetImgName);
+//
+//        Closet closetResult = closetService.testcloset(closetCreateRequest,member,closetImgName);
+//        //closetService의 testcloset 메소드를 호출하여 데이터베이스에 옷장 정보를 저장. 저장된 결과를 closetResult에 할당.
+//
+//        String imgUrl = s3Service.generatePresignedUrl("closet/" + closetResult.getClosetImgName());
+//        //저장된 이미지 파일을 인터넷에서 접근할 수 있는 URL을 생성.
+//
+//        System.out.println("closet/" + closetResult.getClosetImgName());
+//        ClosetSaveResponse closetsaveresponse = new ClosetSaveResponse();
+//        //클라이언트에 반환할 응답을 담을 ClosetSaveResponse 객체를 생성.
+//
+//        closetsaveresponse.setClosetSeq(closetResult.getClosetSeq());
+//        closetsaveresponse.setClosetName(closetResult.getClosetName());
+//        closetsaveresponse.setClosetPictureUrl(imgUrl);
+////        closetsaveresponse.setClosetSectionList(closetResult.get);
+//        closetsaveresponse.setClosetRegData(closetResult.getClosetRegData());
+//        closetsaveresponse.setMembernickname(closetResult.getMember().getMemberNickname());
+//        //closetsaveresponse 객체에 closetResult에서 얻은 데이터를 설정. 이를 통해 클라이언트에 옷장의 순번, 이름, 이미지 URL, 등록 날짜, 사용자 닉네임 등을 전달
+//
+//        return Api.OK(closetsaveresponse);
     }
 
-    //2.db에다가 옷장을 추가하고 옷장의 오토 인크리먼트가 된 pk를 가져와야함
-
-    //3.byte타입 array  이타입으로 반환byte[] 된걸 s3저장하고
-    //db에 옷장저장, 그옷장에 해당 섹션저장
-    //api ok반환
-
-
-
-
-    @PostMapping("/rembg_req")
-    @Operation(summary = "옷장 등록전 사진 배경제거")
-    public Api<Object> postRembgReq(@RequestBody MultipartFile file) {
-        //1.사진 유효성검사 (null,jpg,png)
-        if (file.isEmpty() || (!file.getContentType().equalsIgnoreCase("image/jpg") &&
-                !file.getContentType().equalsIgnoreCase("image/png"))) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "Invalid file type or empty file.");
-        }
-        // 2.gpu에 사진 변환 요청(누끼변환 요청)
-        
-        // 여기서붙터
-        File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
-        // 임시 파일을 삭제하도록 설정합니다. 프로그램 종료 시 삭제됩니다.
-        convFile.deleteOnExit();
-        // MultipartFile의 내용을 임시 파일로 복사합니다.
-        try {
-            file.transferTo(convFile);
-        } catch (IOException e) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "파이썬 맛감!");
-        }
-        //여기까지는 임시코드. FastApiService 기능 완성하면 바꿀것
-
-        Member member = memberService.getLoginUserInfo();
-        if (member == null) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
-        }
-        //파일 이름 생성 로직을 호출
-        String transformedImageName = FileNameGenerator.generateFileName("closet/original/", member.getMemberId(), "jpg");
-
-        // 4. 완료응답이오면
-        // 5. S3서비스한테 있는 generatePresignedUrl 이 메서드한테 앞에서 생성한 파일이름 그거를 달라고 요청을하기
-//            String downloadUrl = s3Service.generatePresignedUrl("경로와 파일 이름과 확장자명까지 함꼐 보내주세요");
-        // 아래 경로는 임시입니다
-        String downloadUrl = s3Service.generatePresignedUrl("photo/original/photo_tester_231103_145931_789464.jpg");
-
-        // 6. 그걸 프론트에 보내기
-        return Api.OK(new ClosetRembgResponse(transformedImageName,downloadUrl));
-
-    }
 
     // 옷장 삭제
     @PutMapping("/{closetSeq}")
