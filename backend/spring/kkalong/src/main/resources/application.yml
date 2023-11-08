@@ -81,3 +81,10 @@ logging:
 aws:
   s3:
     bucket: kkalong
+
+ai-server:
+  gpu:
+    ip: ${AI_SERVER_IP}
+    preprocess-port: ${AI_SERVER_PREPROCESS_PORT}
+    viton-port: ${AI_SERVER_VITON_PORT}
+  openpose: ${AI_SERVER_OPENPOSE_ADDR}

@@ -130,7 +130,7 @@ public class testController {
         return fastApiService.requestOpenpose(member, photo.getPhotoImgName(), photo.getPhotoSeq());
     }
 
-    @GetMapping("fast/welcome")
+    @GetMapping("/fast/welcome")
     public Api<Object> testServer7(){
         return fastApiService.callWelcome();
     }
