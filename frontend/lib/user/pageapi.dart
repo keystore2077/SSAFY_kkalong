@@ -170,11 +170,10 @@ class PageApi {
 
   Future<dynamic> tokenValidation(token) async {
     try {
-      final response = await dio.post('$serverURL/user/auth/checktoken',
+      final response = await dio.post('$serverURL/api/member/auth/checktoken',
           options: Options(
             headers: {
-              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
-              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+              'Authorization': 'Bearer $token',
             },
           ));
       print('토큰유효 api ${response.data}');
