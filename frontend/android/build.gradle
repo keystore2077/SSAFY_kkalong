@@ -29,3 +29,19 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+
+
+
+// android {
+    
+//     compileSdkVersion 33
+//     defaultConfig {
+        
+//         minSdkVersion 21
+//         targetSdkVersion flutter.targetSdkVersion
+
+//     }
+
+  
+// }
+
