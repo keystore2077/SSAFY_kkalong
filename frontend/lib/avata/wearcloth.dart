@@ -7,10 +7,8 @@ import '../store/userstore.dart';
 // import 'package:flutter_mycloset/category/categoryselect.dart';
 
 class WearCloth extends StatefulWidget {
-  const WearCloth({
-    super.key,
-    this.storage,
-  });
+  final int photoSeq;
+  WearCloth({super.key, this.storage, required this.photoSeq});
 
   final storage;
 
@@ -34,30 +32,9 @@ class WearClothState extends State<WearCloth> {
     if (accessToken.isNotEmpty) {
       headers['Authorization'] = 'Bearer $accessToken';
     }
-    // try {
-    //   print('특정이미지 출력할수있을까');
-    //   var response = await Dio().get(
-    //     'http://k9c105.p.ssafy.io:8761/api/photo/22',
-    //     options: Options(
-    //       headers: headers,
-    //     ),
-    //   );
-    //   print('특정이미지 요청완료');
-    //   print('내가 response를 뽑아볼게뿅');
-    //   print(response.data);
-    //   var url = response.data['url'];
-    //   print('내가url을 뽑아볼게뿅');
-    //   // print(response.data[url]);
-    //   print(url);
-    //   setState(() {
-    //     print('url을 이미지url에 넣어볼게');
-    //     imageUrl = response.data[url];
-    //     print(imageUrl);
-    //   });
-    // } catch (e) {
-    //   print('이미지로드중 에러!!!!!!!!!!!');
-    // }
+
     try {
+      // print('photoSeq: ${widget.photoSeq}');
       print('특정이미지 출력할수있을까');
       var response = await Dio().get(
         'http://k9c105.p.ssafy.io:8761/api/photo/36',

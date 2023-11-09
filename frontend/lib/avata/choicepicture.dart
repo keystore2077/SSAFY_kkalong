@@ -596,11 +596,11 @@ class _ChoicePictureState extends State<ChoicePicture> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const WearCloth()),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) => const WearCloth()),
+                      // );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF5BEB5),
