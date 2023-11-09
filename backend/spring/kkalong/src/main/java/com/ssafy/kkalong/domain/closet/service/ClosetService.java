@@ -70,8 +70,8 @@ public class ClosetService {
         return sectionRepository.saveAll(sectionsToSave);
     }
     //db에 저장할 정보들 저장할라고 하는거임
-    public Closet updateCloset(ClosetUpdateRequest updateRequest,Member member, String filename){
-        Closet updateCloset = new Closet();
+    public Closet updateCloset(ClosetUpdateRequest updateRequest,Member member, String filename,Closet closet){
+        Closet updateCloset = closetRepository.save(closet);
 
     }
 

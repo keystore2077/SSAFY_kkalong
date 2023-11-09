@@ -144,7 +144,7 @@ public class ClosetController {
 
 
 
-    @PostMapping("/test")
+    @PostMapping("")
     @Operation(summary = "옷장등록")
     public Api<Object> createClosetPrac(MultipartFile file, ClosetCreateRequest closetCreateRequest){ //ClosetCreateRequest 타입의 객체를 매개변수로 받아 처리
         System.out.println(closetCreateRequest.toString());
@@ -186,7 +186,7 @@ public class ClosetController {
         for (SectionCreateRequestItem closetList : list){
             Sort sort = sortService.getSort(closetList.getSort());
             if (sort == null){
-                return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷 종류입니다. Top, Pants, Outer, Skirt, Dress, Etc 중에서 보내주세요.", closetList.getSort()));
+                return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷장섹션 종류입니다. 선반,행거,박스,수납장 중에서 보내주세요.", closetList.getSort()));
             }
         }
         //1.옷장 엔티티를 만들어서 db에 넣는작업(로직은 service에서 만들기)
@@ -216,19 +216,21 @@ public class ClosetController {
     // 옷장 정보 수정
     @PutMapping("")
     @Operation(summary = "옷장 정보 수정")
-    public Api<Object> putCloset(@RequestBody ClosetUpdateRequest closetUpdateRequest, MultipartFile file) {
+    public Api<Object> putCloset(MultipartFile file,@ModelAttribute ClosetUpdateRequest closetUpdateRequest) {
         //사용자 정보가 없으면 에러 메시지를 반환합니다.
         Member member = memberService.getLoginUserInfo();
         if (member == null) {
 
             return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인이 필요합니다.");
         }
+        //00
 
         //1.유효성검사를하기(옷장이있는지 확인하기)
         Closet closet = closetService.findCloset(closetUpdateRequest.getClosetSeq());
         if (closet == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지않은 옷장일련번호입니다!");
         }
+        //00
 
         //2.찾은옷장이랑 옷장 주인이 맞는지,로그인된 회원이랑 옷장주인이 맞는지 확인하기
         int memberSeq = member.getMemberSeq();
