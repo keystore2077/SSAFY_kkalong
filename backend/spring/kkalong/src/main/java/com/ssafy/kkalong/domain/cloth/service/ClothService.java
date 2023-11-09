@@ -3,6 +3,7 @@ package com.ssafy.kkalong.domain.cloth.service;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.repository.SectionRepository;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothSaveReq;
+import com.ssafy.kkalong.domain.cloth.dto.request.ClothUpdateReq;
 import com.ssafy.kkalong.domain.cloth.dto.response.ClothGetRes;
 import com.ssafy.kkalong.domain.cloth.dto.response.ClothSaveRes;
 import com.ssafy.kkalong.domain.cloth.entity.Cloth;
@@ -19,6 +20,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import com.ssafy.kkalong.s3.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -142,4 +144,76 @@ public class ClothService {
                 })
                 .toList();
     }
+
+
+
+    public  ClothSaveRes updateCloth(Cloth cloth, ClothUpdateReq req){
+        // 옷 수정
+        Cloth clothUp =clothRepository.save(cloth);
+        
+        //태그 삭제
+        List<Integer> tagSeqList = req.getTagSegDeleteList();
+        for (Integer seq : tagSeqList){
+            TagRelationKey tagRelationKey = new TagRelationKey(clothUp.getClothSeq(),seq );
+            TagRelation tagRelation = tagRelaionRepository.findById(tagRelationKey).orElse(null);
+            if(tagRelation != null){
+                tagRelation.setTagRelationDelDate(LocalDateTime.now());
+                tagRelation.setTagRelationDelete(true);
+                tagRelaionRepository.save(tagRelation);
+            }
+        }
+
+        //태그 추가
+        List<String> tagList = req.getTagAddList();
+        for (String tagName : tagList){
+            Tag tag = tagRepository.findByTag(tagName).orElse(null);
+            if(tag == null){
+                //태그 생성
+                tag = tagRepository.save(new Tag(tagName));
+                //옷태그 관계 생성
+                TagRelationKey tagRelationKey = TagRelationKey.builder()
+                        .clothSeq(clothUp.getClothSeq())
+                        .tagSeq(tag.getTagSeq())
+                        .build();
+                TagRelation tagRelation = TagRelation.builder()
+                        .tagRelationKey(tagRelationKey)
+                        .cloth(clothUp)
+                        .tag(tag)
+                        .build();
+                tagRelaionRepository.save(tagRelation);
+
+            }
+            else{
+                //1. 태그 관계가 있는지 확인
+                TagRelationKey tagRelationKey = new TagRelationKey(clothUp.getClothSeq(),tag.getTagSeq() );
+                TagRelation tagRelation = tagRelaionRepository.findById(tagRelationKey).orElse(null);
+
+                //2.태그 관계가 있는 경우 삭제를 false로 전환
+                if(tagRelation != null){
+                    tagRelation.setTagRelationDelDate(null);
+                    tagRelation.setTagRelationDelete(false);
+                    tagRelaionRepository.save(tagRelation);
+                }
+                //3.태그 관계가 없는 경우 생성
+                else{
+                    TagRelation tagRelationAdd = TagRelation.builder()
+                            .tagRelationKey(tagRelationKey)
+                            .cloth(clothUp)
+                            .tag(tag)
+                            .build();
+                    tagRelaionRepository.save(tagRelationAdd);
+                }
+
+            }
+        }
+        List<Tag> resulttagList =getTagList(clothUp.getClothSeq());
+
+        String filePathNobg = "cloth/no_bg/" + clothUp.getClothImgName() +".png";
+        String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+
+        return ClothSaveRes.toRes(clothUp,imgUrl,resulttagList );
+
+    }
+
+
 }
