@@ -94,6 +94,6 @@ public class FastApiCallerService {
         // DB 업데이트
         clothService.updateClothImgMasking(cloth.getClothSeq());
 
-        System.out.println("cihp 완료");
+        System.out.println("U2net 완료");
     }
 }

@@ -194,6 +194,7 @@ public class FastApiService {
 
         // response에서 json 추출
         try {
+            System.out.println("u2net 추출 시작");
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
@@ -207,7 +208,7 @@ public class FastApiService {
             byte[] u2net = Base64.getDecoder().decode((String) jsonMap.get("u2net"));
             // 파일 임시 저장
             String fileName = FileNameGenerator.generateFileNameNoExtension("temp", memberId);
-
+            System.out.println("u2net 임시 저장중, 파일명: " + fileName);
             File tempFile = File.createTempFile(fileName, ".jpg");
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 fos.write(u2net);
