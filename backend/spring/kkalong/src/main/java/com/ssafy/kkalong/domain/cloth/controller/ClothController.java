@@ -72,7 +72,7 @@ public class ClothController {
         String imgUrl="";
         String fileName="";
         if (!file.isEmpty()) {
-
+            
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
                 //1.원본 사진 저장
                 fileName= FileNameGenerator.generateFileNameNoExtension("cloth", member.getMemberId());
@@ -110,8 +110,8 @@ public class ClothController {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "jpg 파일 형식만 등록 가능합니다.");
             }
         } else {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "업로드된 파일이 없습니다.");
-        }
+           return Api.ERROR(ErrorCode.BAD_REQUEST, "업로드된 파일이 없습니다.");
+       }
 
         return Api.OK(clothService.saveCloth(member, section, sort, request, imgUrl,fileName ));
     }
