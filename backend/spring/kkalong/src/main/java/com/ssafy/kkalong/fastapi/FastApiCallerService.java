@@ -60,8 +60,8 @@ public class FastApiCallerService {
         // cihp 결과 저장
         try{
             FastApiRequestGeneralRes cihpResBody = (FastApiRequestGeneralRes)cihpRes.getBody();
-            System.out.println("저장 경로: photo/masking/" + cihpResBody.getImgName() + ".png");
-            s3Service.uploadFile("photo/masking/" + cihpResBody.getImgName() + ".png", cihpResBody.getImg());
+            System.out.println("저장 경로: photo/masking/" + photo.getPhotoImgName() + ".png");
+            s3Service.uploadFile("photo/masking/" + photo.getPhotoImgName() + ".png", cihpResBody.getImg());
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(cihp)");
             throw e;
@@ -85,8 +85,8 @@ public class FastApiCallerService {
         // U2Net 결과 저장
         try{
             FastApiRequestGeneralRes u2NetResBody = (FastApiRequestGeneralRes)u2NetRes.getBody();
-            System.out.println("저장 경로: cloth/masking/" + u2NetResBody.getImgName() + ".png");
-            s3Service.uploadFile("cloth/masking/" + u2NetResBody.getImgName() + ".png", u2NetResBody.getImg());
+            System.out.println("저장 경로: cloth/masking/" + cloth.getClothImgName() + ".png");
+            s3Service.uploadFile("cloth/masking/" + cloth.getClothImgName() + ".png", u2NetResBody.getImg());
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(U2Net)");
             throw e;
