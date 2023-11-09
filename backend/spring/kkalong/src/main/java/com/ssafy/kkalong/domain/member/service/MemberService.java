@@ -1,9 +1,9 @@
 package com.ssafy.kkalong.domain.member.service;
 
+import com.ssafy.kkalong.domain.member.dto.request.MemberProfileUpdateReq;
 import com.ssafy.kkalong.domain.member.dto.request.MemberUpdateReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignInReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
-import com.ssafy.kkalong.domain.member.dto.response.MemberInfoRes;
 import com.ssafy.kkalong.domain.member.dto.response.MemberUpdateRes;
 import com.ssafy.kkalong.domain.member.dto.response.SignInRes;
 import com.ssafy.kkalong.domain.member.dto.response.SignUpRes;
@@ -12,7 +12,6 @@ import com.ssafy.kkalong.domain.member.repository.MemberRepository;
 import com.ssafy.kkalong.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Service
@@ -90,7 +88,7 @@ public class MemberService {
         }
     }
 
-    public Optional<MemberUpdateRes> updateMember(String memberId, MemberUpdateReq request){
+    public Optional<MemberUpdateRes> updateMemberProfile(String memberId, MemberProfileUpdateReq request){
         return Optional.ofNullable(memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false)
                 .filter(member -> encoder.matches(request.getMemberPw(), member.getMemberPw()))
                 .map(member -> {
@@ -107,6 +105,16 @@ public class MemberService {
                     return MemberUpdateRes.toRes(memberRepository.save(member));
                 })
                 .orElseThrow(() -> new NoSuchElementException("비밀번호가 틀립니다")));
+    }
+
+    public MemberUpdateRes updateMember(Member member, MemberUpdateReq request){
+        member.setMemberNickname(request.getMemberNickname());
+        if(!request.getNewPassword().isEmpty()){
+            member.setMemberPw(encoder.encode(request.getNewPassword()));
+        }
+
+        return MemberUpdateRes.toRes(memberRepository.save(member));
+
     }
 
     public void deleteMember(Member member){
