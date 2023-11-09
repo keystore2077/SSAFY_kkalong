@@ -264,6 +264,7 @@
 //   }
 // }
 import 'package:dio/dio.dart';
+import './wearcloth.dart';
 import 'package:http_parser/http_parser.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -496,46 +497,17 @@ class _AvataPictureState extends State<AvataPicture> {
                   ), // 수정된 부분
                 );
 
-                // final response = await dio.post(
-                //   '$serverURL/api/photo',
-                //   data: formData,
-                //   options: Options(
-                //     'Authorization': accessToken != '' ? 'Bearer $accessToken' : ''
-                //   ),
-                // );
                 print('디오요청완료');
                 print(response.data);
                 return response.data;
-
-                // if (response.statusCode == 200) {
-                //   print('파일 잘 업로드됨!!!!!!!!!!!!!!: ${response.data}');
-                // } else {
-                //   print('사진파일 못보냄ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ: ${response.statusCode}');
-                // }
               } catch (e) {
                 print('그밖의 에러ㅜㅜㅜㅜㅜㅜㅜㅜㅜ: $e');
+              } finally {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const WearCloth()),
+                );
               }
-
-// if (response.statusCode == 200) {
-//   // 서버 응답의 JSON을 디코드합니다.
-//   final responseData = json.decode(response.data);
-
-//   // 서버에서 정의된 'resultCode'를 확인합니다.
-//   if (responseData['result']['resultCode'] == 200) {
-//     print('파일 잘 업로드됨: ${responseData['body']}');
-//   } else {
-//     // 서버가 성공 상태 코드를 반환했지만, 내부 resultCode가 성공을 나타내지 않는 경우
-//     print('파일 업로드는 성공했지만, 결과 코드에 문제가 있음: ${responseData['result']['resultMessage']}');
-//   }
-// } else {
-//   // HTTP 상태 코드가 성공적이지 않은 경우
-//   print('사진파일 못보냄: ${response.statusCode}');
-// }
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ChoicePicture()),
-              );
             }
           },
           style: ElevatedButton.styleFrom(
