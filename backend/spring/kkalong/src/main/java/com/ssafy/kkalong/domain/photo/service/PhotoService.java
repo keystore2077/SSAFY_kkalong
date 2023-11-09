@@ -22,7 +22,7 @@ public class PhotoService {
     private EntityManager entityManager;
 
     public List<Photo> getPhotoList(Member member){
-        return photoRepository.findAllByMemberMemberSeqAndIsPhotoDeleted(member, false);
+        return photoRepository.findAllByMemberMemberSeqAndIsPhotoDeleted(member.getMemberSeq(), false);
     }
 
     public Photo getPhotoBySeq(int photoSeq){
