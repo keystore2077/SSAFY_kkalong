@@ -226,7 +226,7 @@ public class FastApiService {
         // RestTemplate을 사용하여 FastAPI 서버에 POST 요청 보내기
         RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, String.class).getBody();
-        System.out.println(response);
+        System.out.println("response from Openpose: " + response);
         if (!response.equals("\"success\"")) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "처리중 문제 발생");
         }

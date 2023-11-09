@@ -1,6 +1,5 @@
 package com.ssafy.kkalong.domain.member.entity;
 
-import com.ssafy.kkalong.domain.member.dto.request.MemberUpdateReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
 import jakarta.persistence.*;
 import lombok.*;

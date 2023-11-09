@@ -2,13 +2,13 @@ package com.ssafy.kkalong.domain.photo.dto.response;
 
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PhotoRes {

@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TagRelaionRepository extends JpaRepository<TagRelation, TagRelationKey> {
-    List<TagRelation> findAllByClothClothSeq(int clothSeq);
+    List<TagRelation> findAllByClothClothSeqAndIsTagRelationDelete(int clothSeq, boolean isDeleted);
 }

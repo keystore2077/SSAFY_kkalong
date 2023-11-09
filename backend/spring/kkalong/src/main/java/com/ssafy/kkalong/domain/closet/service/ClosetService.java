@@ -87,7 +87,7 @@ public class ClosetService {
 
 
     public Section getSection(int sectionSeg){
-        return sectionRepository.findById(sectionSeg).orElse(null);
+        return sectionRepository.findBySectionSeqAndIsSectionDeleted(sectionSeg,false).orElse(null);
     }
 }
 
