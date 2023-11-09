@@ -300,5 +300,24 @@ public class ClothController {
         return Api.OK(clothService.updateCloth(cloth, request));
     }
 
+    @Operation(summary = "옷 상세정보")
+    @PutMapping(value = "/{clothSeq}" )
+    public Api<Object> deleteCloth(@PathVariable int clothSeq) {
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        Cloth cloth =clothService.getCloth(clothSeq);
+        if(cloth ==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
+        }
+        if(cloth.getMember().getMemberId()!=member.getMemberId() && cloth.isPrivate()){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "비공개 옷 이거나 조회하고자 하는 회원이 옷 주인이 아닙니다.");
+        }
+        clothService.deleteCloth(cloth);
+        return Api.OK(String.format("옷(%s)이/가 삭제 되었습니다",cloth.getClothName()));
+    }
+
 
 }
