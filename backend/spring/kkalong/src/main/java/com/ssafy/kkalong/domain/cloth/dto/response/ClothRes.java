@@ -49,13 +49,9 @@ public class ClothRes {
     private String imgUrl;
 
     public static ClothRes toRes(Cloth cloth, String imgUrl){
-        return ClothRes.builder()
+        ClothRes res = ClothRes.builder()
                 .clothSeq(cloth.getClothSeq())
                 .memberNickname(cloth.getMember().getMemberNickname())
-                .closetSeq(cloth.getSection().getCloset().getClosetSeq())
-                .closetName(cloth.getSection().getCloset().getClosetName())
-                .sectionSeq(cloth.getSection().getSectionSeq())
-                .sectionName(cloth.getSection().getSectionName())
                 .sortSeq(cloth.getSort().getSortSeq())
                 .sort(cloth.getSort().getSort())
                 .clothName(cloth.getClothName())
@@ -63,5 +59,14 @@ public class ClothRes {
                 .clothRegDate(cloth.getClothRegDate())
                 .imgUrl(imgUrl)
                 .build();
+        if(cloth.getSection()!=null){
+            res.setSectionSeq(cloth.getSection().getSectionSeq());
+            res.setSectionName(cloth.getSection().getSectionName());
+
+            res.setClosetSeq(cloth.getSection().getCloset().getClosetSeq());
+            res.setClosetName(cloth.getSection().getCloset().getClosetName());
+
+        }
+        return res;
     }
 }

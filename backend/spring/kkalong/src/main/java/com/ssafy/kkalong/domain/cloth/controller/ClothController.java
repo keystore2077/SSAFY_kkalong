@@ -7,6 +7,7 @@ import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothSaveReq;
+import com.ssafy.kkalong.domain.cloth.dto.request.ClothUpdateReq;
 import com.ssafy.kkalong.domain.cloth.dto.response.ClothSaveRes;
 import com.ssafy.kkalong.domain.cloth.entity.Cloth;
 import com.ssafy.kkalong.domain.cloth.entity.Tag;
@@ -51,12 +52,15 @@ public class ClothController {
         }
 
         //sectionSeq 유효성 검사
-        Section section = closetService.getSection(request.getSectionSeq());
-        if (section == null) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 저장하려는 구역 정보를 찾지 못했습니다.");
-        }
-        else if (section.getCloset().getMember().getMemberId() != member.getMemberId()) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 구역의 주인이 아닙니다.");
+        Section section = null;
+        if(request.getSectionSeq()!=0){
+            section= closetService.getSection(request.getSectionSeq());
+            if (section == null) {
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 저장하려는 구역 정보를 찾지 못했습니다.");
+            }
+            else if (section.getCloset().getMember().getMemberId() != member.getMemberId()) {
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 구역의 주인이 아닙니다.");
+            }
         }
 
         //sortSeq 유효성 검사
@@ -68,7 +72,7 @@ public class ClothController {
         String imgUrl="";
         String fileName="";
         if (!file.isEmpty()) {
-
+            
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
                 //1.원본 사진 저장
                 fileName= FileNameGenerator.generateFileNameNoExtension("cloth", member.getMemberId());
@@ -106,8 +110,8 @@ public class ClothController {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "jpg 파일 형식만 등록 가능합니다.");
             }
         } else {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "업로드된 파일이 없습니다.");
-        }
+           return Api.ERROR(ErrorCode.BAD_REQUEST, "업로드된 파일이 없습니다.");
+       }
 
         return Api.OK(clothService.saveCloth(member, section, sort, request, imgUrl,fileName ));
     }
@@ -190,6 +194,110 @@ public class ClothController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "태그 정보를 찾을 수 없습니다.");
         }
         return Api.OK(clothService.getClothListByTag(member, tag));
+    }
+
+    @Operation(summary = "옷 정보수정")
+    @PutMapping(value = "" )
+    public Api<Object> updateCloth(@RequestParam("mFile") MultipartFile file, @ModelAttribute ClothUpdateReq request) {
+        System.out.println(request.toString());
+
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        Cloth cloth =clothService.getCloth(request.getClothSeq());
+        if(cloth ==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
+        }
+
+        //sectionSeq 유효성 검사
+        Section section = null;
+        if(request.getSectionSeq()!=0){
+            section = closetService.getSection(request.getSectionSeq());
+            if (section == null) {
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 저장하려는 구역 정보를 찾지 못했습니다.");
+            }
+            else if (section.getCloset().getMember().getMemberId() != member.getMemberId()) {
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 구역의 주인이 아닙니다.");
+            }
+            //Section 변경 사항 저장
+            if (cloth.getSection().getSectionSeq() != request.getSectionSeq()) {
+                cloth.setSection(section);
+            }
+        }else{
+            cloth.setSection(null);
+        }
+
+        //sortSeq 유효성 검사
+        Sort sort = sortService.getClothSort(request.getSort());
+        if (sort == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷 종류입니다. Top, Pants, Outer, Skirt, Dress, Etc 중에서 보내주세요.", request.getSort()));
+        }
+        //sort 변경 사항 저장
+        if (cloth.getSort().getSortSeq() != sort.getSortSeq()) {
+            cloth.setSort(sort);
+        }
+
+        String imgUrl="";
+        String fileName="";
+        if (!file.isEmpty()) {
+
+            if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
+                //1.원본 사진 저장
+                fileName= FileNameGenerator.generateFileNameNoExtension("cloth", member.getMemberId());
+
+                String filePathOriginal = "cloth/original/" + fileName+".jpg";
+                String filePathYesbg = "cloth/yes_bg/" + fileName+".jpg";
+                String filePathNobg = "cloth/no_bg/" + fileName+".png";
+
+                try {
+                    s3Service.uploadFile(filePathOriginal, file);
+
+                } catch (IOException e) {
+                    return Api.ERROR(ErrorCode.BAD_REQUEST, "원본 사진 저장 중 오류가 발생하였습니다: ");
+                }
+
+                //rembg 호출
+                Api<Object> rembgRes = fastApiService.requestRembg(member.getMemberId(), file);
+                if (!Objects.equals(rembgRes.getResult().getResultCode(), Result.OK().getResultCode())){
+                    return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생했습니다.(Rembg)");
+                }
+                //rembg 결과 저장
+                RequestRembgRes res;
+                try{
+                    res = (RequestRembgRes)rembgRes.getBody();
+                    s3Service.uploadFile(filePathYesbg, res.getYesBg());
+                    s3Service.uploadFile(filePathNobg, res.getNoBg());
+                } catch (Exception e) {
+                    return Api.ERROR(ErrorCode.SERVER_ERROR, "저장중 문제가 발생했습니다.(Rembg)");
+                }
+                System.out.println("rembg 완료");
+
+                imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+                cloth.setClothImgMasking(false);
+                cloth.setClothImgName(fileName);
+            }
+            else {
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "jpg 파일 형식만 등록 가능합니다.");
+            }
+        }else{
+            fileName=cloth.getClothImgName();
+            String filePathNobg = "cloth/no_bg/" + fileName+".png";
+            imgUrl=s3Service.generatePresignedUrl(filePathNobg);
+        }
+
+        // 옷장 이름 변경 사항 저장
+        if (!cloth.getClothName().equals(request.getClothName())) {
+            cloth.setClothName(request.getClothName());
+        }
+
+        // 공개 여부 변경 사항 저장
+        if (cloth.isPrivate() != request.isPrivate()) {
+            cloth.setPrivate(request.isPrivate());
+        }
+
+        return Api.OK(clothService.updateCloth(cloth, request));
     }
 
 

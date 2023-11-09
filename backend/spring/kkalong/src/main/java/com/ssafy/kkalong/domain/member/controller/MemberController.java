@@ -2,6 +2,7 @@ package com.ssafy.kkalong.domain.member.controller;
 
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
+import com.ssafy.kkalong.domain.member.dto.request.MemberProfileUpdateReq;
 import com.ssafy.kkalong.domain.member.dto.request.MemberUpdateReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignInReq;
 import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
@@ -13,10 +14,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.time.*;
-import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
@@ -135,8 +134,8 @@ public class MemberController {
     }
 
     @Operation(summary = "회원 정보 수정")
-    @PutMapping("")
-    public Api<Object> updateMember(@RequestBody MemberUpdateReq request){
+    @PutMapping("/profile")
+    public Api<Object> updateMemberProfile(@RequestBody MemberProfileUpdateReq request){
         Member member = memberService.getLoginUserInfo();
         if(member==null){
             return Api.ERROR(ErrorCode.BAD_REQUEST,"로그인된 회원 정보를 찾지 못했습니다.");
@@ -155,9 +154,17 @@ public class MemberController {
         //비밀 번호 검사
         String memberNewPw = request.getNewPassword();
         String pwRegex = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}$";
-        if(memberNewPw.length()!=0&&!memberNewPw.matches(pwRegex)){
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않는 비밀번호입니다. 영어와, 숫자만 가능하고 최소 8자에서 20자 이내로 작성해주세요. 영어와 숫자는 최소 한번 이상 포함되어야 합니다.");
+        String memberNewPwcheck = request.getNewPasswordCheck();
+
+        if(!memberNewPw.isEmpty()){
+            if ( !memberNewPw.equals(memberNewPwcheck)){
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "비밀번호와 비밀번호확인이 다릅니다.");
+            }
+            if(!memberNewPw.matches(pwRegex)){
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않는 비밀번호입니다. 영어와, 숫자만 가능하고 최소 8자에서 20자 이내로 작성해주세요. 영어와 숫자는 최소 한번 이상 포함되어야 합니다.");
+            }
         }
+
 
         //이메일 검사
         String memberMail = request.getMemberEmail();
@@ -190,7 +197,43 @@ public class MemberController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 안는 연도입니다.", memberGender));
         }
 
-        return Api.OK(memberService.updateMember(member.getMemberId(), request));
+        return Api.OK(memberService.updateMemberProfile(member.getMemberId(), request));
+    }
+
+    @Operation(summary = "닉네임, 비밀번호 수정")
+    @PutMapping("")
+    public Api<Object> updateMember(@RequestBody MemberUpdateReq request){
+        Member member = memberService.getLoginUserInfo();
+        if(member==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST,"로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        //닉네임 체크 검사
+        String nickName = request.getMemberNickname();
+        String nickNameRegex = "^[a-zA-Z가-힣0-9]{2,10}$";
+        if(!nickName.matches(nickNameRegex)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 않는 닉네임입니다. 영어와 한글, 숫자만 가능하고 최소 2자에서 10자이내로 작성해주세요", nickName));
+        }
+        if(!nickName.equals(member.getMemberNickname())&&memberService.checkNickName(nickName)!=null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 중복된 닉네임입니다.", nickName));
+        }
+
+        //비밀 번호 검사
+        String memberNewPw = request.getNewPassword();
+        String memberNewPwcheck = request.getNewPasswordCheck();
+        if(!memberNewPw.isEmpty()){
+            if ( !memberNewPw.equals(memberNewPwcheck)){
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "비밀번호와 비밀번호확인이 다릅니다.");
+            }
+            String pwRegex = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}$";
+            if(!memberNewPw.matches(pwRegex)){
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지 않는 비밀번호입니다. 영어와, 숫자만 가능하고 최소 8자에서 20자 이내로 작성해주세요. 영어와 숫자는 최소 한번 이상 포함되어야 합니다.");
+            }
+        }
+
+
+
+        return Api.OK(memberService.updateMember(member, request));
     }
 
 
