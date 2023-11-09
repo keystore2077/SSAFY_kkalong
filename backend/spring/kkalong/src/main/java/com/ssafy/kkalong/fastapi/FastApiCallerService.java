@@ -77,7 +77,7 @@ public class FastApiCallerService {
         System.out.println("callU2Net called...");
         System.out.println("요청 경로: cloth/yes_bg/" + cloth.getClothImgName() + ".jpg");
 
-        byte[] byteFile = s3Service.downloadFile("photo/yes_bg/" + cloth.getClothImgName() + ".jpg");
+        byte[] byteFile = s3Service.downloadFile("cloth/yes_bg/" + cloth.getClothImgName() + ".jpg");
         Api<Object> u2NetRes = fastApiService.requestU2Net(member.getMemberId(), byteFile);
         if (!Objects.equals(u2NetRes.getResult().getResultCode(), Result.OK().getResultCode())){
             System.out.println("내부 처리중 문제가 발생했습니다.(U2Net)");
