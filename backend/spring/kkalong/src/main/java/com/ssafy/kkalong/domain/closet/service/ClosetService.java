@@ -1,6 +1,8 @@
 package com.ssafy.kkalong.domain.closet.service;
 
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetCreateRequest;
+import com.ssafy.kkalong.domain.closet.dto.request.ClosetRequest;
+import com.ssafy.kkalong.domain.closet.dto.request.ClosetUpdateRequest;
 import com.ssafy.kkalong.domain.closet.dto.request.SectionCreateRequestItem;
 import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.entity.Section;
@@ -68,6 +70,11 @@ public class ClosetService {
         return sectionRepository.saveAll(sectionsToSave);
     }
     //db에 저장할 정보들 저장할라고 하는거임
+    public Closet updateCloset(ClosetUpdateRequest updateRequest,Member member, String filename){
+        Closet updateCloset = new Closet();
+
+    }
+
     public Closet testcloset(ClosetCreateRequest request, Member member, String closetImageName) {
         Closet newCloset = new Closet();
         newCloset.setClosetName(request.getClosetName());
