@@ -18,6 +18,7 @@ import com.ssafy.kkalong.fastapi.FastApiService;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.fastapi.dto.RequestVitonRes;
 import com.ssafy.kkalong.s3.S3Service;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +52,7 @@ public class PhotoController {
     // 4. 성공을 반환한다.
     @PostMapping("")
     @Operation(summary = "AI용 원본 사진 저장")
-    public Api<Object> savePhotoOriginal(MultipartFile photoReq) {
+    public Api<Object> savePhotoOriginal(@Parameter(description = "전송할 파일", required = true) @RequestPart MultipartFile multipartFile) {
         // 사용자 유효성 검사
         Member member = memberService.getLoginUserInfo();
         if (member == null){
@@ -59,11 +60,11 @@ public class PhotoController {
         }
 
         // 파일 유효성 검사
-        if (photoReq == null){
+        if (multipartFile == null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "파일을 보내주십시오");
         }
         // 확장자 유효성 검사
-        String extension = photoReq.getContentType();
+        String extension = multipartFile.getContentType();
         if (extension != null && !extension.equals("image/jpeg") && !extension.equals("image/jpg")){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "유효한 확장자가 아닙니다");
         }
@@ -77,14 +78,14 @@ public class PhotoController {
 
         // S3서버에 사진을 저장
         try {
-            String res = s3Service.uploadFile(path + fileName + ".jpg", photoReq);
+            String res = s3Service.uploadFile(path + fileName + ".jpg", multipartFile);
             System.out.println(res);
         } catch (IOException e) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "업로드 실패");
         }
         System.out.println("저장 완료");
         //rembg 호출
-        Api<Object> rembgRes = fastApiService.requestRembg(member.getMemberId(), photoReq);
+        Api<Object> rembgRes = fastApiService.requestRembg(member.getMemberId(), multipartFile);
         if (!Objects.equals(rembgRes.getResult().getResultCode(), Result.OK().getResultCode())){
             return Api.ERROR(ErrorCode.SERVER_ERROR, "내부 처리중 문제가 발생 했습니다.(Rembg)");
         }
@@ -158,7 +159,7 @@ public class PhotoController {
     // 4. 반환한다.
     @GetMapping("/{photoSeq}")
     @Operation(summary = "AI용 특정 사진 조회")
-    public Api<Object> getPhotoListBySeq(@PathVariable int photoSeq) {
+    public Api<Object> getPhotoListBySeq(@Parameter(description = "요청할 photo의 Seq값", required = true) @PathVariable int photoSeq) {
         // 사용자 유효성 검사
         Member member = memberService.getLoginUserInfo();
         if (member == null){
@@ -166,6 +167,7 @@ public class PhotoController {
         }
 
         Photo photo = photoService.getPhotoBySeq(photoSeq);
+        System.out.println(photo);
         if (photo == null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "해당하는 번호의 옷이 존재하지 않습니다.");
         }
@@ -185,7 +187,7 @@ public class PhotoController {
     // 3. 성공을 반환한다.
     @PutMapping("/{photoSeq}")
     @Operation(summary = "AI용 내 사진 삭제")
-    public Api<Object> deletePhotoBySeq(@PathVariable int photoSeq) {
+    public Api<Object> deletePhotoBySeq(@Parameter(description = "삭제할 photo의 Seq", required = true) @PathVariable int photoSeq) {
         // 사용자 유효성 검사
         Member member = memberService.getLoginUserInfo();
         if (member == null){

@@ -35,6 +35,7 @@ public class FastApiCallerService {
         // Openpose는 독자적인 과정을 거치므로 결과 저장 과정이 필요 없음
         try{
             Api<Object> openposeRes = fastApiService.requestOpenpose(member, photo);
+            System.out.println("requestOpenpose 완료");
             if (!openposeRes.getResult().equals(Result.OK())){
                 System.out.println("내부 처리중 문제가 발생했습니다.(Openpose)");
             }
@@ -52,6 +53,7 @@ public class FastApiCallerService {
         byte[] byteFile = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
 
         Api<Object> cihpRes = fastApiService.requestCihp(member.getMemberId(), byteFile);
+        System.out.println("requestCihp 완료");
         if (!Objects.equals(cihpRes.getResult().getResultCode(), Result.OK().getResultCode())){
             System.out.println("내부 처리중 문제가 발생했습니다.(cihp)");
         }
