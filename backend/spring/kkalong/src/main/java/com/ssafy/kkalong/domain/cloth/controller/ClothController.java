@@ -274,7 +274,7 @@ public class ClothController {
 
                 imgUrl = s3Service.generatePresignedUrl(filePathNobg);
                 cloth.setClothImgMasking(false);
-            }a
+            }
             else {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "jpg 파일 형식만 등록 가능합니다.");
             }
