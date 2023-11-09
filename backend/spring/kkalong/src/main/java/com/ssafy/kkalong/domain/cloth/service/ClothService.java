@@ -14,14 +14,13 @@ import com.ssafy.kkalong.domain.cloth.repository.ClothRepository;
 import com.ssafy.kkalong.domain.cloth.repository.TagRelaionRepository;
 import com.ssafy.kkalong.domain.cloth.repository.TagRepository;
 import com.ssafy.kkalong.domain.member.entity.Member;
-import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.sort.entity.Sort;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import com.ssafy.kkalong.s3.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -83,6 +82,7 @@ public class ClothService {
         return ClothSaveRes.toRes(clothSave, imgUrl, tagList);
     }
 
+    @Transactional
     public void updateClothImgMasking(int clothSeq) {
         // 엔티티를 조회
         Cloth cloth = entityManager.find(Cloth.class, clothSeq);
