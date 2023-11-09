@@ -42,9 +42,7 @@ public class ClothService {
 
     public ClothSaveRes saveCloth(Member member, Section section, Sort sort, ClothSaveReq request, String imgUrl,
             String fileName) {
-        // 옷 저장
         Cloth cloth = Cloth.builder()
-                .section(section)
                 .sort(sort)
                 .member(member)
                 .clothName(request.getClothName())
@@ -55,6 +53,9 @@ public class ClothService {
                 .isPrivate(request.isPrivate())
                 .clothRegDate(LocalDateTime.now())
                 .build();
+        if (section !=null){
+            cloth.setSection(section);
+        }
 
         Cloth clothSave = clothRepository.save(cloth);
 

@@ -225,6 +225,8 @@ public class ClothController {
             if (cloth.getSection().getSectionSeq() != request.getSectionSeq()) {
                 cloth.setSection(section);
             }
+        }else{
+            cloth.setSection(null);
         }
 
         //sortSeq 유효성 검사
@@ -274,6 +276,7 @@ public class ClothController {
 
                 imgUrl = s3Service.generatePresignedUrl(filePathNobg);
                 cloth.setClothImgMasking(false);
+                cloth.setClothImgName(fileName);
             }
             else {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "jpg 파일 형식만 등록 가능합니다.");
