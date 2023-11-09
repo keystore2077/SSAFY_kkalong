@@ -85,44 +85,45 @@ class PageApi {
     }
   }
 
-//   Future<dynamic> getinfo(token) async {
-//     print(token);
-//     print(token.runtimeType);
-//     try {
-//       final response = await dio.post('$serverURL/user/mypage',
-//           options: Options(
-//             headers: {
-//               'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
-//               // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
-//             },
-//           ));
-//       print('개인정보 조회 ${response.data}');
-//       return response.data;
-//     } catch (e) {
-//       print(e.toString());
-//     }
-//   }
+  Future<dynamic> getinfo(token) async {
+    print(token);
+    print(token.runtimeType);
+    try {
+      final response = await dio.get('$serverURL/api/member',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('개인정보 조회 ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
-//   Future<dynamic> updateuserinfo(
-//       token, selectedVeganNumber, selectedAllergieNumber) async {
-//     try {
-//       final response = await dio.put('$serverURL/user',
-//           data: {
-//             'veganId': selectedVeganNumber,
-//             'allergyList': selectedAllergieNumber
-//           },
-//           options: Options(
-//             headers: {
-//               'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
-//               // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
-//             },
-//           ));
-//       print('유저 정보 수정 ${response.data}');
-//       return response.data;
-//     } catch (e) {
-//       print(e.toString());
-//     }
-//   }
+  Future<dynamic> updateuserinfo(
+      token, nick, pw, pwc) async {
+    try {
+      final response = await dio.put('$serverURL/api/member',
+          data: {
+            'memberNickname':nick,
+            'newPassword':pw,
+            'newPasswordCheck':pwc
+          },
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('유저 정보 수정 ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
 //   Future<dynamic> findPassword(id, birth) async {
 //     try {
@@ -152,21 +153,21 @@ class PageApi {
 //     }
 //   }
 
-//   Future<dynamic> logout(token) async {
-//     try {
-//       final response = await dio.post('$serverURL/user/signout',
-//           options: Options(
-//             headers: {
-//               'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
-//               // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
-//             },
-//           ));
-//       print('로그아웃 api ${response.data}');
-//       return response.data;
-//     } catch (e) {
-//       print(e.toString());
-//     }
-//   }
+  Future<dynamic> logout(token) async {
+    try {
+      final response = await dio.delete('$serverURL/api/member/logout',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('로그아웃 api ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   Future<dynamic> tokenValidation(token) async {
     try {
@@ -183,21 +184,19 @@ class PageApi {
     }
   }
 
-//   Future<dynamic> deleteuser(token, id) async {
-//     try {
-//       final response = await dio.delete('$serverURL/user',
-//           data: {"userEmail": id},
-//           options: Options(
-//             headers: {
-//               'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
-//               // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
-//             },
-//           ));
-//       print('회원탈퇴 api ${response.data}');
-//       return response.data;
-//     } catch (e) {
-//       print(e.toString());
-//     }
-//   }
-// }
+  Future<dynamic> deleteuser(token) async {
+    try {
+      final response = await dio.put('$serverURL/api/member/delete',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('회원탈퇴 api ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }
