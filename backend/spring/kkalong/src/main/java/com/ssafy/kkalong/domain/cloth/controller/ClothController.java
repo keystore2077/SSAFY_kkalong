@@ -227,7 +227,6 @@ public class ClothController {
             }
         }
 
-
         //sortSeq 유효성 검사
         Sort sort = sortService.getClothSort(request.getSort());
         if (sort == null) {
@@ -269,12 +268,13 @@ public class ClothController {
                     s3Service.uploadFile(filePathYesbg, res.getYesBg());
                     s3Service.uploadFile(filePathNobg, res.getNoBg());
                 } catch (Exception e) {
-                    return Api.ERROR(ErrorCode.SERVER_ERROR, "저장중중 문제가 발생했습니다.(Rembg)");
+                    return Api.ERROR(ErrorCode.SERVER_ERROR, "저장중 문제가 발생했습니다.(Rembg)");
                 }
                 System.out.println("rembg 완료");
 
                 imgUrl = s3Service.generatePresignedUrl(filePathNobg);
-            }
+                cloth.setClothImgMasking(false);
+            }a
             else {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "jpg 파일 형식만 등록 가능합니다.");
             }
