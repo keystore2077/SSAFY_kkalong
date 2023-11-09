@@ -97,7 +97,7 @@ public class ClothService {
     }
 
     public List<Tag> getTagList(int clothSeq) {
-        return tagRelaionRepository.findAllByClothClothSeq(clothSeq).stream()
+        return tagRelaionRepository.findAllByClothClothSeqAndIsTagRelationDelete(clothSeq, false).stream()
                 .map(v -> {
                     return v.getTag();
                 })
