@@ -15,20 +15,8 @@ public class MemberUpdateReq {
     private String memberNickname ;
 
     @Schema(description = "비밀번호")
-    private String memberPw ;
+    private String newPassword ;
 
-    @Schema(description = "회원 새비밀번호")
-    String newPassword;
-
-    @Schema(description = "이메일")
-    private String memberEmail ;
-
-    @Schema(description = "전화번호")
-    private String memberPhone ;
-
-    @Schema(description = "성별")
-    private Character memberGender;
-
-    @Schema(description = "생년")
-    private int memberBirthYear ;
+    @Schema(description = "비밀번호 확인")
+    String newPasswordCheck;
 }
