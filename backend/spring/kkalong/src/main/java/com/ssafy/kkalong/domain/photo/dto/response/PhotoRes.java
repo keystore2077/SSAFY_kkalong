@@ -20,12 +20,15 @@ public class PhotoRes {
     private LocalDateTime photoRegDate;
     @Schema(description = "사진의 URL")
     private String url;
+    @Schema(description = "사진 전처리 유무")
+    private boolean isPreprocessed;
 
-    public static PhotoRes toRes(Photo photo, String url){
+    public static PhotoRes toRes(Photo photo, String url, boolean isPreprocessed){
         return PhotoRes.builder()
                 .photoSeq(photo.getPhotoSeq())
                 .photoImgName(photo.getPhotoImgName())
                 .photoRegDate(photo.getPhotoRegDate())
-                .url(url).build();
+                .url(url)
+                .isPreprocessed(isPreprocessed).build();
     }
 }
