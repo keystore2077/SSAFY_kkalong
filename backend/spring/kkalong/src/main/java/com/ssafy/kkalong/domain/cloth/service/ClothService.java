@@ -89,6 +89,7 @@ public class ClothService {
 
         if (cloth != null) {
             cloth.setClothImgMasking(true);
+            entityManager.merge(cloth);
         }
     }
 
