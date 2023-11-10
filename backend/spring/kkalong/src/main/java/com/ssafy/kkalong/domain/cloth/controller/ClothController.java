@@ -4,6 +4,7 @@ import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.api.Result;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
+import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothInputSectionReq;
@@ -382,15 +383,38 @@ public class ClothController {
         //sectionSeq 유효성 검사
         Section section= closetService.getSection(reqeset.getSectionSeq());
         if (section == null) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 저장하려는 구역 정보를 찾지 못했습니다.");
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 비우려는 구역 정보를 찾지 못했습니다.");
         }
         else if (section.getCloset().getMember().getMemberSeq() != member.getMemberSeq()) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 구역의 주인이 아닙니다.");
         }
-
-
         return Api.OK(clothService.inputSectionCloth(reqeset.getClothSeqList(), section));
     }
+
+
+    @Operation(summary = "옷장에 있는 옷 비우기")
+    @PutMapping(value = "/del/closet/{closetSeq}" )
+    public Api<Object> emptyClosetCloth(@PathVariable int closetSeq) {
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        //sectionSeq 유효성 검사
+        Closet closet= closetService.findCloset(closetSeq);
+        if (closet == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 비우려는 옷장 정보를 찾지 못했습니다.");
+        }
+        else if (closet.getMember().getMemberSeq() != member.getMemberSeq()) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 옷장 주인이 아닙니다.");
+        }
+
+        return Api.OK(clothService.emptyClosetCloth(closetService.findSection(closetSeq)));
+    }
+
+
+
+
 
 
 }
