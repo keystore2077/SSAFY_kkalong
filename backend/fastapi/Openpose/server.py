@@ -79,15 +79,15 @@ async def run_openpose(rb: orb):
         raise HTTPException(status_code=500, detail=str(e))
 
     # 4. 작업이 끝나면 파일을 S3서버에 올린다
-    try:
-        s3.upload_file(r"./output_images/" + rb.photo_img_name + "_rendered.png", bucket_name,
-                       "photo/openpose/img/" + rb.photo_img_name + "_rendered.png")
-        s3.upload_file(r"./output_jsons/" + rb.photo_img_name + "_keypoints.json", bucket_name,
-                       "photo/openpose/json/" + rb.photo_img_name + "_keypoints.json")
-    except botocore.exceptions.NoCredentialsError:
-        return "AWS 자격 증명을 찾을 수 없습니다. 자격 증명을 설정하세요."
-    except botocore.exceptions.EndpointConnectionError:
-        return "S3 엔드포인트에 연결할 수 없습니다. 리전을 확인하세요."
+    # try:
+    s3.upload_file(r"./output_images/" + rb.photo_img_name + "_rendered.png", bucket_name,
+                   "photo/openpose/img/" + rb.photo_img_name + "_rendered.png")
+    s3.upload_file(r"./output_jsons/" + rb.photo_img_name + "_keypoints.json", bucket_name,
+                   "photo/openpose/json/" + rb.photo_img_name + "_keypoints.json")
+    # except botocore.exceptions.NoCredentialsError:
+    #     return "AWS 자격 증명을 찾을 수 없습니다. 자격 증명을 설정하세요."
+    # except botocore.exceptions.EndpointConnectionError:
+    #     return "S3 엔드포인트에 연결할 수 없습니다. 리전을 확인하세요."
 
     # 5. DB에 작업이 되어 있음으로 업데이트 한다.
     sql = ("update photo "
