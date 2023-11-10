@@ -74,10 +74,13 @@ public class FastApiCallerService {
 
     @Async
     public void callU2Net(Member member, Cloth cloth) {
+        callU2Net(member,cloth.getClothImgName(),cloth.getClothSeq());
+    }
+    public void callU2Net(Member member, String clothImgName, int clothSeq) {
         System.out.println("callU2Net called...");
-        System.out.println("요청 경로: cloth/yes_bg/" + cloth.getClothImgName() + ".jpg");
+        System.out.println("요청 경로: cloth/yes_bg/" + clothImgName + ".jpg");
 
-        byte[] byteFile = s3Service.downloadFile("cloth/yes_bg/" + cloth.getClothImgName() + ".jpg");
+        byte[] byteFile = s3Service.downloadFile("cloth/yes_bg/" + clothImgName + ".jpg");
         Api<Object> u2NetRes = fastApiService.requestU2Net(member.getMemberId(), byteFile);
         if (!Objects.equals(u2NetRes.getResult().getResultCode(), Result.OK().getResultCode())){
             System.out.println("내부 처리중 문제가 발생했습니다.(U2Net)");
@@ -85,14 +88,14 @@ public class FastApiCallerService {
         // U2Net 결과 저장
         try{
             FastApiRequestGeneralRes u2NetResBody = (FastApiRequestGeneralRes)u2NetRes.getBody();
-            System.out.println("저장 경로: cloth/masking/" + cloth.getClothImgName() + ".png");
-            s3Service.uploadFile("cloth/masking/" + cloth.getClothImgName() + ".png", u2NetResBody.getImg());
+            System.out.println("저장 경로: cloth/masking/" + clothImgName + ".png");
+            s3Service.uploadFile("cloth/masking/" + clothImgName+ ".png", u2NetResBody.getImg());
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(U2Net)");
             throw e;
         }
         // DB 업데이트
-        clothService.updateClothImgMasking(cloth.getClothSeq());
+        clothService.updateClothImgMasking(clothSeq);
 
         System.out.println("U2net 완료");
     }

@@ -17,6 +17,7 @@ import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.domain.social.dto.request.FashionSaveReq;
 import com.ssafy.kkalong.domain.sort.entity.Sort;
 import com.ssafy.kkalong.domain.sort.service.SortService;
+import com.ssafy.kkalong.fastapi.FastApiCallerService;
 import com.ssafy.kkalong.fastapi.FastApiService;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
@@ -42,6 +43,7 @@ public class ClothController {
     private final MemberService memberService;
     private final ClosetService closetService;
     private final SortService sortService;
+    private final FastApiCallerService fastApiCallerService;
     private final FastApiService fastApiService;
     @Operation(summary = "옷 저장")
     @PostMapping(value = "" )
@@ -112,8 +114,11 @@ public class ClothController {
         } else {
            return Api.ERROR(ErrorCode.BAD_REQUEST, "업로드된 파일이 없습니다.");
        }
+        ClothSaveRes result = clothService.saveCloth(member, section, sort, request, imgUrl,fileName );
 
-        return Api.OK(clothService.saveCloth(member, section, sort, request, imgUrl,fileName ));
+        fastApiCallerService.callU2Net(member, fileName, result.getClothRes().getClothSeq());
+
+        return Api.OK(result);
     }
 
     @Operation(summary = "옷 상세정보")
