@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import './categorycloth.dart';
 import '../closet/closetcloth.dart';
 import '../closet/clothcamera.dart';
 
 class CategorySelect extends StatefulWidget {
   final int selectedIndex;
-  const CategorySelect({super.key, this.category, required this.selectedIndex});
+  const CategorySelect({super.key, required this.category, required this.selectedIndex});
 
-  final category;
+  final int category;
 
   @override
   State<CategorySelect> createState() => _CategorySelectState();
@@ -14,13 +16,14 @@ class CategorySelect extends StatefulWidget {
 
 class _CategorySelectState extends State<CategorySelect> {
   final ScrollController scrollController = ScrollController();
-
+  
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: DefaultTabController(
           length: 6,
+          initialIndex: widget.category,
           child: NestedScrollView(
             controller: scrollController,
             headerSliverBuilder: (context, isScrolled) {
@@ -65,15 +68,38 @@ class _CategorySelectState extends State<CategorySelect> {
                 )
               ];
             },
-            body: const TabBarView(children: [
-              ClosetClothList(),
-              ClosetClothList(),
-              ClosetClothList(),
-              ClosetClothList(),
-              ClosetClothList(),
-              ClosetClothList(),
+            body: TabBarView(children: [
+              CategoryClothList(category: 0),
+              CategoryClothList(category: 1),
+              CategoryClothList(category: 2),
+              CategoryClothList(category: 3),
+              CategoryClothList(category: 4),
+              CategoryClothList(category: 5),
             ]),
           ),
+        ),
+
+        floatingActionButton: ElevatedButton(
+          onPressed: () async {
+            final ImagePicker picker = ImagePicker();
+            final XFile? image =
+                await picker.pickImage(source: ImageSource.camera);
+
+            if (image != null) {
+              // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
+              // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
+            } else {
+              // 이미지가 선택되지 않았을 때 처리할 작업을 추가합니다.
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey[50],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+            ),
+            // 다른 스타일 속성들
+          ),
+          child: const Text(' + 옷등록'),
         ),
         // floatingActionButton: ElevatedButton(
         //   onPressed: () {
