@@ -76,6 +76,7 @@ public class FastApiCallerService {
     public void callU2Net(Member member, Cloth cloth) {
         callU2Net(member,cloth.getClothImgName(),cloth.getClothSeq());
     }
+    
     public void callU2Net(Member member, String clothImgName, int clothSeq) {
         System.out.println("callU2Net called...");
         System.out.println("요청 경로: cloth/yes_bg/" + clothImgName + ".jpg");
@@ -88,8 +89,8 @@ public class FastApiCallerService {
         // U2Net 결과 저장
         try{
             FastApiRequestGeneralRes u2NetResBody = (FastApiRequestGeneralRes)u2NetRes.getBody();
-            System.out.println("저장 경로: cloth/masking/" + clothImgName + ".png");
-            s3Service.uploadFile("cloth/masking/" + clothImgName+ ".png", u2NetResBody.getImg());
+            System.out.println("저장 경로: cloth/masking/" + clothImgName + ".jpg");
+            s3Service.uploadFile("cloth/masking/" + clothImgName+ ".jpg", u2NetResBody.getImg());
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(U2Net)");
             throw e;
