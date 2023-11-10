@@ -28,7 +28,7 @@ class CategoryPageState extends State<CategoryPage> {
       {"image": "Assets/Image/Suit.png", "name": "Outer"},
       {"image": "Assets/Image/Skirt.png", "name": "Skirts"},
       {"image": "Assets/Image/Dress.png", "name": "Dress"},
-      {"image": "Assets/Image/Ellipsis.png", "name": "ect"},
+      {"image": "Assets/Image/Ellipsis.png", "name": "Etc"},
     ]
   };
 
@@ -133,9 +133,7 @@ class CategoryPageState extends State<CategoryPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => CategorySelect(
-                                  selectedIndex: index,
-                                )),
+                            builder: (context) => CategorySelect(category: index)),
                       );
                     },
                     child: Container(
