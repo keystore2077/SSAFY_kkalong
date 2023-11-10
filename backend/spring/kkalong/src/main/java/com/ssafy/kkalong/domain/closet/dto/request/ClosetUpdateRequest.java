@@ -15,8 +15,18 @@ public class ClosetUpdateRequest {
     @Schema(description = "옷장이름")
     private String closetName;
 
-    @Schema(description = "옷장구성 섹션")
-    private List<SectionCreateRequestItem> closetSectionList;
+    //수정용
+    @Schema(description = "옷장구성 섹션 수정용")
+    private List<SectionUpdateRequest> closetSectionUpdateList;
+
+    //추가 name.list
+    @Schema(description = "옷장구성 섹션 추가용")
+    private List<SectionCreateRequestItem> closetSectionAddList ;
+
+    //삭제 seq
+    @Schema(description = "옷장구성 섹션 삭제용")
+    private List<Integer> closetSectionDeleteList ;
+
 
 
 

@@ -238,12 +238,68 @@ public class ClosetController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된회원이 옷장 소유주와 다릅니다!");
         }
 
+
+
+        // 옷장 이름 변경 처리
+        if (!closet.getClosetName().equals(closetUpdateRequest.getClosetName())) {
+            closet.setClosetName(closetUpdateRequest.getClosetName());
+        }
+
+
+        String fileName="";
+        //옷장 사진파일에 대한 유효성검사 해주기(1)
+        if (!file.isEmpty()) {
+
+            if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
+                // S3에 저장할 파일 이름을 생성
+                fileName= FileNameGenerator.generateFileName("closet", member.getMemberId(), "png");
+                String filePath = "closet/" + fileName;
+
+                // 배경 제거 API에 요청을 보내 처리된 이미지를 받습니다.
+                Api<Object>result = fastApiService.requestRembg(member.getMemberId(),file);
+                RequestRembgRes reRes = (RequestRembgRes)result.getBody();
+
+                // S3에 배경이 제거된 이미지를 업로드합니다.
+                s3Service.uploadFile(filePath,reRes.getNoBg());
+
+                // 프론트엔드에서 접근 가능한 S3 이미지 URL을 생성합니다.
+
+                closet.setClosetImgName(fileName);
+
+            }
+            else {
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "지원하지 않는 파일 형식입니다.");
+            }
+        }
+        String filePath = "closet/" + closet.getClosetImgName();
+        String s3imgUrl = s3Service.generatePresignedUrl(filePath);
+
+
         // 옷장 정보를 업데이트하는 로직을 호출합니다.
         Closet updatedCloset = closetService.updateCloset(closet);
+        //추가
+        closetService.createSection(closetUpdateRequest.getClosetSectionAddList(),updatedCloset);
+        closetService.deleteSection(closetUpdateRequest.getClosetSectionDeleteList(),updatedCloset);
+        closetService.updateSection(closetUpdateRequest.getClosetSectionUpdateList(),updatedCloset);
+
+        List<Section>sectionList = closetService.findSection(updatedCloset.getClosetSeq());
+        List<SectionSaveResponse> sectionSaveResponseList = new ArrayList<>();
+        for (Section item : sectionList){
+            SectionSaveResponse sectionSaveResponse = new SectionSaveResponse(item);
+            sectionSaveResponseList.add(sectionSaveResponse);
+        }
+        ClosetSaveResponse closetSaveResponse = new ClosetSaveResponse();
+
+        closetSaveResponse.setClosetSeq(updatedCloset.getClosetSeq());
+        closetSaveResponse.setMemberId(updatedCloset.getMember().getMemberId());
+        closetSaveResponse.setClosetName(updatedCloset.getClosetName());
+        closetSaveResponse.setClosetPictureUrl(s3imgUrl);
+        closetSaveResponse.setClosetSectionList(sectionSaveResponseList);
+        closetSaveResponse.setClosetRegData(updatedCloset.getClosetRegData());
+        closetSaveResponse.setMembernickname(updatedCloset.getMember().getMemberNickname());
 
 
-
-        return Api.OK("옷장 정보 수정");
+        return Api.OK(closetSaveResponse);
     }
 
     // 옷장 삭제
