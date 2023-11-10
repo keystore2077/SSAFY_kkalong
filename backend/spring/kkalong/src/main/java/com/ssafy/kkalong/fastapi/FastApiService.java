@@ -8,6 +8,7 @@ import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
+import com.ssafy.kkalong.fastapi.dto.RequestVitonRes;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -325,7 +326,7 @@ public class FastApiService {
                 System.out.println("fos 변환 실패");
                 return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
             }
-            return Api.OK(new FastApiRequestGeneralRes(fileName, tempFile, "./"));
+            return Api.OK(new RequestVitonRes("success", tempFile));
         } catch (JSONException | IOException e) {
             // JSON 파싱 오류 처리
             e.printStackTrace();
