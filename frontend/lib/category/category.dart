@@ -126,14 +126,16 @@ class CategoryPageState extends State<CategoryPage> {
                 (BuildContext context, int index) {
                   final item = savecloset['list']?[index];
                   if (item == null) {
-                    return const SizedBox(); // 빈 위젯 반환
+                    return const SizedBox();
                   }
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const CategorySelect()),
+                            builder: (context) => CategorySelect(
+                                  selectedIndex: index,
+                                )),
                       );
                     },
                     child: Container(
