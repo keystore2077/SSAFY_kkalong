@@ -245,8 +245,8 @@ public class ClosetController {
 
         String fileName="";
         //옷장 사진파일에 대한 유효성검사 해주기(1)
-        if (!file.isEmpty()) {
-
+        if (file != null && !file.isEmpty()) {
+            
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
                 // S3에 저장할 파일 이름을 생성
                 fileName= FileNameGenerator.generateFileName("closet", member.getMemberId(), "png");
