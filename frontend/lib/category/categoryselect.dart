@@ -5,8 +5,7 @@ import '../closet/closetcloth.dart';
 import '../closet/clothcamera.dart';
 
 class CategorySelect extends StatefulWidget {
-  final int selectedIndex;
-  const CategorySelect({super.key, required this.category, required this.selectedIndex});
+  const CategorySelect({super.key, required this.category});
 
   final int category;
 
