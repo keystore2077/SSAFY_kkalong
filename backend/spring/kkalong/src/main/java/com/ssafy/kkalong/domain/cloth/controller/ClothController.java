@@ -17,6 +17,7 @@ import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.domain.social.dto.request.FashionSaveReq;
 import com.ssafy.kkalong.domain.sort.entity.Sort;
 import com.ssafy.kkalong.domain.sort.service.SortService;
+import com.ssafy.kkalong.fastapi.FastApiCallerService;
 import com.ssafy.kkalong.fastapi.FastApiService;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
@@ -42,6 +43,7 @@ public class ClothController {
     private final MemberService memberService;
     private final ClosetService closetService;
     private final SortService sortService;
+    private final FastApiCallerService fastApiCallerService;
     private final FastApiService fastApiService;
     @Operation(summary = "옷 저장")
     @PostMapping(value = "" )
@@ -112,8 +114,11 @@ public class ClothController {
         } else {
            return Api.ERROR(ErrorCode.BAD_REQUEST, "업로드된 파일이 없습니다.");
        }
+        ClothSaveRes result = clothService.saveCloth(member, section, sort, request, imgUrl,fileName );
 
-        return Api.OK(clothService.saveCloth(member, section, sort, request, imgUrl,fileName ));
+        fastApiCallerService.callU2Net(member, fileName, result.getClothRes().getClothSeq());
+
+        return Api.OK(result);
     }
 
     @Operation(summary = "옷 상세정보")
@@ -298,6 +303,25 @@ public class ClothController {
         }
 
         return Api.OK(clothService.updateCloth(cloth, request));
+    }
+
+    @Operation(summary = "옷 상세정보")
+    @PutMapping(value = "/{clothSeq}" )
+    public Api<Object> deleteCloth(@PathVariable int clothSeq) {
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        Cloth cloth =clothService.getCloth(clothSeq);
+        if(cloth ==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
+        }
+        if(cloth.getMember().getMemberId()!=member.getMemberId() && cloth.isPrivate()){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "비공개 옷 이거나 조회하고자 하는 회원이 옷 주인이 아닙니다.");
+        }
+        clothService.deleteCloth(cloth);
+        return Api.OK(String.format("옷(%s)이/가 삭제 되었습니다",cloth.getClothName()));
     }
 
 

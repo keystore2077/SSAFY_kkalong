@@ -14,14 +14,13 @@ import com.ssafy.kkalong.domain.cloth.repository.ClothRepository;
 import com.ssafy.kkalong.domain.cloth.repository.TagRelaionRepository;
 import com.ssafy.kkalong.domain.cloth.repository.TagRepository;
 import com.ssafy.kkalong.domain.member.entity.Member;
-import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.sort.entity.Sort;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import com.ssafy.kkalong.s3.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -83,12 +82,14 @@ public class ClothService {
         return ClothSaveRes.toRes(clothSave, imgUrl, tagList);
     }
 
+    @Transactional
     public void updateClothImgMasking(int clothSeq) {
         // 엔티티를 조회
         Cloth cloth = entityManager.find(Cloth.class, clothSeq);
 
         if (cloth != null) {
             cloth.setClothImgMasking(true);
+            entityManager.merge(cloth);
         }
     }
 
@@ -216,5 +217,20 @@ public class ClothService {
 
     }
 
+    public void deleteCloth(Cloth cloth ){
+        //옷 삭제        
+        cloth.setClothDeleted(true);
+        cloth.setClothDelDate(LocalDateTime.now());
+
+        clothRepository.save(cloth);
+        
+        //태그 관계 삭제
+        List<TagRelation> tagRelations = tagRelaionRepository.findAllByClothClothSeqAndIsTagRelationDelete(cloth.getClothSeq(), false);
+        for(TagRelation tagRelation : tagRelations){
+            tagRelation.setTagRelationDelDate(LocalDateTime.now());
+            tagRelation.setTagRelationDelete(true);
+            tagRelaionRepository.save(tagRelation);
+        }
+    }
 
 }

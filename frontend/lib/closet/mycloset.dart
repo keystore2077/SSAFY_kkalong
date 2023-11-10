@@ -379,6 +379,16 @@ class MyClosetState extends State<MyCloset> {
                       ),
                       const Spacer(),
                       ElevatedButton(
+                        // onPressed: () async {
+                        //   final ImagePicker picker = ImagePicker();
+                        //   final XFile? image = await picker.pickImage(
+                        //       source: ImageSource.camera);
+
+                        //   if (image != null) {
+                        //     // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
+                        //     // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
+                        //   }
+                        // },
                         onPressed: () async {
                           final ImagePicker picker = ImagePicker();
                           final XFile? image = await picker.pickImage(

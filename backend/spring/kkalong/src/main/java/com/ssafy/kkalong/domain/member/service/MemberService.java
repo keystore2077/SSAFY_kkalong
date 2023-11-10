@@ -29,9 +29,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final PasswordEncoder encoder;	// 추가
-
-    private final String USER_HASH_KEY = "user";
-    private final long USER_TTL_SECONDS = 3600;
     private final RedisTemplate<String, String> redisTemplate;
 
     //회원 가입

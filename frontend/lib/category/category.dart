@@ -54,44 +54,11 @@ class CategoryPageState extends State<CategoryPage> {
           SliverList(
             delegate: SliverChildListDelegate(
               [
-                // Container(
-                //   padding: const EdgeInsets.fromLTRB(25, 25, 25, 0),
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Container(
-                //         margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
-                //         child: const Column(
-                //           crossAxisAlignment: CrossAxisAlignment.center,
-                //           children: [
-                //             SizedBox(
-                //               child: Padding(
-                //                 padding: EdgeInsets.fromLTRB(0, 5, 0, 2),
-                //                 child: Text(
-                //                   'Category',
-                //                   style: TextStyle(
-                //                     fontSize: 25,
-                //                     fontWeight: FontWeight.w600,
-                //                   ),
-                //                 ),
-                //               ),
-                //             ),
-                //           ],
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-
                 AppBar(
-                  toolbarHeight: 100,
+                  toolbarHeight: 55,
                   leading: IconButton(
-                    icon: const Icon(
-                        Icons.arrow_back_ios_outlined), // 원하는 아이콘으로 변경할 수 있습니다.
-                    onPressed: () {
-                      // 아이콘을 탭할 때 수행할 동작을 여기에 작성합니다.
-                      // 예를 들면, Drawer를 열거나, 이전 페이지로 돌아가는 동작 등을 구현할 수 있습니다.
-                    },
+                    icon: const Icon(Icons.arrow_back_ios_outlined),
+                    onPressed: () {},
                   ),
                   backgroundColor: const Color.fromARGB(255, 251, 235, 233),
                   centerTitle: true,
@@ -159,14 +126,16 @@ class CategoryPageState extends State<CategoryPage> {
                 (BuildContext context, int index) {
                   final item = savecloset['list']?[index];
                   if (item == null) {
-                    return const SizedBox(); // 빈 위젯 반환
+                    return const SizedBox();
                   }
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const CategorySelect()),
+                            builder: (context) => CategorySelect(
+                                  selectedIndex: index,
+                                )),
                       );
                     },
                     child: Container(

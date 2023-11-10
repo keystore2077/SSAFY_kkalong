@@ -82,6 +82,11 @@ public class FastApiService {
             jsonStr = unescapeJsonString(jsonStr);
             Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
             });
+            if (jsonMap.get("file_yes_bg") == null || jsonMap.get("file_no_bg") == null){
+                System.out.println("RemBg 처리중 문제가 발생했습니다");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+            }
+
             byte[] yesBg = Base64.getDecoder().decode((String) jsonMap.get("file_yes_bg"));
             byte[] noBg = Base64.getDecoder().decode((String) jsonMap.get("file_no_bg"));
             // 파일 임시 저장
@@ -139,9 +144,12 @@ public class FastApiService {
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
-//            System.out.println(jsonStr);
-            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
-            });
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {});
+            if (jsonMap.get("cihp") == null){
+                System.out.println("CIHP 처리중 문제가 발생했습니다");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+            }
+
             byte[] cihp = Base64.getDecoder().decode((String) jsonMap.get("cihp"));
             // 파일 임시 저장
             System.out.println("임시 저장중...");
@@ -186,15 +194,21 @@ public class FastApiService {
 
         // response에서 json 추출
         try {
+            System.out.println("u2net 추출 시작");
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
             Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
             });
+            if (jsonMap.get("u2net") == null){
+                System.out.println("u2net 처리중 문제가 발생했습니다");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+            }
+
             byte[] u2net = Base64.getDecoder().decode((String) jsonMap.get("u2net"));
             // 파일 임시 저장
             String fileName = FileNameGenerator.generateFileNameNoExtension("temp", memberId);
-
+            System.out.println("u2net 임시 저장중, 파일명: " + fileName);
             File tempFile = File.createTempFile(fileName, ".jpg");
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 fos.write(u2net);
@@ -218,6 +232,7 @@ public class FastApiService {
 
     public Api<Object> requestOpenpose(Member member, String photoImgName, int photoSeq) {
         String apiUrl = openposeUrl + "/openpose";  // GPU서버의 URL
+        System.out.println(apiUrl+"로 요청 보냄...");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         String requestJson = "{\"member_id\":\"" + member.getMemberId() + "\",\"photo_img_name\":\"" + photoImgName + "\",\"photo_seq\":\"" + photoSeq + "\"}";
@@ -240,6 +255,7 @@ public class FastApiService {
         String apiUrl = vitonHdUrl + "/viton";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        System.out.println("헤더 설정 완료");
 
         String clothImgBase64 = Base64.getEncoder().encodeToString(clothImg);
         String clothMaskingImgBase64 = Base64.getEncoder().encodeToString(clothMaskingImg);
@@ -247,6 +263,7 @@ public class FastApiService {
         String photoParsingImgBase64 = Base64.getEncoder().encodeToString(photoParsingImg);
         String photoOpenposeImgBase64 = Base64.getEncoder().encodeToString(photoOpenposeImg);
         String photoOpenposeJsonBase64 = Base64.getEncoder().encodeToString(photoOpenposeJson);
+        System.out.println("이미지 Base64 인코딩 완료");
 
 //        // ObjectMapper 초기화
 //        ObjectMapper objectMapper = new ObjectMapper();
@@ -272,6 +289,7 @@ public class FastApiService {
         jsonMap.put("image_parse", photoParsingImgBase64);
         jsonMap.put("openpose_img", photoOpenposeImgBase64);
         jsonMap.put("openpose_json", photoOpenposeJsonBase64);
+        System.out.println("json 객체 생성 완료");
 
         String jsonStringReq = null;
         try {

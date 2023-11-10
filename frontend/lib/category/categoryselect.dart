@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import '../closet/closetcloth.dart';
+import '../closet/clothcamera.dart';
 
 class CategorySelect extends StatefulWidget {
-  const CategorySelect({super.key, this.category});
+  final int selectedIndex;
+  const CategorySelect({super.key, this.category, required this.selectedIndex});
 
   final category;
 
@@ -74,45 +75,23 @@ class _CategorySelectState extends State<CategorySelect> {
             ]),
           ),
         ),
-
-        // floatingActionButton: FloatingActionButton.small(
+        // floatingActionButton: ElevatedButton(
         //   onPressed: () {
-        //     scrollController.animateTo(
-        //       scrollController.position.minScrollExtent,
-        //       duration: const Duration(milliseconds: 500),
-        //       curve: Curves.fastOutSlowIn,
+        //     print('여기까지 잘왔니??????');
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (context) => const ClothCamera()),
         //     );
         //   },
-        //   backgroundColor: Colors.grey[50],
-        //   shape: RoundedRectangleBorder(
-        //       side: const BorderSide(width: 1, color: Color(0xFFF5BEB5)),
-        //       borderRadius: BorderRadius.circular(12)),
-        //   child:
-        //       const Icon(Icons.arrow_upward_sharp, color: Color(0xFFF5BEB5)),
-        // )
-
-        floatingActionButton: ElevatedButton(
-          onPressed: () async {
-            final ImagePicker picker = ImagePicker();
-            final XFile? image =
-                await picker.pickImage(source: ImageSource.camera);
-
-            if (image != null) {
-              // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
-              // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
-            } else {
-              // 이미지가 선택되지 않았을 때 처리할 작업을 추가합니다.
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[50],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
-            ),
-            // 다른 스타일 속성들
-          ),
-          child: const Text(' + 옷등록'),
-        ),
+        //   style: ElevatedButton.styleFrom(
+        //     backgroundColor: Colors.grey[50],
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+        //     ),
+        //     // 다른 스타일 속성들
+        //   ),
+        //   child: const Text(' + 옷등록'),
+        // ),
       ),
     );
   }

@@ -11,6 +11,7 @@ import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.domain.photo.dto.request.PhotoMixRequestReq;
 import com.ssafy.kkalong.domain.photo.dto.response.PhotoMixRequestRes;
 import com.ssafy.kkalong.domain.photo.dto.response.PhotoRes;
+import com.ssafy.kkalong.domain.photo.dto.response.SavePhotoRes;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
 import com.ssafy.kkalong.fastapi.FastApiCallerService;
@@ -118,7 +119,7 @@ public class PhotoController {
         fastApiCallerService.callCihp(member, photoResult);
         System.out.println("비동기 호출 완료");
 
-        return Api.OK("성공");
+        return Api.OK(new SavePhotoRes("저장 성공", photoResult.getPhotoSeq()));
     }
 
     // 1. 사용자 인증 정보를 확인한다
@@ -143,7 +144,8 @@ public class PhotoController {
         }
         for (Photo p : photoList) {
             String url = s3Service.generatePresignedUrl("photo/no_bg/" + p.getPhotoImgName() + ".png");
-            PhotoRes pRes = PhotoRes.toRes(p, url);
+            boolean isPreprocessed = p.isPhotoJsonOpenpose() && p.isPhotoImgOpenpose() && p.isPhotoImgMasking();
+            PhotoRes pRes = PhotoRes.toRes(p, url, isPreprocessed);
             photoResList.add(pRes);
         }
         return Api.OK(photoResList);
@@ -169,12 +171,10 @@ public class PhotoController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "해당하는 번호의 옷이 존재하지 않습니다.");
         }
         // 전처리가 되어 있는지 확인
-        if (!photo.isPhotoImgMasking() || !photo.isPhotoImgOpenpose() || !photo.isPhotoJsonOpenpose()) {
-            return Api.OK("아직 전처리가 끝나지 않았습니다. 나중에 다시 시도해주세요");
-        }
+        boolean isPreprocessed = photo.isPhotoJsonOpenpose() && photo.isPhotoImgOpenpose() && photo.isPhotoImgMasking();
 
         String url = s3Service.generatePresignedUrl("photo/no_bg/" + photo.getPhotoImgName() + ".png");
-        PhotoRes photoRes = PhotoRes.toRes(photo, url);
+        PhotoRes photoRes = PhotoRes.toRes(photo, url, isPreprocessed);
 
         return Api.OK(photoRes);
     }
@@ -253,8 +253,9 @@ public class PhotoController {
 
         // 3. 필요한 파일 다운로드 후 VITON 호출
         byte[] clothImg = s3Service.downloadFile("cloth/yes_bg/" + cloth.getClothImgName() + ".jpg");
-        byte[] clothMaskingImg = s3Service.downloadFile("cloth/masking/" + cloth.getClothName() + ".jpg");
-        byte[] photoImg = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
+        byte[] clothMaskingImg = s3Service.downloadFile("cloth/masking/" + cloth.getClothImgName() + ".jpg");
+//        byte[] photoImg = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
+        byte[] photoImg = s3Service.downloadFile("photo/original/" + photo.getPhotoImgName() + ".jpg");
         byte[] photoParsingImg = s3Service.downloadFile("photo/masking/" + photo.getPhotoImgName() + ".png");
         byte[] photoOpenposeImg = s3Service
                 .downloadFile("photo/openpose/img/" + photo.getPhotoImgName() + "_rendered.png");
