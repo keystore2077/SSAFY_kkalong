@@ -246,7 +246,7 @@ public class ClosetController {
         String fileName="";
         //옷장 사진파일에 대한 유효성검사 해주기(1)
         if (file != null && !file.isEmpty()) {
-            
+
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
                 // S3에 저장할 파일 이름을 생성
                 fileName= FileNameGenerator.generateFileName("closet", member.getMemberId(), "png");
@@ -306,5 +306,33 @@ public class ClosetController {
         return Api.OK("옷장 삭제");
 
     }
+
+    @GetMapping("/list")
+    @Operation(summary = "옷장 목록 보기")
+    public Api<Object> getClosetList() {
+        //1. 유효성검사 (로그인된 회원인지)
+        //2. reponse로 전달해야한게 list인 seq,name <=이것만 들어가는 response dto를 생성
+        //3. service에서 조회를 해야함
+        //  컨트롤러에서 로그인된 회원을 보내줌 =>그 회원이 가지고 있는 모든 옷장 리스트를 반환 해줘야함 => 만든 dto로 전환(converter)
+        // =>그거를 api.ok에 반환하면됨
+        // 서비스를 따로 만들 필요가없어
+
+
+        return Api.OK("옷장 목록보기");
+
+    }
+
+    @GetMapping("/list/{closetSeq}")
+    @Operation(summary = "해당 옷장 소속구역 보기")
+    public Api<Object> getClosetSectionList(@PathVariable int closetSeq) {
+        // 위에랑 똑같은데 유효성 검사 하나더 해줘야함
+        // closet seq에 대한 유효성 검사를 해줘야함 총 2개
+        // service 41번줄을 사용해서 리스트를 섹션을 가지고오면
+        // 위에서 만든 response dto를 convert해가지고 return
+        return Api.OK("해당 옷장 소속구역 보기");
+
+    }
+
+
 
 }

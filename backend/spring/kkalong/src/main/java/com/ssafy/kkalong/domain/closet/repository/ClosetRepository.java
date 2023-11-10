@@ -10,6 +10,7 @@ import java.util.Optional;
 //jpa상속받아서 crud제공하는곳
 public interface ClosetRepository extends JpaRepository<Closet, Integer> {
     List<Closet> findAllByMemberMemberSeq(int member);
+    //얘를 건들어 줘야함
 
     Optional<Closet> findByClosetSeqAndIsClosetDeleted(int closetSeq, boolean isDeleted);
 }
