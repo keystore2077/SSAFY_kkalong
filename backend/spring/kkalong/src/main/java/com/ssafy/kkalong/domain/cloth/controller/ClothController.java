@@ -6,6 +6,7 @@ import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
+import com.ssafy.kkalong.domain.cloth.dto.request.ClothInputSectionReq;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothSaveReq;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothUpdateReq;
 import com.ssafy.kkalong.domain.cloth.dto.response.ClothSaveRes;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,7 +62,7 @@ public class ClothController {
             if (section == null) {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 저장하려는 구역 정보를 찾지 못했습니다.");
             }
-            else if (section.getCloset().getMember().getMemberId() != member.getMemberId()) {
+            else if (section.getCloset().getMember().getMemberSeq() != member.getMemberSeq()) {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 구역의 주인이 아닙니다.");
             }
         }
@@ -133,7 +135,7 @@ public class ClothController {
         if(cloth ==null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
         }
-        if(cloth.getMember().getMemberId()!=member.getMemberId() && cloth.isPrivate()){
+        if(cloth.getMember().getMemberSeq()!=member.getMemberSeq() && cloth.isPrivate()){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "비공개 옷 이거나 조회하고자 하는 회원이 옷 주인이 아닙니다.");
         }
         List<Tag> tagList = clothService.getTagList(clothSeq);
@@ -177,7 +179,7 @@ public class ClothController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "옷장 구역 정보를 찾을 수 없습니다.");
         }
 
-        if(section.getCloset().getMember().getMemberId()!=member.getMemberId()){
+        if(section.getCloset().getMember().getMemberSeq()!=member.getMemberSeq()){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "조회하고자 하는 회원이 옷장 구역의 주인이 아닙니다.");
         }
 
@@ -223,11 +225,11 @@ public class ClothController {
             if (section == null) {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 저장하려는 구역 정보를 찾지 못했습니다.");
             }
-            else if (section.getCloset().getMember().getMemberId() != member.getMemberId()) {
+            else if (section.getCloset().getMember().getMemberSeq() != member.getMemberSeq()) {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 구역의 주인이 아닙니다.");
             }
             //Section 변경 사항 저장
-            if (cloth.getSection().getSectionSeq() != request.getSectionSeq()) {
+            if (cloth.getSection()==null || cloth.getSection().getSectionSeq() != request.getSectionSeq()) {
                 cloth.setSection(section);
             }
         }else{
@@ -305,7 +307,7 @@ public class ClothController {
         return Api.OK(clothService.updateCloth(cloth, request));
     }
 
-    @Operation(summary = "옷 상세정보")
+    @Operation(summary = "옷 삭제")
     @PutMapping(value = "/{clothSeq}" )
     public Api<Object> deleteCloth(@PathVariable int clothSeq) {
         Member member = memberService.getLoginUserInfo();
@@ -317,11 +319,77 @@ public class ClothController {
         if(cloth ==null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
         }
-        if(cloth.getMember().getMemberId()!=member.getMemberId() && cloth.isPrivate()){
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "비공개 옷 이거나 조회하고자 하는 회원이 옷 주인이 아닙니다.");
+        if(cloth.getMember().getMemberSeq()!=member.getMemberSeq()){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이 옷 주인이 아닙니다.");
         }
+
         clothService.deleteCloth(cloth);
         return Api.OK(String.format("옷(%s)이/가 삭제 되었습니다",cloth.getClothName()));
+    }
+
+    @Operation(summary = "옷리스트 삭제")
+    @PutMapping(value = "/del/list" )
+    public Api<Object> deleteClothList(@RequestBody  List<Integer> clothSeqList) {
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+        List<Cloth> clothList = new ArrayList<>();
+        for(int clothSeq : clothSeqList){
+            Cloth cloth =clothService.getCloth(clothSeq);
+            if(cloth ==null){
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
+            }
+            if(cloth.getMember().getMemberSeq()!=member.getMemberSeq()){
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이 옷 주인이 아닙니다.");
+            }
+            clothList.add(cloth);
+        }
+        for(Cloth cloth : clothList){
+            clothService.deleteCloth(cloth);
+        }
+
+        return Api.OK("옷들이 삭제 되었습니다");
+    }
+
+    @Operation(summary = "옷장 구역에 있는 옷 비우기")
+    @PutMapping(value = "/del/section/{sectionSeq}" )
+    public Api<Object> emptySectionCloth(@PathVariable int sectionSeq) {
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        //sectionSeq 유효성 검사
+        Section section= closetService.getSection(sectionSeq);
+        if (section == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 저장하려는 구역 정보를 찾지 못했습니다.");
+        }
+        else if (section.getCloset().getMember().getMemberSeq() != member.getMemberSeq()) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 구역의 주인이 아닙니다.");
+        }
+        return Api.OK(clothService.emptySectionCloth(member, section));
+    }
+
+    @Operation(summary = "옷장 구역에 옷 추가하기")
+    @PutMapping(value = "/input/section" )
+    public Api<Object> inputSectionCloth(@RequestBody ClothInputSectionReq reqeset) {
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+
+        //sectionSeq 유효성 검사
+        Section section= closetService.getSection(reqeset.getSectionSeq());
+        if (section == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 저장하려는 구역 정보를 찾지 못했습니다.");
+        }
+        else if (section.getCloset().getMember().getMemberSeq() != member.getMemberSeq()) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 구역의 주인이 아닙니다.");
+        }
+
+
+        return Api.OK(clothService.inputSectionCloth(reqeset.getClothSeqList(), section));
     }
 
 

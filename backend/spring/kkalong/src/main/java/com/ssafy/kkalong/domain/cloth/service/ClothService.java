@@ -218,12 +218,10 @@ public class ClothService {
     }
 
     public void deleteCloth(Cloth cloth ){
-        //옷 삭제        
+        //옷 삭제
         cloth.setClothDeleted(true);
         cloth.setClothDelDate(LocalDateTime.now());
-
         clothRepository.save(cloth);
-        
         //태그 관계 삭제
         List<TagRelation> tagRelations = tagRelaionRepository.findAllByClothClothSeqAndIsTagRelationDelete(cloth.getClothSeq(), false);
         for(TagRelation tagRelation : tagRelations){
@@ -231,6 +229,33 @@ public class ClothService {
             tagRelation.setTagRelationDelete(true);
             tagRelaionRepository.save(tagRelation);
         }
+
     }
+
+    public List<String> emptySectionCloth(Member member ,Section section ){
+        List<Cloth> clothList = clothRepository.findAllByMemberAndSectionAndIsClothDeleted(member, section, false);
+        List<String> result = new ArrayList<>();
+        for (Cloth cloth : clothList){
+            cloth.setSection(null);
+            result.add(clothRepository.save(cloth).getClothName());
+        }
+        return result;
+    }
+
+    public List<ClothGetRes> inputSectionCloth(List<Integer> clothSeqList, Section section){
+        List<ClothGetRes> result = new ArrayList<>();
+        for(int clothSeq:clothSeqList){
+            Cloth cloth = getCloth(clothSeq);
+            if(cloth != null){
+                cloth.setSection(section);
+                clothRepository.save(cloth);
+                String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() + ".png";
+                String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+                result.add(ClothGetRes.toRes(cloth,imgUrl));
+            }
+        }
+        return result;
+    }
+
 
 }
