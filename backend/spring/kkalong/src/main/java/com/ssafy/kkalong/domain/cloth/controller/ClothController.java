@@ -229,7 +229,7 @@ public class ClothController {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 구역의 주인이 아닙니다.");
             }
             //Section 변경 사항 저장
-            if (cloth.getSection().getSectionSeq() != request.getSectionSeq()) {
+            if (cloth.getSection()==null || cloth.getSection().getSectionSeq() != request.getSectionSeq()) {
                 cloth.setSection(section);
             }
         }else{
