@@ -7,10 +7,16 @@ import '../avata/namedavata.dart';
 // import 'package:flutter_mycloset/category/categoryselect.dart';
 
 class ChoiceCloth extends StatefulWidget {
-  const ChoiceCloth({
-    super.key,
-    this.storage,
-  });
+  final int photoSeq;
+  final String? imageUrl;
+  final String sortName;
+
+  const ChoiceCloth(
+      {super.key,
+      this.storage,
+      required this.photoSeq,
+      required this.imageUrl,
+      required this.sortName});
 
   final storage;
 
@@ -65,7 +71,7 @@ class ChoiceClothState extends State<ChoiceCloth> {
             delegate: SliverChildListDelegate(
               [
                 AppBar(
-                  toolbarHeight: 100,
+                  toolbarHeight: 55,
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -76,9 +82,42 @@ class ChoiceClothState extends State<ChoiceCloth> {
                           width: 70.0,
                           height: 70.0,
                         ),
+                        //  child: Image.network(
+                        //     widget.imageUrl ?? "Assets/Image/logo.png",
+                        //     height: 125,
+                        //     width: 180,
+                        //     errorBuilder: (context, error, stackTrace) {
+                        //       return Image.asset(
+                        //         "Assets/Image/logo.png",
+                        //         height: 125,
+                        //         width: 180,
+                        //       );
+                        //     },
+                        //     loadingBuilder: (BuildContext context, Widget child,
+                        //         ImageChunkEvent? loadingProgress) {
+                        //       if (loadingProgress == null) return child;
+                        //       return Center(
+                        //         child: CircularProgressIndicator(
+                        //           value: loadingProgress.expectedTotalBytes !=
+                        //                   null
+                        //               ? loadingProgress.cumulativeBytesLoaded /
+                        //                   loadingProgress.expectedTotalBytes!
+                        //               : null,
+                        //         ),
+                        //       );
+                        //     },
+                        //   )
                       ),
-                      const Text(
-                        'Top',
+                      // const Text(
+                      //   'Top',
+                      //   style: TextStyle(
+                      //     fontSize: 22,
+                      //     color: Color.fromARGB(255, 0, 0, 0),
+                      //     fontWeight: FontWeight.w600,
+                      //   ),
+                      // ),
+                      Text(
+                        widget.sortName,
                         style: TextStyle(
                           fontSize: 22,
                           color: Color.fromARGB(255, 0, 0, 0),
@@ -92,8 +131,46 @@ class ChoiceClothState extends State<ChoiceCloth> {
               ],
             ),
           ),
+          // SliverPadding(
+          //   padding: const EdgeInsets.fromLTRB(20, 5, 20, 20),
+          //   sliver: SliverGrid(
+          //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          //       crossAxisCount: 1,
+          //       crossAxisSpacing: 20.0,
+          //       mainAxisSpacing: 20.0,
+          //     ),
+          //     delegate: SliverChildBuilderDelegate(
+          //       (BuildContext context, int index) {
+          //         final item = nookie['list']?[index];
+          //         if (item == null) {
+          //           return const SizedBox(); // 빈 위젯 반환
+          //         }
+          //         return GestureDetector(
+          //           onTap: () {
+          //             print(widget.photoSeq);
+          //           },
+          //           child: Container(
+          //             color: const Color.fromARGB(255, 251, 235, 233),
+          //             child: Column(
+          //               mainAxisAlignment: MainAxisAlignment.center,
+          //               children: <Widget>[
+          //                 Image.asset(
+          //                   item["image"] ?? "Assets/Image/logo.png",
+          //                   height: 125,
+          //                   width: 180,
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
+          //         );
+          //       },
+          //       childCount: nookie['list']?.length ?? 0,
+          //     ),
+          //   ),
+          // ),
+
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 5, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 1, 20, 20),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 1,
@@ -106,21 +183,46 @@ class ChoiceClothState extends State<ChoiceCloth> {
                   if (item == null) {
                     return const SizedBox(); // 빈 위젯 반환
                   }
-                  return GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      color: const Color.fromARGB(255, 251, 235, 233),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Image.asset(
-                            item["image"] ?? "Assets/Image/logo.png",
-                            height: 125,
-                            width: 180,
-                          ),
-                        ],
-                      ),
-                    ),
+                  return
+                      // GestureDetector(
+                      //   onTap: () {},
+                      //   child: Container(
+                      //     color: const Color.fromARGB(255, 251, 235, 233),
+                      //     child: Column(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children: <Widget>[
+                      //         Image.asset(
+                      //           item["image"] ?? "Assets/Image/logo.png",
+                      //           height: 125,
+                      //           width: 180,
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // );
+                      Image.network(
+                    widget.imageUrl ?? "Assets/Image/logo.png",
+                    height: 125,
+                    width: 180,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        "Assets/Image/logo.png",
+                        height: 125,
+                        width: 180,
+                      );
+                    },
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
                   );
                 },
                 childCount: savecloset['list']?.length ?? 0,
@@ -130,25 +232,6 @@ class ChoiceClothState extends State<ChoiceCloth> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(30, 2, 10, 0),
-              // child: Row(
-              //   mainAxisSize: MainAxisSize.min,
-              //   children: [
-              //     SizedBox(
-              //       width: 400,
-              //       child: Text(
-              //         '옷선택',
-              //         style: TextStyle(fontSize: 20),
-              //       ),
-              //     ),
-              //     SizedBox(
-              //       width: 400,
-              //       child: Text(
-              //         '옷선택',
-              //         style: TextStyle(fontSize: 20),
-              //       ),
-              //     ),
-              //   ],
-              // ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -224,7 +307,7 @@ class ChoiceClothState extends State<ChoiceCloth> {
               ),
             ),
           ),
-          const ClothSlide()
+          ClothSlide(sortName: widget.sortName)
         ],
       ),
     );
