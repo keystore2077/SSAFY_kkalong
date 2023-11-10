@@ -147,20 +147,101 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
+import '../store/userstore.dart';
+import 'clothdetail.dart';
 
-class ClosetClothList extends StatelessWidget {
-  const ClosetClothList({super.key});
+class ClosetClothList extends StatefulWidget {
+  const ClosetClothList({super.key, this.storage, required this.sectionSeq});
+
+  final storage;
+  final int sectionSeq;
+
+  @override
+  State<ClosetClothList> createState() => _ClosetClothListState();
+}
+
+class _ClosetClothListState extends State<ClosetClothList> {
+  static final storage = FlutterSecureStorage();
+  String? accessToken;
+
+  @override
+  void initState() {
+    super.initState();
+    final userStore = Provider.of<UserStore>(context, listen: false);
+    accessToken = userStore.accessToken;
+    dioData(accessToken);
+  }
+
+  final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
+  final serverURL = 'http://k9c105.p.ssafy.io:8761';
+
+  var data = [];
+
+  Future<dynamic> dioData(token) async {
+    try {
+      final response =
+          await dio.get('$serverURL/api/cloth/section/${widget.sectionSeq}',
+              // queryParameters: {'userEmail': id}
+              options: Options(
+                headers: {
+                  'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+                  // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+                },
+              ));
+      var result = response.data['body'];
+      print(result);
+      setState(() {
+        data = result;
+      });
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('오류 발생!'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: Text('확인'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: 3, // 3줄을 나타내도록 설정
+        itemCount: data.length, // 3줄을 나타내도록 설정
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
               onTap: () {
                 // 클릭 이벤트 -> 옷상세로 넘어가게 할거임..
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ClothDetail(clothSeq: data[index]['clothSeq'])),
+                );
               },
               child:
                   // Column(
@@ -213,8 +294,8 @@ class ClosetClothList extends StatelessWidget {
                         margin: const EdgeInsets.all(8.0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.asset(
-                            'Assets/Image/logo.png',
+                          child: Image.network(
+                            data[index]['imgUrl'],
                             height: 100,
                             width: 150,
                             fit: BoxFit.fill,
@@ -226,7 +307,7 @@ class ClosetClothList extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.only(right: 20),
                           child: Text(
-                            '언제입어도 편안한 츄리닝 $index',
+                            data[index]['clothName'],
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
@@ -234,7 +315,13 @@ class ClosetClothList extends StatelessWidget {
                             overflow: TextOverflow.clip, // 글자를 자르도록 설정
                           ),
                         ),
-                      )
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                        child: Icon(data[index]['private'] == true
+                            ? Icons.lock
+                            : Icons.lock_open),
+                      ),
                     ],
                   ),
                   const Divider(

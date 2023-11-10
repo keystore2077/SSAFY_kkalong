@@ -255,21 +255,28 @@ class _ClosetDetailState extends State<ClosetDetail> {
 
   var data = {};
   var sections = [];
+  var imgUrl =
+      'https://mblogthumb-phinf.pstatic.net/MjAxODEyMTlfMTcz/MDAxNTQ1MjA0MTk4NDQy.-lCTSpFhyK1yb6_e8FaFoZwZmMb_-rRZ04AnFmNijB4g.ID8x5cmkX8obTOxG8yoq39JRURXvKBPjbxY_z5M90bkg.JPEG.cine_play/707211_1532672215.jpg?type=w800';
+  // var imgUrl = '';
+  var closetName = '';
 
   Future<dynamic> dioData(token) async {
     try {
-      final response = await dio.get('$serverURL/api/closet/${widget.closetSeq}',
-          // queryParameters: {'userEmail': id}
-          options: Options(
-            headers: {
-              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
-              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
-            },
-          ));
+      final response =
+          await dio.get('$serverURL/api/closet/${widget.closetSeq}',
+              // queryParameters: {'userEmail': id}
+              options: Options(
+                headers: {
+                  'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+                  // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+                },
+              ));
       var result = response.data['body'];
       setState(() {
         data = result;
         sections = result['closetSectionList'];
+        imgUrl = result['closetPictureUrl'];
+        closetName = result['closetName'];
       });
       return response.data;
     } catch (e) {
@@ -306,39 +313,39 @@ class _ClosetDetailState extends State<ClosetDetail> {
     return SafeArea(
       child: Scaffold(
         body: DefaultTabController(
-          length: sections.length,
-          child: NestedScrollView(
-            controller: scrollController,
-            headerSliverBuilder: (context, isScrolled) {
-              return [
-                SliverAppBar(
-                  title: Text(
-                    data['closetName'],
-                    style: TextStyle(color: Colors.white), // 텍스트의 색상을 흰색으로 설정
-                  ),
-                  centerTitle: true,
-                  backgroundColor: const Color.fromARGB(255, 246, 212, 206),
-                  iconTheme: const IconThemeData(color: Colors.black),
-                  collapsedHeight: 325,
-                  expandedHeight: 325,
-                  flexibleSpace: Image.network(
-                    data['closetPictureUrl'],
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined), // 두 번째 아이콘
-                      onPressed: () {
-                        // 두 번째 아이콘을 클릭했을 때 실행할 작업
-                      },
+            length: sections.length,
+            child: NestedScrollView(
+              controller: scrollController,
+              headerSliverBuilder: (context, isScrolled) {
+                return [
+                  SliverAppBar(
+                    title: Text(
+                      closetName,
+                      style: TextStyle(color: Colors.white), // 텍스트의 색상을 흰색으로 설정
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_forever_outlined),
-                      onPressed: () {},
+                    centerTitle: true,
+                    backgroundColor: const Color.fromARGB(255, 246, 212, 206),
+                    iconTheme: const IconThemeData(color: Colors.black),
+                    collapsedHeight: 325,
+                    expandedHeight: 325,
+                    flexibleSpace: Image.network(
+                      imgUrl,
                     ),
-                  ],
-                ),
-                SliverPersistentHeader(
-                  delegate: MyDelegate(TabBar(
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined), // 두 번째 아이콘
+                        onPressed: () {
+                          // 두 번째 아이콘을 클릭했을 때 실행할 작업
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_forever_outlined),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                  SliverPersistentHeader(
+                    delegate: MyDelegate(TabBar(
                       labelColor: Colors.black,
                       indicatorWeight: 4,
                       unselectedLabelColor: Color(0xffD0D0D0),
@@ -347,19 +354,22 @@ class _ClosetDetailState extends State<ClosetDetail> {
                           TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
                       indicatorColor: Color.fromARGB(255, 68, 25, 80),
                       indicatorSize: TabBarIndicatorSize.label,
-                      tabs: sections.map((sectionTitle) => Text(sectionTitle['sectionName'])).toList(),
-                  )),
-                  floating: true,
-                  pinned: true,
-                )
-              ];
-            },
-            body: TabBarView(
-              children: sections.map((section) {
-                return ClosetClothList();
-              }).toList(),
-          ),
-        )),
+                      tabs: sections
+                          .map((sectionTitle) =>
+                              Text(sectionTitle['sectionName']))
+                          .toList(),
+                    )),
+                    floating: true,
+                    pinned: true,
+                  )
+                ];
+              },
+              body: TabBarView(
+                children: sections.map((section) {
+                  return ClosetClothList(sectionSeq: section['sectionSeq']);
+                }).toList(),
+              ),
+            )),
 
         // floatingActionButton: FloatingActionButton.small(
         //   onPressed: () {
