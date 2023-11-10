@@ -4,12 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 void main() {
-  runApp(
-      MaterialApp(
-          theme: ThemeData(),
-          home: ClothInfo()
-      )
-  );
+  runApp(MaterialApp(theme: ThemeData(), home: ClothInfo()));
 }
 
 class ClothInfo extends StatefulWidget {
@@ -134,6 +129,7 @@ class _ClothInfoState extends State<ClothInfo> {
       ),
     );
   }
+
   // 리스트에 저장된 항목을 바탕으로 위젯을 생성하는 함수
   List<Widget> _buildItemList() {
     return tags.asMap().entries.map((entry) {
@@ -208,8 +204,7 @@ class _ClothInfoState extends State<ClothInfo> {
                                 vertical: 16.0, horizontal: 30.0),
                             focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    width: 1.5,
-                                    color: Color(0xFFF5BEB5))),
+                                    width: 1.5, color: Color(0xFFF5BEB5))),
                             border: OutlineInputBorder(),
                             labelText: '옷이름',
                             focusColor: Color(0xFFF5BEB5)),
@@ -229,12 +224,15 @@ class _ClothInfoState extends State<ClothInfo> {
                           decoration: InputDecoration(
                             // Add Horizontal padding using menuItemStyleData.padding so it matches
                             // the menu padding when button's width is not specified.
-                            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 16),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(5),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
+                              borderSide: BorderSide(
+                                  color: Color(
+                                      0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
                             ),
                             // Add more decoration..
                           ),
@@ -244,14 +242,14 @@ class _ClothInfoState extends State<ClothInfo> {
                           ),
                           items: closets
                               .map((item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Text(
-                              item,
-                              style: const TextStyle(
-                                fontSize: 14,
-                              ),
-                            ),
-                          ))
+                                    value: item,
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ))
                               .toList(),
                           validator: (value) {
                             if (value == null) {
@@ -286,10 +284,7 @@ class _ClothInfoState extends State<ClothInfo> {
                           ),
                         ),
                       ),
-                      Flexible(
-                          fit: FlexFit.tight,
-                          flex: 1,
-                          child: SizedBox()),
+                      Flexible(fit: FlexFit.tight, flex: 1, child: SizedBox()),
                       Flexible(
                         fit: FlexFit.tight,
                         flex: 12,
@@ -298,12 +293,15 @@ class _ClothInfoState extends State<ClothInfo> {
                           decoration: InputDecoration(
                             // Add Horizontal padding using menuItemStyleData.padding so it matches
                             // the menu padding when button's width is not specified.
-                            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 16),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(5),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
+                              borderSide: BorderSide(
+                                  color: Color(
+                                      0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
                             ),
                             // Add more decoration..
                           ),
@@ -313,14 +311,14 @@ class _ClothInfoState extends State<ClothInfo> {
                           ),
                           items: sections
                               .map((item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Text(
-                              item,
-                              style: const TextStyle(
-                                fontSize: 14,
-                              ),
-                            ),
-                          ))
+                                    value: item,
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ))
                               .toList(),
                           validator: (value) {
                             if (value == null) {
@@ -370,7 +368,9 @@ class _ClothInfoState extends State<ClothInfo> {
                         borderRadius: BorderRadius.circular(5),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
+                        borderSide: BorderSide(
+                            color: Color(
+                                0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
                       ),
                       // Add more decoration..
                     ),
@@ -380,14 +380,14 @@ class _ClothInfoState extends State<ClothInfo> {
                     ),
                     items: clothes
                         .map((item) => DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(
-                        item,
-                        style: const TextStyle(
-                          fontSize: 14,
-                        ),
-                      ),
-                    ))
+                              value: item,
+                              child: Text(
+                                item,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ))
                         .toList(),
                     validator: (value) {
                       if (value == null) {
@@ -465,24 +465,21 @@ class _ClothInfoState extends State<ClothInfo> {
                             },
                             style: OutlinedButton.styleFrom(
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    5.0), // 각진 정도 조절
+                                borderRadius:
+                                    BorderRadius.circular(5.0), // 각진 정도 조절
                               ),
                               side: const BorderSide(
-                                color:
-                                Color(0xFFF5BEB5), // 외곽선 색상 설정
+                                color: Color(0xFFF5BEB5), // 외곽선 색상 설정
                                 width: 1, // 외곽선 두께 설정
                               ),
                             ),
                             child: const Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                  0.2, 0.2, 0.2, 0.2),
+                              padding: EdgeInsets.fromLTRB(0.2, 0.2, 0.2, 0.2),
                               child: Text(
                                 '태그 추가',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color:
-                                  Color(0xFFF5BEB5), // 글자 색상 설정
+                                  color: Color(0xFFF5BEB5), // 글자 색상 설정
                                 ),
                               ),
                             ),
@@ -506,28 +503,21 @@ class _ClothInfoState extends State<ClothInfo> {
                   SizedBox(
                     height: 60,
                     child: Padding(
-                      padding:
-                      const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                       child: ButtonTheme(
                           child: TextButton(
-                              onPressed: () async {
-
-                              },
-                              style:
-                              OutlinedButton.styleFrom(
+                              onPressed: () async {},
+                              style: OutlinedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.circular(
+                                  borderRadius: BorderRadius.circular(
                                       5.0), // 원하는 각진 정도로 설정
                                 ),
-                                backgroundColor:
-                                const Color(0xFFF5BEB5),
+                                backgroundColor: const Color(0xFFF5BEB5),
                               ),
                               child: const SizedBox(
                                 height: 40,
                                 child: Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
                                       '등록하기',

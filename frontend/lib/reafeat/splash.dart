@@ -315,7 +315,7 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
       } else {
         // 토큰이 없는 경우 로그인 페이지로 이동
         Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (_) => LogIn(storage: storage),
+          builder: (_) => LogIn(),
         ));
         // Navigator.of(context).pushReplacementAndRemoveUntil(
         //   MaterialPageRoute(

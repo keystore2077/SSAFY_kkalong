@@ -82,6 +82,11 @@ public class FastApiService {
             jsonStr = unescapeJsonString(jsonStr);
             Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
             });
+            if (jsonMap.get("file_yes_bg") == null || jsonMap.get("file_no_bg") == null){
+                System.out.println("RemBg 처리중 문제가 발생했습니다");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+            }
+
             byte[] yesBg = Base64.getDecoder().decode((String) jsonMap.get("file_yes_bg"));
             byte[] noBg = Base64.getDecoder().decode((String) jsonMap.get("file_no_bg"));
             // 파일 임시 저장
@@ -139,9 +144,12 @@ public class FastApiService {
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
-//            System.out.println(jsonStr);
-            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
-            });
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {});
+            if (jsonMap.get("cihp") == null){
+                System.out.println("CIHP 처리중 문제가 발생했습니다");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+            }
+
             byte[] cihp = Base64.getDecoder().decode((String) jsonMap.get("cihp"));
             // 파일 임시 저장
             System.out.println("임시 저장중...");
@@ -186,15 +194,21 @@ public class FastApiService {
 
         // response에서 json 추출
         try {
+            System.out.println("u2net 추출 시작");
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
             Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
             });
+            if (jsonMap.get("u2net") == null){
+                System.out.println("u2net 처리중 문제가 발생했습니다");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+            }
+
             byte[] u2net = Base64.getDecoder().decode((String) jsonMap.get("u2net"));
             // 파일 임시 저장
             String fileName = FileNameGenerator.generateFileNameNoExtension("temp", memberId);
-
+            System.out.println("u2net 임시 저장중, 파일명: " + fileName);
             File tempFile = File.createTempFile(fileName, ".jpg");
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 fos.write(u2net);

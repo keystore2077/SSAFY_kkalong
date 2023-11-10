@@ -60,8 +60,8 @@ public class FastApiCallerService {
         // cihp 결과 저장
         try{
             FastApiRequestGeneralRes cihpResBody = (FastApiRequestGeneralRes)cihpRes.getBody();
-            System.out.println("저장 경로: photo/masking/" + cihpResBody.getImgName() + ".png");
-            s3Service.uploadFile("photo/masking/" + cihpResBody.getImgName() + ".png", cihpResBody.getImg());
+            System.out.println("저장 경로: photo/masking/" + photo.getPhotoImgName() + ".png");
+            s3Service.uploadFile("photo/masking/" + photo.getPhotoImgName() + ".png", cihpResBody.getImg());
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(cihp)");
             throw e;
@@ -77,7 +77,7 @@ public class FastApiCallerService {
         System.out.println("callU2Net called...");
         System.out.println("요청 경로: cloth/yes_bg/" + cloth.getClothImgName() + ".jpg");
 
-        byte[] byteFile = s3Service.downloadFile("photo/yes_bg/" + cloth.getClothImgName() + ".jpg");
+        byte[] byteFile = s3Service.downloadFile("cloth/yes_bg/" + cloth.getClothImgName() + ".jpg");
         Api<Object> u2NetRes = fastApiService.requestU2Net(member.getMemberId(), byteFile);
         if (!Objects.equals(u2NetRes.getResult().getResultCode(), Result.OK().getResultCode())){
             System.out.println("내부 처리중 문제가 발생했습니다.(U2Net)");
@@ -85,8 +85,8 @@ public class FastApiCallerService {
         // U2Net 결과 저장
         try{
             FastApiRequestGeneralRes u2NetResBody = (FastApiRequestGeneralRes)u2NetRes.getBody();
-            System.out.println("저장 경로: cloth/masking/" + u2NetResBody.getImgName() + ".png");
-            s3Service.uploadFile("cloth/masking/" + u2NetResBody.getImgName() + ".png", u2NetResBody.getImg());
+            System.out.println("저장 경로: cloth/masking/" + cloth.getClothImgName() + ".png");
+            s3Service.uploadFile("cloth/masking/" + cloth.getClothImgName() + ".png", u2NetResBody.getImg());
         } catch (Exception e) {
             System.out.println("저장중 문제가 발생했습니다.(U2Net)");
             throw e;
@@ -94,6 +94,6 @@ public class FastApiCallerService {
         // DB 업데이트
         clothService.updateClothImgMasking(cloth.getClothSeq());
 
-        System.out.println("cihp 완료");
+        System.out.println("U2net 완료");
     }
 }
