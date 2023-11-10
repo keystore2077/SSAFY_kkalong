@@ -1,7 +1,110 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../store/userstore.dart';
+import 'package:dio/dio.dart';
+
+// class ClothSlide extends StatefulWidget {
+//   final String sortName;
+
+//   const ClothSlide({super.key, required this.sortName});
+
+//   @override
+//   State<ClothSlide> createState() => _ClothSlideState();
+// }
+
+// void fetchData(context) async {
+//   var accessToken = context.read<UserStore>().accessToken;
+//   print(accessToken);
+//   Dio dio = Dio();
+//   const serverURL = 'http://k9c105.p.ssafy.io:8761';
+//   try {
+//     // print('솔트네ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ임 ${widget.sortName!}');
+//     print('어디까지 왔나');
+//     Map<String, dynamic> headers = {};
+//     if (accessToken.isNotEmpty) {
+//       headers['Authorization'] = 'Bearer $accessToken';
+//     }
+
+//     final response = await dio.post(
+//       '$serverURL/api/cloth/sort/{sortName}',
+//       options: Options(
+//         headers: headers,
+//       ), // 수정된 부분
+//     );
+
+//     print('디오요청완료');
+//     print(response.data);
+//     var cloList = response.data['body'];
+
+//     print('내가가진옷리스트ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ');
+//     print(cloList);
+//     return response.data;
+//   } catch (e) {
+//     print('그밖의 에러ㅜㅜㅜㅜㅜㅜㅜㅜㅜ: $e');
+//   } finally {}
+// }
+
+// @override
+// void initState() {
+//   initState();
+//   fetchData();
+// }
+
+// class ClothSlide extends StatefulWidget {
+//   final String sortName;
+
+//   const ClothSlide({super.key, required this.sortName});
+
+//   @override
+//   State<ClothSlide> createState() => _ClothSlideState();
+// }
+
+// // class _ClothSlideState extends State<ClothSlide> {
+// //   int? selectedIndex;
+
+//   @override
+//   void initState() {
+//     super.initState(); // Corrected to call super.initState()
+//     fetchData(context); // Passing context to fetchData
+//   }
+
+//   void fetchData(BuildContext context) async {
+//     var accessToken = context.read<UserStore>().accessToken;
+//     print(accessToken);
+//     Dio dio = Dio();
+//     const serverURL = 'http://k9c105.p.ssafy.io:8761';
+//     try {
+//       print('어디까지 왔나');
+//       Map<String, dynamic> headers = {};
+//       if (accessToken.isNotEmpty) {
+//         headers['Authorization'] = 'Bearer $accessToken';
+//       }
+
+//       final response = await dio.get(
+//         '$serverURL/api/cloth/sort/${widget.sortName}', // Corrected string interpolation
+//         options: Options(
+//           headers: headers,
+//         ),
+//       );
+
+//       print('디오요청완료');
+//       print(response.data);
+//       var cloList = response.data['body'];
+
+//       print('내가가진옷리스트');
+//       print(cloList);
+//     } catch (e) {
+//       print('그밖의 에러: $e');
+//     }
+//   }
+
+// class _ClothSlideState extends State<ClothSlide> {
+//   int? selectedIndex;
 
 class ClothSlide extends StatefulWidget {
-  const ClothSlide({super.key});
+  final String sortName;
+
+  const ClothSlide({super.key, required this.sortName});
 
   @override
   State<ClothSlide> createState() => _ClothSlideState();
@@ -9,6 +112,43 @@ class ClothSlide extends StatefulWidget {
 
 class _ClothSlideState extends State<ClothSlide> {
   int? selectedIndex;
+  List<dynamic> cloList = []; // cloList를 클래스 멤버 변수로 선언
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    var accessToken = context.read<UserStore>().accessToken;
+    Dio dio = Dio();
+    const serverURL = 'http://k9c105.p.ssafy.io:8761';
+
+    try {
+      Map<String, dynamic> headers = {};
+      if (accessToken.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $accessToken';
+      }
+
+      final response = await dio.get(
+        '$serverURL/api/cloth/sort/${widget.sortName}',
+        options: Options(headers: headers),
+      );
+      print('옷슬라이드-------------디오요청했음-------------');
+      print('리스판스데이터--------------');
+      print(response.data);
+      // var cloList = response.data['body'];
+      setState(() {
+        cloList = response.data['body'];
+      });
+      print('클로리스트출력');
+      print(cloList);
+      return response.data;
+    } catch (e) {
+      print('에러: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,35 +181,6 @@ class _ClothSlideState extends State<ClothSlide> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Stack(
-                    //   children: [
-                    //     GestureDetector(
-                    //       onTap: () {
-                    //         setState(() {
-                    //           selectedIndex = i;
-                    //         });
-                    //         print('선택완료');
-                    //       },
-                    //       child: Container(
-                    //         decoration: BoxDecoration(
-                    //           borderRadius: BorderRadius.circular(5),
-                    //           border: i == selectedIndex
-                    //               ? Border.all(color: Colors.blue)
-                    //               : null,
-                    //         ),
-                    //       ),
-                    //       child: ClipRRect(
-                    //         borderRadius: BorderRadius.circular(5),
-                    //         child: Image.asset(
-                    //           'Assets/Image/${ranking[i]['image']}.png',
-                    //           width: 100,
-                    //           height: 120,
-                    //           fit: BoxFit.cover,
-                    //         ),
-                    //       ),
-                    //     )
-                    //   ],
-                    // ),
                     Stack(
                       children: [
                         GestureDetector(
@@ -89,7 +200,6 @@ class _ClothSlideState extends State<ClothSlide> {
                                   : null,
                             ),
                             child: ClipRRect(
-                              // ClipRRect is now the child of the Container
                               borderRadius: BorderRadius.circular(5),
                               child: Image.asset(
                                 'Assets/Image/${ranking[i]['image']}.png',
@@ -97,22 +207,39 @@ class _ClothSlideState extends State<ClothSlide> {
                                 height: 120,
                                 fit: BoxFit.cover,
                               ),
+                              //     Image.network(
+                              //   cloList[i]['imgUrl'], // URL을 직접 사용
+                              //   width: 100,
+                              //   height: 120,
+                              //   fit: BoxFit.cover,
+                              // ),
                             ),
                           ),
                         )
                       ],
                     ),
-
                     Container(
-                        margin: const EdgeInsets.fromLTRB(12, 5, 0, 0),
-                        child: Text(
-                          '${ranking[i]['title']!.length > 6 ? ranking[i]['title']?.substring(0, 6) : ranking[i]['title']}'
-                          '${ranking[i]['title']!.length > 6 ? ".." : ""}',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        )),
+                      margin: const EdgeInsets.fromLTRB(12, 5, 0, 0),
+                      // child: Text(
+                      //   '${ranking[i]['clothName']?.length > 6 ? ranking[i]['clothName']?.substring(0, 6) : ranking[i]['clothName']}'
+                      //   '${ranking[i]['clothName']!.length > 6 ? ".." : ""}',
+                      //   // '${cloList[i]['clothName']!.length > 6 ? cloList[i]['clothName']?.substring(0, 6) : cloList[i]['clothName']}'
+                      //   // '${cloList[i]['clothName']!.length > 6 ? ".." : ""}',
+                      //   style: const TextStyle(
+                      //     fontSize: 15,
+                      //     fontWeight: FontWeight.w600,
+                      //   ),
+                      // )
+                      child: Text(
+                        // ranking[i]['clothName']이 null이 아닌지 확인하고, 그에 따라 조건부 로직을 실행합니다.
+                        '${ranking[i]['clothName'] != null && ranking[i]['clothName']!.length > 6 ? ranking[i]['clothName']!.substring(0, 6) : ranking[i]['clothName'] ?? ''}' // null일 경우 빈 문자열을 사용합니다.
+                        '${ranking[i]['clothName'] != null && ranking[i]['clothName']!.length > 6 ? ".." : ""}',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               );
