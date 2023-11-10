@@ -8,6 +8,7 @@ import '../store/userstore.dart';
 
 class WearCloth extends StatefulWidget {
   final int photoSeq;
+  // WearCloth({super.key, this.storage});
   WearCloth({super.key, this.storage, required this.photoSeq});
 
   final storage;
@@ -34,10 +35,10 @@ class WearClothState extends State<WearCloth> {
     }
 
     try {
-      // print('photoSeq: ${widget.photoSeq}');
+      print('photoSeq출력ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ: ${widget.photoSeq}');
       print('특정이미지 출력할수있을까');
       var response = await Dio().get(
-        'http://k9c105.p.ssafy.io:8761/api/photo/36',
+        'http://k9c105.p.ssafy.io:8761/api/photo/${widget.photoSeq}',
         options: Options(
           headers: headers,
         ),
@@ -102,7 +103,7 @@ class WearClothState extends State<WearCloth> {
                   toolbarHeight: 100,
                   centerTitle: true,
                   title: const Text(
-                    '나에게 옷을 입혀주세요!',
+                    '어떤 옷을 입어보시겠어요?',
                     style: TextStyle(
                       fontSize: 22,
                       color: Color.fromARGB(255, 0, 0, 0),
@@ -182,7 +183,7 @@ class WearClothState extends State<WearCloth> {
                   const SizedBox(
                     width: 400,
                     child: Text(
-                      '내 옷',
+                      '옷종류',
                       style: TextStyle(fontSize: 20),
                     ),
                   ),

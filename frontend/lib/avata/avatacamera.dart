@@ -500,6 +500,8 @@ class _AvataPictureState extends State<AvataPicture> {
                 print('디오요청완료');
                 print(response.data);
                 var photoSeq = response.data['body']['photoSeq'];
+
+                print('포토시퀀스ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ');
                 print(photoSeq);
                 Navigator.push(
                   context,
@@ -509,12 +511,7 @@ class _AvataPictureState extends State<AvataPicture> {
                 return response.data;
               } catch (e) {
                 print('그밖의 에러ㅜㅜㅜㅜㅜㅜㅜㅜㅜ: $e');
-              } finally {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const WearCloth()),
-                // );
-              }
+              } finally {}
             }
           },
           style: ElevatedButton.styleFrom(
