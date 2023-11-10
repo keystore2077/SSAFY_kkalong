@@ -16,11 +16,11 @@ public class SectionSaveResponse {
 
 
     @Schema(description = "옷장 상세 종류 인덱스")  //박스 행거 같은거
-    private Sort sort;
+    private String sort;
 
     public SectionSaveResponse(Section item){
         this.sectionSeq = item.getSectionSeq();
         this.sectionName = item.getSectionName();
-        this.sort = item.getSort();
+        this.sort = item.getSort().getSort();
     }
 }
