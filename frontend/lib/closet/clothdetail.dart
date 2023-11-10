@@ -1,55 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-void main() {
-  runApp(
-      MaterialApp(
-          theme: ThemeData(),
-          home: ClothDetail()
-      )
-  );
-}
-
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
+import '../store/userstore.dart';
+import '../main.dart';
 class ClothDetail extends StatefulWidget {
+  const ClothDetail({
+    super.key,
+    this.storage,
+    required this.clothSeq,
+  });
+
+  final storage;
   final clothSeq;
-  const ClothDetail({Key? key, this.clothSeq}) : super(key: key);
 
   @override
-  _ClothDetailState createState() => _ClothDetailState();
+  State<ClothDetail> createState() => ClothDetailState();
 }
 
-class _ClothDetailState extends State<ClothDetail> {
-  var data = [];
-  getData() async{
-    var result = await http.get(Uri.parse('https://codingapple1.github.io/app/data.json'));
-    // var result = await http.get(Uri.parse('https://example.com/api/cloth/${widget.clothSeq}'));
-    if (result.statusCode == 200) {
-      var result2 = jsonDecode(result.body);
-      setState(() {
-        data = result2;
-      });
-      print(data);
-    } else {
-      _showErrorDialog('오류 발생: ${result.statusCode}');
-    }
-  }
-
-  deleteCloth() async {
-    var result = await http.put(Uri.parse('https://codingapple1.github.io/app/data.json'));
-    // var result = await http.put(Uri.parse('https://example.com/api/cloth/${widget.clothSeq}'));
-    if (result.statusCode == 200) {
-      print('삭제완료');
-    } else {
-      _showErrorDialog('오류 발생: ${result.statusCode}');
-    }
-  }
+class ClothDetailState extends State<ClothDetail> {
+  static final storage = FlutterSecureStorage();
+  String? accessToken;
 
   @override
   void initState() {
     super.initState();
-    getData();
+    final userStore = Provider.of<UserStore>(context, listen: false);
+    accessToken = userStore.accessToken;
+    dioData(accessToken);
+  }
+
+  final TextEditingController inputController = TextEditingController();
+  final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
+  final serverURL = 'http://k9c105.p.ssafy.io:8761';
+
+  var data = {};
+  var tags = [];
+
+  Future<dynamic> dioData(token) async {
+    try {
+      final response = await dio.get('$serverURL/api/cloth/${widget.clothSeq}',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      var result = response.data['body'];
+      setState(() {
+        data = result;
+        tags = result['tagList'];
+      });
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
+
+  Future<dynamic> deleteCloth(token) async {
+    try {
+      final response = await dio.put('$serverURL/api/cloth/${widget.clothSeq}',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('옷삭제 api ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
   }
 
   // void navigateTaglist(BuildContext context, String tagName) {
@@ -77,36 +113,8 @@ class _ClothDetailState extends State<ClothDetail> {
     );
   }
 
-  final List<String> location = [
-    '공주옷장 선반1',
-    '할머니옷장 수납장3',
-    '아재옷장 박스1',
-  ];
-  String? selectedLocation;
-
-  final List<String> categories = [
-    'Top',
-    'Pants',
-    'Outer',
-    'Skirts',
-    'Dress',
-    'Etc',
-  ];
-  String? selectedCategories;
-
-  final List<String> tags = [
-    '손세탁',
-    '물빠짐 주의',
-    '면재질',
-  ];
-  String? selectedTags;
-
-  final List<String> names = [
-    '최애 수영복',
-    '듀얼마스타 신욱',
-    '무적의 백엔드',
-  ];
-  String? selectedName;
+  var imgUrl =
+      'https://mblogthumb-phinf.pstatic.net/MjAxODEyMTlfMTcz/MDAxNTQ1MjA0MTk4NDQy.-lCTSpFhyK1yb6_e8FaFoZwZmMb_-rRZ04AnFmNijB4g.ID8x5cmkX8obTOxG8yoq39JRURXvKBPjbxY_z5M90bkg.JPEG.cine_play/707211_1532672215.jpg?type=w800';
 
   @override
   Widget build(BuildContext context) {
@@ -132,10 +140,13 @@ class _ClothDetailState extends State<ClothDetail> {
               color: Color(0xFFfc6474),
             )),
             IconButton(onPressed: () {
-              deleteCloth();
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (c) => Text('옷조회하는 창'))
-              );
+              deleteCloth(accessToken);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Main()),
+                );
+
             }, icon: Icon(
               Icons.delete,
               color: Color(0xFFfc6474),
@@ -165,7 +176,7 @@ class _ClothDetailState extends State<ClothDetail> {
                             ),
                             onPressed: (){},
                           ),
-                          Image.asset('assets/오레노턴완.jpg',
+                          Image.network(data['clothRes']['imgUrl'],
                             width: 200,
                             height: 350,
                           ),
@@ -186,7 +197,7 @@ class _ClothDetailState extends State<ClothDetail> {
                     height: 20,
                   ),
                   Text(
-                    names[0],
+                    data['clothRes']['clothName'],
                     style: TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 20,
@@ -207,7 +218,7 @@ class _ClothDetailState extends State<ClothDetail> {
                         width: 10,
                       ),
                       Text(
-                        location[0],
+                        '${data['clothRes']['closetName']} ${data['clothRes']['sectionName']}',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 17,
@@ -232,7 +243,7 @@ class _ClothDetailState extends State<ClothDetail> {
                       color: Color(0xFFF5BEB5),
                     ),
                     child: Center(child: Text(
-                      '#${categories[4]}',
+                      '#${data['clothRes']['sort']}',
                       style: TextStyle(
                         color: Colors.white,
                       ),
@@ -256,7 +267,7 @@ class _ClothDetailState extends State<ClothDetail> {
                             borderRadius: BorderRadius.circular(30.0),
                           ),
                           child: Center(child: Text(
-                            '#${tag}',
+                            '#${tag['tag']}',
                             style: TextStyle(
                               color: Color(0xFFF5BEB5),
                             ),

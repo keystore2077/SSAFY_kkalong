@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../closet/closetcloth.dart';
+import './categorycloth.dart';
 
 class CategorySelect extends StatefulWidget {
-  const CategorySelect({super.key, this.category});
+  const CategorySelect({super.key, required this.category});
 
-  final category;
+  final int category;
 
   @override
   State<CategorySelect> createState() => _CategorySelectState();
@@ -13,13 +13,14 @@ class CategorySelect extends StatefulWidget {
 
 class _CategorySelectState extends State<CategorySelect> {
   final ScrollController scrollController = ScrollController();
-
+  
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: DefaultTabController(
           length: 6,
+          initialIndex: widget.category,
           child: NestedScrollView(
             controller: scrollController,
             headerSliverBuilder: (context, isScrolled) {
@@ -64,32 +65,16 @@ class _CategorySelectState extends State<CategorySelect> {
                 )
               ];
             },
-            body: const TabBarView(children: [
-              ClosetClothList(),
-              ClosetClothList(),
-              ClosetClothList(),
-              ClosetClothList(),
-              ClosetClothList(),
-              ClosetClothList(),
+            body: TabBarView(children: [
+              CategoryClothList(category: 0),
+              CategoryClothList(category: 1),
+              CategoryClothList(category: 2),
+              CategoryClothList(category: 3),
+              CategoryClothList(category: 4),
+              CategoryClothList(category: 5),
             ]),
           ),
         ),
-
-        // floatingActionButton: FloatingActionButton.small(
-        //   onPressed: () {
-        //     scrollController.animateTo(
-        //       scrollController.position.minScrollExtent,
-        //       duration: const Duration(milliseconds: 500),
-        //       curve: Curves.fastOutSlowIn,
-        //     );
-        //   },
-        //   backgroundColor: Colors.grey[50],
-        //   shape: RoundedRectangleBorder(
-        //       side: const BorderSide(width: 1, color: Color(0xFFF5BEB5)),
-        //       borderRadius: BorderRadius.circular(12)),
-        //   child:
-        //       const Icon(Icons.arrow_upward_sharp, color: Color(0xFFF5BEB5)),
-        // )
 
         floatingActionButton: ElevatedButton(
           onPressed: () async {
