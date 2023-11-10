@@ -1,7 +1,6 @@
 package com.ssafy.kkalong.domain.closet.service;
 
-import com.ssafy.kkalong.domain.closet.dto.request.ClosetCreateRequest;
-import com.ssafy.kkalong.domain.closet.dto.request.SectionCreateRequestItem;
+import com.ssafy.kkalong.domain.closet.dto.request.*;
 import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.repository.ClosetRepository;
@@ -68,6 +67,72 @@ public class ClosetService {
         return sectionRepository.saveAll(sectionsToSave);
     }
     //db에 저장할 정보들 저장할라고 하는거임
+    public Closet updateCloset(Closet closet){
+        return closetRepository.save(closet);
+    }
+    //섹션 수정
+    public List<Section> updateSection(List<SectionUpdateRequest> sectionUpdateRequests,Closet closet){
+        List<Section> result = new ArrayList<>();
+        for(SectionUpdateRequest sectionUpdateRequest : sectionUpdateRequests){
+            Section section = sectionRepository.findBySectionSeqAndIsSectionDeleted(
+                            sectionUpdateRequest.getSectionSeq(), false)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid sectionSeq: " + sectionUpdateRequest.getSectionSeq()));
+
+            // 옷장에 맞는 섹션인지 확인
+            if (!section.getCloset().equals(closet)) {
+                continue; // 옷장이 다르면 무시하고 다음 섹션으로
+            }
+
+            // 상세 종류 인덱스(예: 박스, 행거) 유효성 검사
+            Sort sort = sortService.getSort(sectionUpdateRequest.getSort());
+            if (sort == null) {
+                throw new IllegalArgumentException("Invalid sort index: " + sectionUpdateRequest.getSort());
+            }
+
+            // 섹션 이름 변경이 있는지 확인하고 업데이트
+            if (!section.getSectionName().equals(sectionUpdateRequest.getSectionName())) {
+                section.setSectionName(sectionUpdateRequest.getSectionName());
+            }
+
+            // 섹션의 상세 종류 변경이 있는지 확인하고 업데이트
+            if (!section.getSort().equals(sort)) {
+                section.setSort(sort);
+            }
+
+            // 섹션 저장
+            section = sectionRepository.save(section);
+
+
+            result.add(section);
+        }
+        return result;
+    }
+
+
+    public void deleteSection(List<Integer> closetSectionDeleteList,Closet closet){
+        for (Integer sectionSeq : closetSectionDeleteList) {
+            // 기존 섹션을 시퀀스로 찾기
+            Section section = sectionRepository.findBySectionSeqAndIsSectionDeleted(sectionSeq, false)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid sectionSeq: " + sectionSeq));
+
+            // 옷장에 맞는 섹션인지 확인
+            if (!section.getCloset().equals(closet)) {
+                throw new IllegalArgumentException("Section does not belong to the correct closet");
+            }
+
+            // 섹션 삭제 여부와 삭제 일시 업데이트
+            section.setSectionDeleted(true);
+            section.setSectionDeleteDate(LocalDateTime.now());
+
+
+            sectionRepository.save(section);
+        }
+
+    }
+
+
+
+
     public Closet testcloset(ClosetCreateRequest request, Member member, String closetImageName) {
         Closet newCloset = new Closet();
         newCloset.setClosetName(request.getClosetName());
@@ -82,6 +147,8 @@ public class ClosetService {
     public Section getSection(int sectionSeg){
         return sectionRepository.findBySectionSeqAndIsSectionDeleted(sectionSeg,false).orElse(null);
     }
+
+
 }
 
 

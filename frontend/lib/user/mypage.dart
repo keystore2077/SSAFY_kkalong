@@ -274,7 +274,14 @@ class MyPageState extends State<MyPage> {
           ),
           centerTitle: true,
           elevation: 0,
-          leading: const Text(''),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.send,
+              ),
+              onPressed: () {},
+            ),
+          ],
         ),
         body:
             // SingleChildScrollView(

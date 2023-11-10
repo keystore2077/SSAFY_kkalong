@@ -72,13 +72,13 @@ class ChoiceClothState extends State<ChoiceCloth> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 0),
                         child: Image.asset(
-                          'Assets/Image/Suit.png',
+                          'Assets/Image/TShirt.png',
                           width: 70.0,
                           height: 70.0,
                         ),
                       ),
                       const Text(
-                        'Suit',
+                        'Top',
                         style: TextStyle(
                           fontSize: 22,
                           color: Color.fromARGB(255, 0, 0, 0),

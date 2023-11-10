@@ -15,6 +15,8 @@ class NamedAvata extends StatefulWidget {
 }
 
 class NamedAvataState extends State<NamedAvata> {
+  bool isSelectedYes = false;
+  bool isSelectedNo = false;
   TextEditingController controller = TextEditingController();
   @override
   void initState() {
@@ -140,15 +142,104 @@ class NamedAvataState extends State<NamedAvata> {
                           ),
                         ),
                         const Spacer(),
+                        // Padding(
+                        //   padding: const EdgeInsets.fromLTRB(30, 1, 10, 10),
+                        //   child: TextButton(
+                        //     onPressed: () {},
+                        //     style: TextButton.styleFrom(
+                        //       foregroundColor:
+                        //           const Color.fromARGB(255, 232, 170, 170),
+                        //       side: const BorderSide(
+                        //           color: Color.fromARGB(255, 232, 170, 170),
+                        //           width: 1.0),
+                        //       shape: RoundedRectangleBorder(
+                        //         borderRadius: BorderRadius.circular(20.0),
+                        //       ),
+                        //     ),
+                        //     child: const Text(
+                        //       '아니오',
+                        //       style: TextStyle(
+                        //         fontSize: 12,
+                        //         fontWeight: FontWeight.w600,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        // Padding(
+                        //   padding: const EdgeInsets.fromLTRB(5, 1, 10, 10),
+                        //   child: TextButton(
+                        //     onPressed: () {},
+                        //     style: TextButton.styleFrom(
+                        //       foregroundColor:
+                        //           const Color.fromARGB(255, 232, 170, 170),
+                        //       side: const BorderSide(
+                        //           color: Color.fromARGB(255, 232, 170, 170),
+                        //           width: 1.0),
+                        //       shape: RoundedRectangleBorder(
+                        //         borderRadius: BorderRadius.circular(20.0),
+                        //       ),
+                        //     ),
+                        //     child: const Text(
+                        //       '예',
+                        //       style: TextStyle(
+                        //         fontSize: 12,
+                        //         fontWeight: FontWeight.w600,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(30, 1, 10, 10),
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              setState(() {
+                                isSelectedYes = true;
+                                isSelectedNo =
+                                    false; // '예' 버튼을 선택하면 '아니오' 버튼은 선택되지 않도록 설정
+                              });
+                            },
                             style: TextButton.styleFrom(
-                              foregroundColor:
-                                  const Color.fromARGB(255, 232, 170, 170),
+                              foregroundColor: isSelectedYes
+                                  ? Color.fromARGB(255, 254, 253, 253)
+                                  : Color.fromARGB(255, 250, 246, 246),
+                              backgroundColor: isSelectedYes
+                                  ? Color.fromARGB(255, 251, 173, 161)
+                                  : Color.fromARGB(255, 247, 203, 203),
                               side: const BorderSide(
-                                  color: Color.fromARGB(255, 232, 170, 170),
+                                  color: Color.fromARGB(255, 247, 203, 203),
+                                  width: 1.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                            ),
+                            child: const Text(
+                              '예',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(5, 1, 10, 10),
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                isSelectedYes =
+                                    false; // '아니오' 버튼을 선택하면 '예' 버튼은 선택되지 않도록 설정
+                                isSelectedNo = true;
+                              });
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: isSelectedNo
+                                  ? Color.fromARGB(255, 254, 253, 253)
+                                  : Color.fromARGB(255, 252, 247, 247),
+                              backgroundColor: isSelectedNo
+                                  ? Color.fromARGB(255, 251, 173, 161)
+                                  : const Color.fromARGB(255, 247, 203, 203),
+                              side: const BorderSide(
+                                  color: Color.fromARGB(255, 247, 203, 203),
                                   width: 1.0),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20.0),
@@ -163,34 +254,30 @@ class NamedAvataState extends State<NamedAvata> {
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(2, 1, 20, 10),
-                          child: OutlinedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const NamedAvata()),
-                              );
-                            },
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: const Color(0xFFF5BEB5),
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(
-                                  color: Color(0xFFF5BEB5), width: 1.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                            ),
-                            child: const Text(
-                              '예',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
+
+                        // Padding(
+                        //   padding: const EdgeInsets.fromLTRB(5, 1, 10, 10),
+                        //   child: TextButton(
+                        //     onPressed: () {},
+                        //     style: TextButton.styleFrom(
+                        //       foregroundColor:
+                        //           const Color.fromARGB(255, 232, 170, 170),
+                        //       side: const BorderSide(
+                        //           color: Color.fromARGB(255, 232, 170, 170),
+                        //           width: 1.0),
+                        //       shape: RoundedRectangleBorder(
+                        //         borderRadius: BorderRadius.circular(20.0),
+                        //       ),
+                        //     ),
+                        //     child: const Text(
+                        //       '예',
+                        //       style: TextStyle(
+                        //         fontSize: 12,
+                        //         fontWeight: FontWeight.w600,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

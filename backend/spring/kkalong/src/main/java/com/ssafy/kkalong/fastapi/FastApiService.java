@@ -8,6 +8,7 @@ import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
+import com.ssafy.kkalong.fastapi.dto.RequestVitonRes;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -232,6 +233,7 @@ public class FastApiService {
 
     public Api<Object> requestOpenpose(Member member, String photoImgName, int photoSeq) {
         String apiUrl = openposeUrl + "/openpose";  // GPU서버의 URL
+        System.out.println(apiUrl+"로 요청 보냄...");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         String requestJson = "{\"member_id\":\"" + member.getMemberId() + "\",\"photo_img_name\":\"" + photoImgName + "\",\"photo_seq\":\"" + photoSeq + "\"}";
@@ -254,6 +256,7 @@ public class FastApiService {
         String apiUrl = vitonHdUrl + "/viton";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        System.out.println("헤더 설정 완료");
 
         String clothImgBase64 = Base64.getEncoder().encodeToString(clothImg);
         String clothMaskingImgBase64 = Base64.getEncoder().encodeToString(clothMaskingImg);
@@ -261,6 +264,7 @@ public class FastApiService {
         String photoParsingImgBase64 = Base64.getEncoder().encodeToString(photoParsingImg);
         String photoOpenposeImgBase64 = Base64.getEncoder().encodeToString(photoOpenposeImg);
         String photoOpenposeJsonBase64 = Base64.getEncoder().encodeToString(photoOpenposeJson);
+        System.out.println("이미지 Base64 인코딩 완료");
 
 //        // ObjectMapper 초기화
 //        ObjectMapper objectMapper = new ObjectMapper();
@@ -286,6 +290,7 @@ public class FastApiService {
         jsonMap.put("image_parse", photoParsingImgBase64);
         jsonMap.put("openpose_img", photoOpenposeImgBase64);
         jsonMap.put("openpose_json", photoOpenposeJsonBase64);
+        System.out.println("json 객체 생성 완료");
 
         String jsonStringReq = null;
         try {
@@ -309,7 +314,7 @@ public class FastApiService {
 //            System.out.println(jsonStr);
             jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
             });
-            byte[] viton = Base64.getDecoder().decode((String) jsonMap.get("result"));
+            byte[] viton = Base64.getDecoder().decode((String) jsonMap.get("viton"));
             // 파일 임시 저장
             System.out.println("임시 저장중...");
             String fileName = FileNameGenerator.generateFileNameNoExtension("temp", member.getMemberId());
@@ -321,7 +326,7 @@ public class FastApiService {
                 System.out.println("fos 변환 실패");
                 return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
             }
-            return Api.OK(new FastApiRequestGeneralRes(fileName, tempFile, "./"));
+            return Api.OK(new RequestVitonRes("success", tempFile));
         } catch (JSONException | IOException e) {
             // JSON 파싱 오류 처리
             e.printStackTrace();

@@ -1,14 +1,15 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mycloset/avata/choicecloth.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import '../store/userstore.dart';
 
 // import 'package:flutter_mycloset/category/categoryselect.dart';
 
 class WearCloth extends StatefulWidget {
-  const WearCloth({
-    super.key,
-    this.storage,
-  });
+  final int photoSeq;
+  // WearCloth({super.key, this.storage});
+  WearCloth({super.key, this.storage, required this.photoSeq});
 
   final storage;
 
@@ -17,10 +18,46 @@ class WearCloth extends StatefulWidget {
 }
 
 class WearClothState extends State<WearCloth> {
+  String? imageUrl;
   @override
   void initState() {
     super.initState();
     // 초기화 작업 수행
+    loadImageUrl();
+  }
+
+  void loadImageUrl() async {
+    var accessToken = context.read<UserStore>().accessToken;
+    print(accessToken);
+    Map<String, dynamic> headers = {};
+    if (accessToken.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $accessToken';
+    }
+
+    try {
+      print('photoSeq출력ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ: ${widget.photoSeq}');
+      print('특정이미지 출력할수있을까');
+      var response = await Dio().get(
+        'http://k9c105.p.ssafy.io:8761/api/photo/${widget.photoSeq}',
+        options: Options(
+          headers: headers,
+        ),
+      );
+      print('특정이미지 요청완료');
+      print('내가 response를 뽑아볼게뿅');
+      print(response.data);
+      var url = response.data['body']['url'];
+      print('내가 url을 뽑아볼게뿅');
+      print(url);
+      setState(() {
+        print('url을 imageUrl에 넣어볼게');
+        imageUrl = url;
+        print(imageUrl);
+      });
+    } catch (e) {
+      print('이미지 로드 중 에러!!!!!!!!!!!');
+      print(e.toString());
+    }
   }
 
   final savecloset = {
@@ -39,101 +76,6 @@ class WearClothState extends State<WearCloth> {
       {"image": "Assets/Image/Ellipsis.png", "name": "ect"},
     ]
   };
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: const Color.fromARGB(255, 255, 255, 254),
-//       body: CustomScrollView(
-//         slivers: <Widget>[
-//           const SliverAppBar(
-//             backgroundColor: Color(0xFFF5BEB5),
-//             expandedHeight: 55.0,
-//             floating: true,
-//             pinned: true,
-//             title: Text(
-//               '깔롱의 변신',
-//               style: TextStyle(color: Colors.white),
-//             ),
-//             centerTitle: true,
-//             elevation: 0,
-//             leading: Text(''),
-//           ),
-//           SliverList(
-//             delegate: SliverChildListDelegate(
-//               [
-//                 AppBar(
-//                   toolbarHeight: 100,
-//                   centerTitle: true,
-//                   title: const Text(
-//                     '나에게 옷을 입혀주세요!',
-//                     style: TextStyle(
-//                       fontSize: 22,
-//                       color: Color.fromARGB(255, 0, 0, 0),
-//                       fontWeight: FontWeight.w600,
-//                     ),
-//                   ),
-//                 )
-//               ],
-//             ),
-//           ),
-//           SliverPadding(
-//             padding: const EdgeInsets.fromLTRB(20, 1, 20, 0),
-//             sliver: SliverGrid(
-//               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//                 crossAxisCount: 1,
-//                 crossAxisSpacing: 20.0,
-//                 mainAxisSpacing: 20.0,
-//               ),
-//               delegate: SliverChildBuilderDelegate(
-//                 (BuildContext context, int index) {
-//                   final item = savecloset['list']?[index];
-//                   if (item == null) {
-//                     return const SizedBox(); // 빈 위젯 반환
-//                   }
-//                   return GestureDetector(
-//                     onTap: () {},
-//                     child: Container(
-//                       color: const Color.fromARGB(255, 251, 235, 233),
-//                       child: Column(
-//                         mainAxisAlignment: MainAxisAlignment.center,
-//                         children: <Widget>[
-//                           Image.asset(
-//                             item["image"] ?? "Assets/Image/logo.png",
-//                             height: 125,
-//                             width: 180,
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   );
-//                 },
-//                 childCount: savecloset['list']?.length ?? 0,
-//               ),
-//             ),
-//           ),
-//         ],
-//         Padding(
-//         padding: EdgeInsets.fromLTRB(20, 2, 20, 2),
-//         child: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             SizedBox(
-//               width: 400,
-//               child: Text('내 옷'),
-//             ),
-//             SizedBox(height: 10),
-//             SizedBox(
-//               width: 400,
-//               child: Text('내 옷'),
-//             ),
-//           ],
-//         ),
-//       ),
-//       ),
-//     );
-//   }
-// }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +103,7 @@ class WearClothState extends State<WearCloth> {
                   toolbarHeight: 100,
                   centerTitle: true,
                   title: const Text(
-                    '나에게 옷을 입혀주세요!',
+                    '어떤 옷을 입어보시겠어요?',
                     style: TextStyle(
                       fontSize: 22,
                       color: Color.fromARGB(255, 0, 0, 0),
@@ -186,21 +128,46 @@ class WearClothState extends State<WearCloth> {
                   if (item == null) {
                     return const SizedBox(); // 빈 위젯 반환
                   }
-                  return GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      color: const Color.fromARGB(255, 251, 235, 233),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Image.asset(
-                            item["image"] ?? "Assets/Image/logo.png",
-                            height: 125,
-                            width: 180,
-                          ),
-                        ],
-                      ),
-                    ),
+                  return
+                      // GestureDetector(
+                      //   onTap: () {},
+                      //   child: Container(
+                      //     color: const Color.fromARGB(255, 251, 235, 233),
+                      //     child: Column(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children: <Widget>[
+                      //         Image.asset(
+                      //           item["image"] ?? "Assets/Image/logo.png",
+                      //           height: 125,
+                      //           width: 180,
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // );
+                      Image.network(
+                    imageUrl ?? "Assets/Image/logo.png",
+                    height: 125,
+                    width: 180,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        "Assets/Image/logo.png",
+                        height: 125,
+                        width: 180,
+                      );
+                    },
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
                   );
                 },
                 childCount: savecloset['list']?.length ?? 0,
@@ -216,7 +183,7 @@ class WearClothState extends State<WearCloth> {
                   const SizedBox(
                     width: 400,
                     child: Text(
-                      '내 옷',
+                      '옷종류',
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
@@ -251,30 +218,6 @@ class WearClothState extends State<WearCloth> {
                       })),
                     ),
                   )
-
-                  // SizedBox(
-                  //   width: double.infinity,
-                  //   height: 150,
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //     children: List<Widget>.from(
-                  //         (clomenue["list"] ?? []).map<Widget>((item) {
-                  //       return Column(
-                  //         children: <Widget>[
-                  //           Image.asset(
-                  //             item["image"] ?? 'Assets/Image/logo.png',
-                  //             width: 60,
-                  //             height: 100,
-                  //           ),
-                  //           const SizedBox(
-                  //               height:
-                  //                   5), // const 키워드를 제거했지만 이는 필수적인 변경은 아닙니다.
-                  //           Text(item["name"] ?? 'Unknown'),
-                  //         ],
-                  //       );
-                  //     })),
-                  //   ),
-                  // )
                 ],
               ),
             ),

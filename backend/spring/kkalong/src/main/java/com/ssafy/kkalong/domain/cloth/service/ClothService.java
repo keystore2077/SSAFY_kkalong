@@ -217,5 +217,20 @@ public class ClothService {
 
     }
 
+    public void deleteCloth(Cloth cloth ){
+        //옷 삭제        
+        cloth.setClothDeleted(true);
+        cloth.setClothDelDate(LocalDateTime.now());
+
+        clothRepository.save(cloth);
+        
+        //태그 관계 삭제
+        List<TagRelation> tagRelations = tagRelaionRepository.findAllByClothClothSeqAndIsTagRelationDelete(cloth.getClothSeq(), false);
+        for(TagRelation tagRelation : tagRelations){
+            tagRelation.setTagRelationDelDate(LocalDateTime.now());
+            tagRelation.setTagRelationDelete(true);
+            tagRelaionRepository.save(tagRelation);
+        }
+    }
 
 }

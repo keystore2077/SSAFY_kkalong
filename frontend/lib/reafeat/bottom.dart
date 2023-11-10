@@ -29,7 +29,7 @@ class _BottomState extends State<Bottom> {
             indicatorSize: TabBarIndicatorSize.label,
             indicatorColor: Colors.transparent,
             labelColor: Color(0xFFF5BEB5),
-            labelStyle: TextStyle(fontSize: 13),
+            labelStyle: TextStyle(fontSize: 12),
             unselectedLabelColor: Color(0xffCACACA),
             tabs: [
               Tab(

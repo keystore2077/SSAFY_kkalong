@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import './categorycloth.dart';
+import '../closet/closetcloth.dart';
+import '../closet/clothcamera.dart';
 
 class CategorySelect extends StatefulWidget {
-  const CategorySelect({super.key, required this.category});
+  final int selectedIndex;
+  const CategorySelect({super.key, required this.category, required this.selectedIndex});
 
   final int category;
 
@@ -98,6 +101,23 @@ class _CategorySelectState extends State<CategorySelect> {
           ),
           child: const Text(' + 옷등록'),
         ),
+        // floatingActionButton: ElevatedButton(
+        //   onPressed: () {
+        //     print('여기까지 잘왔니??????');
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (context) => const ClothCamera()),
+        //     );
+        //   },
+        //   style: ElevatedButton.styleFrom(
+        //     backgroundColor: Colors.grey[50],
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+        //     ),
+        //     // 다른 스타일 속성들
+        //   ),
+        //   child: const Text(' + 옷등록'),
+        // ),
       ),
     );
   }
