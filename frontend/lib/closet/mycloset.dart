@@ -277,7 +277,7 @@ class MyClosetState extends State<MyCloset> {
                                 ),
                                 Padding(
                                   padding:
-                                      const EdgeInsets.fromLTRB(55, 2, 0, 1),
+                                      const EdgeInsets.fromLTRB(50, 2, 0, 1),
                                   child: ElevatedButton(
                                     onPressed: () {},
                                     style: ElevatedButton.styleFrom(
@@ -290,7 +290,7 @@ class MyClosetState extends State<MyCloset> {
                                     child: const Text(
                                       '카테고리별 옷보기',
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),

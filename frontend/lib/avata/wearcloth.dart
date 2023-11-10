@@ -100,7 +100,7 @@ class WearClothState extends State<WearCloth> {
             delegate: SliverChildListDelegate(
               [
                 AppBar(
-                  toolbarHeight: 100,
+                  toolbarHeight: 55,
                   centerTitle: true,
                   title: const Text(
                     '어떤 옷을 입어보시겠어요?',
@@ -197,10 +197,14 @@ class WearClothState extends State<WearCloth> {
                           (clomenue["list"] ?? []).map<Widget>((item) {
                         return GestureDetector(
                           onTap: () {
+                            String sortName = item["name"] ?? 'Unknown';
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const ChoiceCloth()),
+                                  builder: (context) => ChoiceCloth(
+                                      photoSeq: widget.photoSeq,
+                                      imageUrl: imageUrl,
+                                      sortName: sortName)),
                             );
                           },
                           child: Column(

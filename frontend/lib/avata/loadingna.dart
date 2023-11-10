@@ -131,13 +131,13 @@ class LoadingNAState extends State<LoadingNA> {
                       children: List<Widget>.from(
                           (clomenue["list"] ?? []).map<Widget>((item) {
                         return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const ChoiceCloth()),
-                            );
-                          },
+                          // onTap: () {
+                          //   Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => const ChoiceCloth()),
+                          //   );
+                          // },
                           child: Column(
                             children: <Widget>[
                               Image.asset(

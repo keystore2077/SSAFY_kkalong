@@ -43,9 +43,6 @@ public class ClosetController {
     @Autowired
     private S3Service s3Service;
     @Autowired
-    private ClosetRepository closetRepository;
-
-    @Autowired
     private FastApiService fastApiService;
 
     @Autowired
@@ -216,7 +213,7 @@ public class ClosetController {
     // 옷장 정보 수정
     @PutMapping("")
     @Operation(summary = "옷장 정보 수정")
-    public Api<Object> putCloset(MultipartFile file,@ModelAttribute ClosetUpdateRequest closetUpdateRequest) {
+    public Api<Object> putCloset(@RequestParam(required = false) MultipartFile file,@ModelAttribute ClosetUpdateRequest closetUpdateRequest) {
         //사용자 정보가 없으면 에러 메시지를 반환합니다.
         Member member = memberService.getLoginUserInfo();
         if (member == null) {
@@ -248,8 +245,8 @@ public class ClosetController {
 
         String fileName="";
         //옷장 사진파일에 대한 유효성검사 해주기(1)
-        if (!file.isEmpty()) {
-
+        if (file != null && !file.isEmpty()) {
+            
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
                 // S3에 저장할 파일 이름을 생성
                 fileName= FileNameGenerator.generateFileName("closet", member.getMemberId(), "png");

@@ -75,11 +75,11 @@ public class ClosetService {
         List<Section> result = new ArrayList<>();
         for(SectionUpdateRequest sectionUpdateRequest : sectionUpdateRequests){
             Section section = sectionRepository.findBySectionSeqAndIsSectionDeleted(
-                            sectionUpdateRequest.getSectionSeq(), false)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid sectionSeq: " + sectionUpdateRequest.getSectionSeq()));
+                            sectionUpdateRequest.getSectionSeq(), false).orElse(null);
+
 
             // 옷장에 맞는 섹션인지 확인
-            if (!section.getCloset().equals(closet)) {
+            if (section==null || !section.getCloset().equals(closet)) {
                 continue; // 옷장이 다르면 무시하고 다음 섹션으로
             }
 
@@ -113,11 +113,11 @@ public class ClosetService {
         for (Integer sectionSeq : closetSectionDeleteList) {
             // 기존 섹션을 시퀀스로 찾기
             Section section = sectionRepository.findBySectionSeqAndIsSectionDeleted(sectionSeq, false)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid sectionSeq: " + sectionSeq));
+                    .orElse(null);
 
             // 옷장에 맞는 섹션인지 확인
-            if (!section.getCloset().equals(closet)) {
-                throw new IllegalArgumentException("Section does not belong to the correct closet");
+            if (section==null || !section.getCloset().equals(closet)) {
+                continue;
             }
 
             // 섹션 삭제 여부와 삭제 일시 업데이트
