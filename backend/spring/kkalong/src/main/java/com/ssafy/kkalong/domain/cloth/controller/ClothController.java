@@ -304,8 +304,13 @@ public class ClothController {
         if (cloth.isPrivate() != request.isPrivate()) {
             cloth.setPrivate(request.isPrivate());
         }
+        ClothSaveRes clothSaveRes = clothService.updateCloth(cloth, request);
 
-        return Api.OK(clothService.updateCloth(cloth, request));
+        if(!file.isEmpty()){
+            fastApiCallerService.callU2Net(member, fileName, clothSaveRes.getClothRes().getClothSeq());
+        }
+
+        return Api.OK(clothSaveRes);
     }
 
     @Operation(summary = "옷 삭제")
@@ -412,8 +417,24 @@ public class ClothController {
         return Api.OK(clothService.emptyClosetCloth(closetService.findSection(closetSeq)));
     }
 
+    @Operation(summary = "옷 잠금 설정")
+    @PutMapping(value = "/lock/{clothSeq}" )
+    public Api<Object> lockCloth(@PathVariable int clothSeq) {
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
 
+        Cloth cloth =clothService.getCloth(clothSeq);
+        if(cloth ==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
+        }
+        if(cloth.getMember().getMemberSeq()!=member.getMemberSeq() ){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, " 조회하고자 하는 회원이 옷 주인이 아닙니다.");
+        }
 
+        return Api.OK(clothService.lockCloth(cloth));
+    }
 
 
 
