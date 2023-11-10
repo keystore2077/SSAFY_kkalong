@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -30,7 +31,7 @@ public class FastApiService {
     @Value("${ai-server.gpu.ip}:${ai-server.gpu.viton-port}")
     private String vitonHdUrl;
 
-//    private final String openposeUrl = "http://localhost:4052";
+    //    private final String openposeUrl = "http://localhost:4052";
     @Value("${ai-server.openpose}")
     private String openposeUrl;
 
@@ -44,6 +45,14 @@ public class FastApiService {
     public Api<Object> callWelcome() {
         System.out.println("callWelcome called.....");
         String apiUrl = preprocessUrl;
+        String response = restTemplate.getForObject(apiUrl, String.class); // GET 요청 보내기
+        System.out.println("response: " + response);
+        return Api.OK(response);
+    }
+
+    public Api<Object> callWelcomeViton() {
+        System.out.println("callWelcomeViton called.....");
+        String apiUrl = vitonHdUrl;
         String response = restTemplate.getForObject(apiUrl, String.class); // GET 요청 보내기
         System.out.println("response: " + response);
         return Api.OK(response);
@@ -73,6 +82,11 @@ public class FastApiService {
             jsonStr = unescapeJsonString(jsonStr);
             Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
             });
+            if (jsonMap.get("file_yes_bg") == null || jsonMap.get("file_no_bg") == null){
+                System.out.println("RemBg 처리중 문제가 발생했습니다");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+            }
+
             byte[] yesBg = Base64.getDecoder().decode((String) jsonMap.get("file_yes_bg"));
             byte[] noBg = Base64.getDecoder().decode((String) jsonMap.get("file_no_bg"));
             // 파일 임시 저장
@@ -130,9 +144,12 @@ public class FastApiService {
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
-//            System.out.println(jsonStr);
-            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
-            });
+            Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {});
+            if (jsonMap.get("cihp") == null){
+                System.out.println("CIHP 처리중 문제가 발생했습니다");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+            }
+
             byte[] cihp = Base64.getDecoder().decode((String) jsonMap.get("cihp"));
             // 파일 임시 저장
             System.out.println("임시 저장중...");
@@ -177,15 +194,21 @@ public class FastApiService {
 
         // response에서 json 추출
         try {
+            System.out.println("u2net 추출 시작");
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
             Map<String, Object> jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
             });
+            if (jsonMap.get("u2net") == null){
+                System.out.println("u2net 처리중 문제가 발생했습니다");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+            }
+
             byte[] u2net = Base64.getDecoder().decode((String) jsonMap.get("u2net"));
             // 파일 임시 저장
             String fileName = FileNameGenerator.generateFileNameNoExtension("temp", memberId);
-
+            System.out.println("u2net 임시 저장중, 파일명: " + fileName);
             File tempFile = File.createTempFile(fileName, ".jpg");
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 fos.write(u2net);
@@ -209,17 +232,16 @@ public class FastApiService {
 
     public Api<Object> requestOpenpose(Member member, String photoImgName, int photoSeq) {
         String apiUrl = openposeUrl + "/openpose";  // GPU서버의 URL
+        System.out.println(apiUrl+"로 요청 보냄...");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        String requestJson = "{\"member_id\":\"" + member.getMemberId() +
-                "\",\"photo_img_name\":\"" + photoImgName +
-                "\",\"photo_seq\":\"" + photoSeq + "\"}";
+        String requestJson = "{\"member_id\":\"" + member.getMemberId() + "\",\"photo_img_name\":\"" + photoImgName + "\",\"photo_seq\":\"" + photoSeq + "\"}";
         HttpEntity<String> requestEntity = new HttpEntity<>(requestJson, headers);
 
         // RestTemplate을 사용하여 FastAPI 서버에 POST 요청 보내기
         RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, String.class).getBody();
-        System.out.println(response);
+        System.out.println("response from Openpose: " + response);
         if (!response.equals("\"success\"")) {
             return Api.ERROR(ErrorCode.SERVER_ERROR, "처리중 문제 발생");
         }
@@ -227,6 +249,94 @@ public class FastApiService {
         return Api.OK("success");
     }
 
+    public Api<Object> requestViton(Member member, String clothName, byte[] clothImg, byte[] clothMaskingImg,
+                             String photoName, byte[] photoImg, byte[] photoParsingImg, byte[] photoOpenposeImg,
+                             byte[] photoOpenposeJson) {
+        String apiUrl = vitonHdUrl + "/viton";  // GPU서버의 URL
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        System.out.println("헤더 설정 완료");
+
+        String clothImgBase64 = Base64.getEncoder().encodeToString(clothImg);
+        String clothMaskingImgBase64 = Base64.getEncoder().encodeToString(clothMaskingImg);
+        String photoImgBase64 = Base64.getEncoder().encodeToString(photoImg);
+        String photoParsingImgBase64 = Base64.getEncoder().encodeToString(photoParsingImg);
+        String photoOpenposeImgBase64 = Base64.getEncoder().encodeToString(photoOpenposeImg);
+        String photoOpenposeJsonBase64 = Base64.getEncoder().encodeToString(photoOpenposeJson);
+        System.out.println("이미지 Base64 인코딩 완료");
+
+//        // ObjectMapper 초기화
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String jsonStringReq = "{" +
+//                "\"cloth_name\": \"" + clothName + "\", " +
+//                "\"cloth\": \"" + clothImgBase64 + "\", " +
+//                "\"cloth_mask\": \"" + clothMaskingImgBase64 + "\", " +
+//                "\"image_name\": \"" + photoName + "\", " +
+//                "\"image\": \"" + photoImgBase64 + "\", " +
+//                "\"image_parse\": \"" + photoParsingImgBase64 + "\", " +
+//                "\"openpose_img\": \"" + photoOpenposeImgBase64 + "\", " +
+//                "\"openpose_json\": \"" + photoOpenposeJsonBase64 + "\"" +
+//                "}";
+
+        // JSON 데이터를 담을 객체 생성
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> jsonMap = new HashMap<>();
+        jsonMap.put("cloth_name", clothName);
+        jsonMap.put("cloth", clothImgBase64);
+        jsonMap.put("cloth_mask", clothMaskingImgBase64);
+        jsonMap.put("image_name", photoName);
+        jsonMap.put("image", photoImgBase64);
+        jsonMap.put("image_parse", photoParsingImgBase64);
+        jsonMap.put("openpose_img", photoOpenposeImgBase64);
+        jsonMap.put("openpose_json", photoOpenposeJsonBase64);
+        System.out.println("json 객체 생성 완료");
+
+        String jsonStringReq = null;
+        try {
+            // JSON 문자열로 변환
+            jsonStringReq = objectMapper.writeValueAsString(jsonMap);
+        } catch (IOException e) {
+            // 예외 처리
+            e.printStackTrace();
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "Json 변환중 문제 발생");
+        }
+
+        // 변환 요청
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(apiUrl, new HttpEntity<>(jsonStringReq, headers), String.class);
+
+        // response에서 json 추출
+        try {
+            System.out.println("추출 시작");
+            String jsonStr = responseEntity.getBody();
+            jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
+            jsonStr = unescapeJsonString(jsonStr);
+//            System.out.println(jsonStr);
+            jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
+            });
+            byte[] viton = Base64.getDecoder().decode((String) jsonMap.get("result"));
+            // 파일 임시 저장
+            System.out.println("임시 저장중...");
+            String fileName = FileNameGenerator.generateFileNameNoExtension("temp", member.getMemberId());
+
+            File tempFile = File.createTempFile(fileName, ".jpg");
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(viton);
+            } catch (IOException e) {
+                System.out.println("fos 변환 실패");
+                return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+            }
+            return Api.OK(new FastApiRequestGeneralRes(fileName, tempFile, "./"));
+        } catch (JSONException | IOException e) {
+            // JSON 파싱 오류 처리
+            e.printStackTrace();
+            System.out.println("변환 중 실패");
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "변환 실패");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("알 수 없는 오류 발생: " + e.getMessage());
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "알 수 없는 오류");
+        }
+    }
 
     // 이스케이프된 문자열을 복원
     private String unescapeJsonString(String escapedString) {

@@ -310,15 +310,16 @@ import '../main.dart';
 import '../store/userstore.dart';
 
 class LogIn extends StatefulWidget {
-  const LogIn({super.key, this.storage});
+  const LogIn({super.key});
 
-  final storage;
+  
   @override
   State<LogIn> createState() => _LogInState();
 }
 
 class _LogInState extends State<LogIn> {
   final PageApi pageapi = PageApi();
+  static final storage = FlutterSecureStorage();
 
   TextEditingController controller = TextEditingController();
   TextEditingController controller2 = TextEditingController();
@@ -445,7 +446,7 @@ class _LogInState extends State<LogIn> {
                                                 final refreshToken =
                                                     response['body']
                                                         ["refreshToken"];
-                                                await widget.storage.write(
+                                                await storage.write(
                                                     key: "login",
                                                     value:
                                                         "accessToken $accessToken refreshToken $refreshToken");

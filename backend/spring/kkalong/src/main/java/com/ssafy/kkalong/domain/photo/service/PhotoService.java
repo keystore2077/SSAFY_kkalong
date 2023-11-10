@@ -22,7 +22,7 @@ public class PhotoService {
     private EntityManager entityManager;
 
     public List<Photo> getPhotoList(Member member){
-        return photoRepository.findAllByMemberMemberSeqAndIsPhotoDeleted(member, false);
+        return photoRepository.findAllByMemberMemberSeqAndIsPhotoDeleted(member.getMemberSeq(), false);
     }
 
     public Photo getPhotoBySeq(int photoSeq){
@@ -50,9 +50,7 @@ public class PhotoService {
         Photo photo = entityManager.find(Photo.class, photoSeq);
 
         if (photo != null) {
-            // 필드 수정
             photo.setPhotoImgMasking(true);
-            // 변경 내용은 JPA에 의해 데이터베이스에 반영됨
         }
     }
 }

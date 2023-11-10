@@ -1,3 +1,4 @@
+import 'package:flutter_mycloset/pages/swipe.dart';
 import 'package:provider/provider.dart';
 import 'store/userstore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -86,7 +87,7 @@ class _MainState extends State<Main> {
                 ChoicePicture(),
                 MyCloset(),
                 CategoryPage(),
-                ClosetDetail(),
+                Swipe(),
                 MyPage(),
                 // userToken == null
                 //     ? LogIn(storage: storage)

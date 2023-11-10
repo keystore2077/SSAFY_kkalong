@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PhotoRepository extends JpaRepository<Photo, Integer> {
-    List<Photo> findAllByMemberMemberSeqAndIsPhotoDeleted(Member member, boolean b);
+    List<Photo> findAllByMemberMemberSeqAndIsPhotoDeleted(int memberSeq, boolean b);
 
     Photo findByPhotoSeqAndIsPhotoDeleted(int photoSeq, boolean b);
 
     Optional<Object> findByPhotoSeq(int photoSeq);
+
+//    Photo FindByMemberMemberSeqAndPhotoSeqAndIsPhotoDeleted(Member member, String photoImageSeq, boolean b);
 }

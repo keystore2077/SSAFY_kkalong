@@ -2,13 +2,13 @@ package com.ssafy.kkalong.domain.photo.dto.response;
 
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PhotoRes {
@@ -20,12 +20,15 @@ public class PhotoRes {
     private LocalDateTime photoRegDate;
     @Schema(description = "사진의 URL")
     private String url;
+    @Schema(description = "사진 전처리 유무")
+    private boolean isPreprocessed;
 
-    public static PhotoRes toRes(Photo photo, String url){
+    public static PhotoRes toRes(Photo photo, String url, boolean isPreprocessed){
         return PhotoRes.builder()
                 .photoSeq(photo.getPhotoSeq())
                 .photoImgName(photo.getPhotoImgName())
                 .photoRegDate(photo.getPhotoRegDate())
-                .url(url).build();
+                .url(url)
+                .isPreprocessed(isPreprocessed).build();
     }
 }
