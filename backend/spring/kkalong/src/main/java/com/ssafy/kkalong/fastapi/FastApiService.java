@@ -232,6 +232,7 @@ public class FastApiService {
 
     public Api<Object> requestOpenpose(Member member, String photoImgName, int photoSeq) {
         String apiUrl = openposeUrl + "/openpose";  // GPU서버의 URL
+        System.out.println(apiUrl+"로 요청 보냄...");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         String requestJson = "{\"member_id\":\"" + member.getMemberId() + "\",\"photo_img_name\":\"" + photoImgName + "\",\"photo_seq\":\"" + photoSeq + "\"}";
@@ -254,6 +255,7 @@ public class FastApiService {
         String apiUrl = vitonHdUrl + "/viton";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        System.out.println("헤더 설정 완료");
 
         String clothImgBase64 = Base64.getEncoder().encodeToString(clothImg);
         String clothMaskingImgBase64 = Base64.getEncoder().encodeToString(clothMaskingImg);
@@ -261,6 +263,7 @@ public class FastApiService {
         String photoParsingImgBase64 = Base64.getEncoder().encodeToString(photoParsingImg);
         String photoOpenposeImgBase64 = Base64.getEncoder().encodeToString(photoOpenposeImg);
         String photoOpenposeJsonBase64 = Base64.getEncoder().encodeToString(photoOpenposeJson);
+        System.out.println("이미지 Base64 인코딩 완료");
 
 //        // ObjectMapper 초기화
 //        ObjectMapper objectMapper = new ObjectMapper();
@@ -286,6 +289,7 @@ public class FastApiService {
         jsonMap.put("image_parse", photoParsingImgBase64);
         jsonMap.put("openpose_img", photoOpenposeImgBase64);
         jsonMap.put("openpose_json", photoOpenposeJsonBase64);
+        System.out.println("json 객체 생성 완료");
 
         String jsonStringReq = null;
         try {

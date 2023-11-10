@@ -76,7 +76,7 @@ public class FastApiCallerService {
     public void callU2Net(Member member, Cloth cloth) {
         callU2Net(member,cloth.getClothImgName(),cloth.getClothSeq());
     }
-    
+
     public void callU2Net(Member member, String clothImgName, int clothSeq) {
         System.out.println("callU2Net called...");
         System.out.println("요청 경로: cloth/yes_bg/" + clothImgName + ".jpg");
