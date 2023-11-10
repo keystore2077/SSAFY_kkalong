@@ -313,7 +313,7 @@ public class FastApiService {
 //            System.out.println(jsonStr);
             jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
             });
-            byte[] viton = Base64.getDecoder().decode((String) jsonMap.get("result"));
+            byte[] viton = Base64.getDecoder().decode((String) jsonMap.get("viton"));
             // 파일 임시 저장
             System.out.println("임시 저장중...");
             String fileName = FileNameGenerator.generateFileNameNoExtension("temp", member.getMemberId());
