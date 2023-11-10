@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
+import '../store/userstore.dart';
+import './closetdetail.dart';
+import '../user/pageapi.dart';
 
 class MyCloset extends StatefulWidget {
   const MyCloset({
@@ -14,11 +20,30 @@ class MyCloset extends StatefulWidget {
 }
 
 class MyClosetState extends State<MyCloset> {
+  static final storage = FlutterSecureStorage();
+  String? accessToken;
+  final PageApi pageapi = PageApi();
+
+  var nick = '';
+
   @override
   void initState() {
     super.initState();
     // 초기화 작업 수행
+    Future.delayed(Duration.zero, () async {
+      final userStore = Provider.of<UserStore>(context, listen: false);
+      final accessToken = userStore.accessToken;
+      final info = await pageapi.getinfo(accessToken);
+      if (info != null) {
+        nick = info['body']['memberNickname'];
+      }
+      dioData(accessToken);
+    });
   }
+
+  final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
+  final serverURL = 'http://k9c105.p.ssafy.io:8761';
+  var data = [];
 
   final savecloset = {
     "list": [
@@ -28,6 +53,50 @@ class MyClosetState extends State<MyCloset> {
       {"image": "Assets/Image/logo.png"},
     ]
   };
+
+  Future<dynamic> dioData(token) async {
+    try {
+      final response = await dio.get('$serverURL/api/closet',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      var result = response.data['body'];
+      setState(() {
+        data = result;
+      });
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('오류 발생!'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: Text('확인'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
 // BearList? bearList;
 
 //   @override
@@ -254,10 +323,10 @@ class MyClosetState extends State<MyCloset> {
                             ),
                             Row(
                               children: [
-                                const Padding(
+                                Padding(
                                   padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                   child: Text(
-                                    '나는야김싸피',
+                                    nick,
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600,
@@ -265,7 +334,7 @@ class MyClosetState extends State<MyCloset> {
                                     ),
                                   ),
                                 ),
-                                const Padding(
+                                Padding(
                                   padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                   child: Text(
                                     '님',
@@ -275,27 +344,7 @@ class MyClosetState extends State<MyCloset> {
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(50, 2, 0, 1),
-                                  child: ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            5.0), // 원하는 각진 정도로 설정
-                                      ),
-                                      // 다른 스타일 속성들
-                                    ),
-                                    child: const Text(
-                                      '카테고리별 옷보기',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                )
+                                
                               ],
                             ),
                             const Padding(
@@ -430,28 +479,33 @@ class MyClosetState extends State<MyCloset> {
               ),
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
-                  final item = savecloset['list']?[index];
+                  final item = data?[index];
                   if (item == null) {
                     return const SizedBox(); // 빈 위젯 반환
                   }
                   return GestureDetector(
                     onTap: () {
                       // 클릭이벤트
+                      Navigator.push(
+                        context,        
+                        MaterialPageRoute(
+                            builder: (context) => ClosetDetail(closetSeq: item['closetSeq'])),
+                      );
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Image.asset(
-                          item["image"] ?? "Assets/Image/logo.png",
-                          height: 200,
-                          width: 200,
+                        Image.network(
+                          item['closetPictureUrl'] ?? "Assets/Image/logo.png",
+                          height: 150,
+                          width: 150,
                         ),
                         // ... (이전 GridView.builder 코드의 나머지 부분)
                       ],
                     ),
                   );
                 },
-                childCount: savecloset['list']?.length ?? 0,
+                childCount: data?.length ?? 0,
               ),
             ),
           ),
