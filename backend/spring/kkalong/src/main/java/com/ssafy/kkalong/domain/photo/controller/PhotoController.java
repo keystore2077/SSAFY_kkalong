@@ -252,10 +252,9 @@ public class PhotoController {
         }
 
         // 3. 필요한 파일 다운로드 후 VITON 호출
-        byte[] clothImg = s3Service.downloadFile("cloth/original/" + cloth.getClothImgName() + ".jpg");
+        byte[] clothImg = s3Service.downloadFile("cloth/yes_bg/" + cloth.getClothImgName() + ".jpg");
         byte[] clothMaskingImg = s3Service.downloadFile("cloth/masking/" + cloth.getClothImgName() + ".jpg");
-//        byte[] photoImg = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
-        byte[] photoImg = s3Service.downloadFile("photo/original/" + photo.getPhotoImgName() + ".jpg");
+        byte[] photoImg = s3Service.downloadFile("photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
         byte[] photoParsingImg = s3Service.downloadFile("photo/masking/" + photo.getPhotoImgName() + ".png");
         byte[] photoOpenposeImg = s3Service
                 .downloadFile("photo/openpose/img/" + photo.getPhotoImgName() + "_rendered.png");
