@@ -319,8 +319,8 @@ public class ClothController {
         if(cloth ==null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
         }
-        if(cloth.getMember().getMemberSeq()!=member.getMemberSeq() && cloth.isPrivate()){
-            return Api.ERROR(ErrorCode.BAD_REQUEST, "비공개 옷 이거나 조회하고자 하는 회원이 옷 주인이 아닙니다.");
+        if(cloth.getMember().getMemberSeq()!=member.getMemberSeq()){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이 옷 주인이 아닙니다.");
         }
 
         clothService.deleteCloth(cloth);
@@ -340,8 +340,8 @@ public class ClothController {
             if(cloth ==null){
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
             }
-            if(cloth.getMember().getMemberSeq()!=member.getMemberSeq() && cloth.isPrivate()){
-                return Api.ERROR(ErrorCode.BAD_REQUEST, "비공개 옷 이거나 조회하고자 하는 회원이 옷 주인이 아닙니다.");
+            if(cloth.getMember().getMemberSeq()!=member.getMemberSeq()){
+                return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이 옷 주인이 아닙니다.");
             }
             clothList.add(cloth);
         }
