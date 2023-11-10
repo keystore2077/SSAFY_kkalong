@@ -43,9 +43,6 @@ public class ClosetController {
     @Autowired
     private S3Service s3Service;
     @Autowired
-    private ClosetRepository closetRepository;
-
-    @Autowired
     private FastApiService fastApiService;
 
     @Autowired
@@ -216,7 +213,7 @@ public class ClosetController {
     // 옷장 정보 수정
     @PutMapping("")
     @Operation(summary = "옷장 정보 수정")
-    public Api<Object> putCloset(MultipartFile file,@ModelAttribute ClosetUpdateRequest closetUpdateRequest) {
+    public Api<Object> putCloset(@RequestParam(required = false) MultipartFile file,@ModelAttribute ClosetUpdateRequest closetUpdateRequest) {
         //사용자 정보가 없으면 에러 메시지를 반환합니다.
         Member member = memberService.getLoginUserInfo();
         if (member == null) {
