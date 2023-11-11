@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_mycloset/closet/clothinfo.dart';
 
 class ClothCamera extends StatefulWidget {
   const ClothCamera({super.key});
@@ -103,6 +104,9 @@ class _ClothCameraState extends State<ClothCamera> {
             final image = await _controller.takePicture();
             setState(() {
               capturedImage = File(image.path);
+              String filePath = image.path;
+              String fileExtension = filePath.split('.').last; // 파일 확장자를 추출합니다.
+              print(fileExtension);
             });
           }
         },
@@ -148,7 +152,13 @@ class _ClothCameraState extends State<ClothCamera> {
           ),
         ),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ClothInfo(image: capturedImage)),
+            );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFF5BEB5),
             shape: RoundedRectangleBorder(
