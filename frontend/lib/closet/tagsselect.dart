@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/closet/clothcamera.dart';
 import 'package:flutter_mycloset/closet/clothdetail.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
@@ -205,17 +205,11 @@ class _TagsSelectState extends State<TagsSelect> {
         ),
       ),
       floatingActionButton: ElevatedButton(
-        onPressed: () async {
-          final ImagePicker picker = ImagePicker();
-          final XFile? image =
-              await picker.pickImage(source: ImageSource.camera);
-
-          if (image != null) {
-            // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
-            // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
-          } else {
-            // 이미지가 선택되지 않았을 때 처리할 작업을 추가합니다.
-          }
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ClothCamera()),
+          );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.grey[50],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/closet/closetinfo.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -344,7 +345,6 @@ class MyClosetState extends State<MyCloset> {
                                     ),
                                   ),
                                 ),
-                                
                               ],
                             ),
                             const Padding(
@@ -446,6 +446,17 @@ class MyClosetState extends State<MyCloset> {
                           if (image != null) {
                             // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
                             // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
+                            String filePath = image.path;
+                            String fileExtension =
+                                filePath.split('.').last; // 파일 확장자를 추출합니다.
+                            print(fileExtension);
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ClosetInfo(image: image)),
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -487,9 +498,10 @@ class MyClosetState extends State<MyCloset> {
                     onTap: () {
                       // 클릭이벤트
                       Navigator.push(
-                        context,        
+                        context,
                         MaterialPageRoute(
-                            builder: (context) => ClosetDetail(closetSeq: item['closetSeq'])),
+                            builder: (context) =>
+                                ClosetDetail(closetSeq: item['closetSeq'])),
                       );
                     },
                     child: Column(
