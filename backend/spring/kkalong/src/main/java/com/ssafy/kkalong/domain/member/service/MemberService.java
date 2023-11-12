@@ -75,7 +75,7 @@ public class MemberService {
     }
 
     public Member checkNickName(String nickName){
-        return memberRepository.findByMemberNicknameAndIsMemberDeleted(nickName, false).orElse(null);
+        return memberRepository.findByMemberNickname(nickName).orElse(null);
     }
 
     public void logout(Member member){
