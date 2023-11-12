@@ -1,5 +1,6 @@
 package com.ssafy.kkalong.domain.cloth.service;
 
+import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.repository.SectionRepository;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothSaveReq;
@@ -255,6 +256,24 @@ public class ClothService {
             }
         }
         return result;
+    }
+
+    public List<String> emptyClosetCloth(List<Section> sectionList){
+        List<String> result = new ArrayList<>();
+
+        for (Section section : sectionList){
+            result.addAll(emptySectionCloth(section.getCloset().getMember(), section));
+        }
+        return result;
+    }
+
+    public ClothGetRes lockCloth(Cloth cloth){
+        cloth.setPrivate(!cloth.isPrivate());
+
+        String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() + ".png";
+        String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+
+        return ClothGetRes.toRes(cloth,imgUrl);
     }
 
 

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_mycloset/closet/tagsselect.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
 import '../main.dart';
+
 class ClothDetail extends StatefulWidget {
   const ClothDetail({
     super.key,
@@ -118,7 +120,7 @@ class ClothDetailState extends State<ClothDetail> {
 
   @override
   Widget build(BuildContext context) {
-    if (data.isNotEmpty){
+    if (data.isNotEmpty) {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFFF5BEB5),
@@ -131,26 +133,27 @@ class ClothDetailState extends State<ClothDetail> {
           elevation: 0,
           leading: const Text(''),
           actions: [
-            IconButton(onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (c) => Text('옷수정하는 창'))
-              );
-            }, icon: Icon(
-              Icons.border_color,
-              color: Color(0xFFfc6474),
-            )),
-            IconButton(onPressed: () {
-              deleteCloth(accessToken);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => Main()),
-                );
-
-            }, icon: Icon(
-              Icons.delete,
-              color: Color(0xFFfc6474),
-            )),
+            IconButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (c) => Text('옷수정하는 창')));
+                },
+                icon: Icon(
+                  Icons.border_color,
+                  color: Color(0xFFfc6474),
+                )),
+            IconButton(
+                onPressed: () {
+                  deleteCloth(accessToken);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Main()),
+                  );
+                },
+                icon: Icon(
+                  Icons.delete,
+                  color: Color(0xFFfc6474),
+                )),
           ],
         ),
         body: Center(
@@ -165,34 +168,32 @@ class ClothDetailState extends State<ClothDetail> {
                 children: [
                   Center(
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.chevron_left,
-                              size: 40,
-                              color: Color(0xFF54545b),
-                            ),
-                            onPressed: (){},
-                          ),
-                          Image.network(data['clothRes']['imgUrl'],
-                            width: 200,
-                            height: 350,
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.chevron_right,
-                              size: 40,
-                              color: Color(0xFF54545b),
-                            ),
-                            onPressed: (){
-
-                            },
-                          ),
-                        ],
-                      )
-                  ),
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.chevron_left,
+                          size: 40,
+                          color: Color(0xFF54545b),
+                        ),
+                        onPressed: () {},
+                      ),
+                      Image.network(
+                        data['clothRes']['imgUrl'],
+                        width: 200,
+                        height: 350,
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.chevron_right,
+                          size: 40,
+                          color: Color(0xFF54545b),
+                        ),
+                        onPressed: () {},
+                      ),
+                    ],
+                  )),
                   const SizedBox(
                     height: 20,
                   ),
@@ -232,8 +233,10 @@ class ClothDetailState extends State<ClothDetail> {
                   ),
                   Container(
                     width: 75,
-                    margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                    padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                    margin:
+                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
                     decoration: BoxDecoration(
                       border: Border.all(
                         color: Color(0xFFF5BEB5),
@@ -242,7 +245,8 @@ class ClothDetailState extends State<ClothDetail> {
                       borderRadius: BorderRadius.circular(30.0),
                       color: Color(0xFFF5BEB5),
                     ),
-                    child: Center(child: Text(
+                    child: Center(
+                        child: Text(
                       '#${data['clothRes']['sort']}',
                       style: TextStyle(
                         color: Colors.white,
@@ -252,29 +256,41 @@ class ClothDetailState extends State<ClothDetail> {
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: tags.map((tag) => GestureDetector(
-                        onTap: () {
-                          // navigateTaglist(context, tag);
-                        },
-                        child: Container(
-                          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Color(0xFFF5BEB5),
-                              width: 1.5,
-                            ),
-                            borderRadius: BorderRadius.circular(30.0),
-                          ),
-                          child: Center(child: Text(
-                            '#${tag['tag']}',
-                            style: TextStyle(
-                              color: Color(0xFFF5BEB5),
-                            ),
-                          ),
-                          ),
-                        ),
-                      )).toList(),
+                      children: tags
+                          .map((tag) => GestureDetector(
+                                onTap: () {
+                                  // navigateTaglist(context, tag);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => TagsSelect(
+                                            tagSeq: tag['tagSeq'],
+                                            tagName: tag['tag'])),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 8.0, horizontal: 4.0),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 8.0, horizontal: 12.0),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Color(0xFFF5BEB5),
+                                      width: 1.5,
+                                    ),
+                                    borderRadius: BorderRadius.circular(30.0),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '#${tag['tag']}',
+                                      style: TextStyle(
+                                        color: Color(0xFFF5BEB5),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ))
+                          .toList(),
                     ),
                   ),
                 ],
@@ -282,9 +298,11 @@ class ClothDetailState extends State<ClothDetail> {
             ),
           ),
         ),
-      );} else {
+      );
+    } else {
       return Center(
         child: CircularProgressIndicator(),
       );
     }
-  }}
+  }
+}
