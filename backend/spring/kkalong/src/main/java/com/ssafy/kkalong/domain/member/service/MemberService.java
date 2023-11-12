@@ -75,6 +75,10 @@ public class MemberService {
     }
 
     public Member checkNickName(String nickName){
+        return memberRepository.findByMemberNicknameAndIsMemberDeleted(nickName, false).orElse(null);
+    }
+
+    public Member checkNickNameEvenIfDeleted(String nickName){
         return memberRepository.findByMemberNickname(nickName).orElse(null);
     }
 
