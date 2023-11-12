@@ -4,13 +4,11 @@ import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetCreateRequest;
-import com.ssafy.kkalong.domain.closet.dto.request.ClosetRequest;
 import com.ssafy.kkalong.domain.closet.dto.request.ClosetUpdateRequest;
 import com.ssafy.kkalong.domain.closet.dto.request.SectionCreateRequestItem;
 import com.ssafy.kkalong.domain.closet.dto.response.*;
 import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.entity.Section;
-import com.ssafy.kkalong.domain.closet.repository.ClosetRepository;
 import com.ssafy.kkalong.domain.closet.service.ClosetService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
@@ -20,17 +18,13 @@ import com.ssafy.kkalong.fastapi.FastApiService;
 import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
 import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/closet")
@@ -246,7 +240,7 @@ public class ClosetController {
         String fileName="";
         //옷장 사진파일에 대한 유효성검사 해주기(1)
         if (file != null && !file.isEmpty()) {
-            
+
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
                 // S3에 저장할 파일 이름을 생성
                 fileName= FileNameGenerator.generateFileName("closet", member.getMemberId(), "png");
@@ -306,5 +300,77 @@ public class ClosetController {
         return Api.OK("옷장 삭제");
 
     }
+
+    @GetMapping("/list")
+    @Operation(summary = "옷장 목록 보기")
+    public Api<Object> getClosetList() {
+        //1. 유효성검사 (로그인된 회원인지)
+        Member member = memberService.getLoginUserInfo(); //멤버를 반환해주는거(서비스에서 작성된것)
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
+        }
+        int memberSeq = member.getMemberSeq();  //멤버의 일련번호 받아오는 과정
+
+        //2. reponse로 전달해야한게 list인 seq,name <=이것만 들어가는 response dto를 생성
+        List<ClosetListResponse> result = new ArrayList<>();
+
+        //3. service에서 조회를 해야함
+        List<Closet> closets = closetService.findClosetsByMemberSeq(memberSeq);
+
+        for (Closet closet : closets){
+            String closetName = closet.getClosetName();
+            int closetSeq = closet.getClosetSeq();
+            ClosetListResponse closetListResponse = ClosetListResponse.builder()
+                    .seq(closetSeq)
+                    .name(closetName)
+                    .build();
+            result.add(closetListResponse);
+
+        }
+
+        return Api.OK(result);
+
+    }
+
+    @GetMapping("/list/{closetSeq}")
+    @Operation(summary = "해당 옷장 소속구역 보기")
+    public Api<Object> getClosetSectionList(@PathVariable int closetSeq) {
+        // 위에랑 똑같은데 유효성 검사 하나더 해줘야함
+        // closet seq에 대한 유효성 검사를 해줘야함 총 2개
+        Member member = memberService.getLoginUserInfo(); //멤버를 반환해주는거(서비스에서 작성된것)
+        if (member == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "회원이아닙니다!");
+        }
+        int memberSeq = member.getMemberSeq();  //멤버의 일련번호 받아오는 과정
+
+        Closet closet = closetService.findCloset(closetSeq);
+        if (closet == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지않은 옷장일련번호입니다!");
+        }
+
+        if (memberSeq != closet.getMember().getMemberSeq()) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된회원이 옷장 소유주와 다릅니다!");
+        }
+
+        // service 41번줄을 사용해서 리스트를 섹션을 가지고오면
+        List<Section> sections = closetService.findSection(closetSeq);
+        List<ClosetListResponse> result = new ArrayList<>();
+
+        for (Section section : sections){
+            int seq = section.getSectionSeq();
+            String name = section.getSectionName();
+            ClosetListResponse closetListResponse = ClosetListResponse.builder()
+                    .seq(seq)
+                    .name(name)
+                    .build();
+            result.add(closetListResponse);
+
+        }
+
+        return Api.OK(result);
+
+    }
+
+
 
 }

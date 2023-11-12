@@ -32,8 +32,8 @@ public class ClosetService {
 
 
     public List<Closet> findClosetsByMemberSeq(int memberSeq) {
-        return closetRepository.findAllByMemberMemberSeq(memberSeq);       //멤버시퀀스를주면 멤버시퀀스 값을가지고있는 클로젯리스트 반환
-
+        return closetRepository.findAllByMemberMemberSeqAndIsClosetDeleted(memberSeq,false);       //멤버시퀀스를주면 멤버시퀀스 값을가지고있는 클로젯리스트 반환
+        //              이걸써야함   이 위에를 수정해줘야함     이거를   memberSeq,삭제여부 둘다 판단하는걸로 바꿔줘야함
     }
     public Closet findCloset(int closetSeq){
         return closetRepository.findByClosetSeqAndIsClosetDeleted(closetSeq, false).orElse(null);
