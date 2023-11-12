@@ -270,7 +270,7 @@ public class ClosetController {
         Closet updatedCloset = closetService.updateCloset(closet);
         //추가
         closetService.createSection(closetUpdateRequest.getClosetSectionAddList(),updatedCloset);
-        closetService.deleteSection(closetUpdateRequest.getClosetSectionDeleteList(),updatedCloset);
+        closetService.deleteSection(closetUpdateRequest.getClosetSectionDeleteList(),updatedCloset,member);
         closetService.updateSection(closetUpdateRequest.getClosetSectionUpdateList(),updatedCloset);
 
         List<Section>sectionList = closetService.findSection(updatedCloset.getClosetSeq());
@@ -297,7 +297,27 @@ public class ClosetController {
     @PutMapping("/{closetSeq}")
     @Operation(summary = "옷장 삭제")
     public Api<Object> deleteCloset(@PathVariable int closetSeq) {
-        return Api.OK("옷장 삭제");
+        Member member = memberService.getLoginUserInfo();
+        if (member == null) {
+
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인이 필요합니다.");
+        }
+        //1.유효성검사를하기(옷장이있는지 확인하기)
+        Closet closet = closetService.findCloset(closetSeq);
+        if (closet == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "유효하지않은 옷장일련번호입니다!");
+        }
+
+        //2.찾은옷장이랑 옷장 주인이 맞는지,로그인된 회원이랑 옷장주인이 맞는지 확인하기
+        int memberSeq = member.getMemberSeq();
+        if (memberSeq != closet.getMember().getMemberSeq()) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된회원이 옷장 소유주와 다릅니다!");
+        }
+
+        closetService.deleteCloset(closet);
+
+
+        return Api.OK(String.format("옷장(%s)이/가 삭제 되었습니다",closet.getClosetName()));
 
     }
 
