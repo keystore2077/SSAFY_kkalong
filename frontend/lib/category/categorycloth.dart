@@ -36,6 +36,7 @@ class _CategoryClothListState extends State<CategoryClothList> {
   var fashionSeq = 0;
   var fashionName = '';
   var data = [];
+  var lock = [];
 
   Future<dynamic> dioData(token) async {
     try {
@@ -80,6 +81,30 @@ class _CategoryClothListState extends State<CategoryClothList> {
         ],
       ),
     );
+  }
+
+  Future<dynamic> diolock(token, clothSeq) async {
+    try {
+      final response = await dio.put('$serverURL/api/cloth/lock/$clothSeq',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('유저 정보 수정 ${response.data}');
+
+      setState(() {
+        // data 리스트 내의 해당 아이템을 업데이트하는 로직
+        // data 리스트에서 clothSeq가 일치하는 아이템의 'private' 값을 업데이트
+        var item = data.firstWhere((item) => item['clothSeq'] == clothSeq);
+        item['private'] = !item['private']; // 잠금 상태 토글
+      });
+
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
@@ -131,11 +156,16 @@ class _CategoryClothListState extends State<CategoryClothList> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                      child: Icon(data[index]['private'] == true
-                          ? Icons.lock
-                          : Icons.lock_open),
+                    GestureDetector(
+                      onTap: () {
+                        diolock(accessToken, data[index]['clothSeq']);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                        child: Icon(data[index]['private'] == true
+                            ? Icons.lock
+                            : Icons.lock_open),
+                      ),
                     ),
                   ],
                 ),
