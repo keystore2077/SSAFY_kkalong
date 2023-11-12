@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_mycloset/main.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ClosetInfo extends StatefulWidget {
   const ClosetInfo({
     super.key,
     this.storage,
+    required this.image,
   });
 
   final storage;
+  final XFile image;
 
   @override
   State<ClosetInfo> createState() => ClosetInfoState();
@@ -61,85 +66,63 @@ class ClosetInfoState extends State<ClosetInfo> {
   Future<dynamic> sendData(token) async {
     Response response;
 
-    List<Map<String, dynamic>> sectionList = sectionItems.entries.map((entry) {
-      // 각 섹션명과 그에 해당하는 아이템 목록을 사용해 리스트를 생성
-      return {
-        'sectionName': entry.key,
-        'sort': entry.value.map((itemName) {
-          return {
-            'sortSeq': entry.value.indexOf(itemName), // 아이템의 인덱스를 sortSeq로 사용
-            'sort': itemName,
-            'sortGroup': {'sortGroupSeq': 2, 'groupName': 'section'}
-          };
-        }).toList()
-      };
+    // List<Map<String, dynamic>> sectionList = sectionItems.entries.map((entry) {
+    //   // 각 섹션명과 그에 해당하는 아이템 목록을 사용해 리스트를 생성
+    //   return {
+    //     'sectionName': entry.key,
+    //     'sort': entry.value.map((itemName) {
+    //       return {
+    //         'sortSeq': entry.value.indexOf(itemName), // 아이템의 인덱스를 sortSeq로 사용
+    //         'sort': itemName,
+    //         'sortGroup': {'sortGroupSeq': 2, 'groupName': 'section'}
+    //       };
+    //     }).toList()
+    //   };
+    // }).toList();
+
+    List<Map<String, dynamic>> sectionList =
+        sectionItems.entries.expand((entry) {
+      return entry.value.map((itemName) {
+        return {
+          "sectionName": itemName,
+          "sort": entry.key,
+        };
+      });
     }).toList();
+
+    // 파일을 MultipartFile 형식으로 변환
+    var file = await MultipartFile.fromFile(widget.image.path,
+        filename: widget.image.name);
+
+    // JSON 데이터와 파일을 포함하는 FormData 생성
+    FormData formData = FormData.fromMap({
+      "file": file,
+      "closetName": inputController.text,
+      "closetSectionList": sectionList
+    });
 
     try {
       // final deviceToken = getMyDeviceToken();
-      final response = await dio.post('$serverURL/api/assess',
+      final response = await dio.post('$serverURL/api/closet',
           options: Options(
             headers: {
               'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
               // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
             },
           ),
-          data: {
-            'closetName': inputController.text,
-            'closetImageName': '',
-            'closetSectionList': {'closetSectionList': sectionList},
-          });
+          data: formData);
+      print("Response: ${response.data}");
       return response.data;
     } catch (e) {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('더이상 평가할 사진이 없습니다!');
+        _showErrorDialog('오류발생!');
       }
     }
   }
-
-  // sendData() async {
-  //   var request = http.MultipartRequest(
-  //       'POST', Uri.parse('https://example.com/api/closet'));
-
-  //   // sectionItems 맵을 순회하면서 closetSectionList를 생성
-  //   List<Map<String, dynamic>> sectionList = sectionItems.entries.map((entry) {
-  //     // 각 섹션명과 그에 해당하는 아이템 목록을 사용해 리스트를 생성
-  //     return {
-  //       'sectionName': entry.key,
-  //       'sort': entry.value.map((itemName) {
-  //         return {
-  //           'sortSeq': entry.value.indexOf(itemName), // 아이템의 인덱스를 sortSeq로 사용
-  //           'sort': itemName,
-  //           'sortGroup': {'sortGroupSeq': 2, 'groupName': 'section'}
-  //         };
-  //       }).toList()
-  //     };
-  //   }).toList();
-
-  //   request.fields['closetName'] = inputController.text;
-  //   request.fields['closetImageName'] = '';
-  //   request.fields['closetSectionList'] =
-  //       jsonEncode({'closetSectionList': sectionList});
-
-  // 요청 전송
-  // var response = await request.send();
-
-  //   if (response.statusCode == 200) {
-  //     var responseData = await response.stream.toBytes();
-  //     var responseString = String.fromCharCodes(responseData);
-  //     var result = jsonDecode(responseString);
-  //     setState(() {
-  //       data = result;
-  //     });
-  //     print(data);
-  //   } else {
-  //     _showErrorDialog('오류 발생: ${response.statusCode}');
-  //   }
-  // }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -234,13 +217,17 @@ class ClosetInfoState extends State<ClosetInfo> {
         leading: const Text(''),
       ),
       body: Container(
-          padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.fromLTRB(30, 10, 30, 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Center(
-                child: Image.asset('assets/오레노턴완.jpg'),
+                child: Image.file(
+                  File(widget.image.path),
+                  width: 200,
+                  height: 300,
+                ),
               ),
               Center(
                 child: SizedBox(
@@ -272,7 +259,13 @@ class ClosetInfoState extends State<ClosetInfo> {
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                   child: ButtonTheme(
                       child: TextButton(
-                          onPressed: () async {},
+                          onPressed: () async {
+                            sendData(accessToken);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Main()),
+                            );
+                          },
                           style: OutlinedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius:

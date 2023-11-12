@@ -267,5 +267,14 @@ public class ClothService {
         return result;
     }
 
+    public ClothGetRes lockCloth(Cloth cloth){
+        cloth.setPrivate(!cloth.isPrivate());
+
+        String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() + ".png";
+        String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
+
+        return ClothGetRes.toRes(cloth,imgUrl);
+    }
+
 
 }

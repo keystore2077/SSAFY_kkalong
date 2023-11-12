@@ -112,7 +112,7 @@ public class MemberController {
     @Operation(summary = "닉네임 중복확인 : 중복이면 false")
     @GetMapping("/nickname/{nickName}")
     public Api<Object> checkNickName(@PathVariable String nickName){
-        return Api.OK(memberService.checkNickName(nickName)==null);
+        return Api.OK(memberService.checkNickNameEvenIfDeleted(nickName)==null);
     }
 
 //    @GetMapping("/verifyToken")

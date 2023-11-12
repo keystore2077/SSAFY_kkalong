@@ -1,20 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
+import '../store/userstore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-void main() {
-  runApp(MaterialApp(theme: ThemeData(), home: ClothInfo()));
-}
+import 'package:http_parser/http_parser.dart'; // MediaType을 사용하기 위해 추가
 
 class ClothInfo extends StatefulWidget {
-  const ClothInfo({Key? key}) : super(key: key);
+  const ClothInfo({
+    super.key,
+    this.storage,
+    required this.image,
+  });
+
+  final storage;
+  final image;
 
   @override
-  _ClothInfoState createState() => _ClothInfoState();
+  State<ClothInfo> createState() => ClothInfoState();
 }
 
-class _ClothInfoState extends State<ClothInfo> {
+class ClothInfoState extends State<ClothInfo> {
+  static final storage = FlutterSecureStorage();
+  String? accessToken;
+
+  @override
+  void initState() {
+    super.initState();
+    final userStore = Provider.of<UserStore>(context, listen: false);
+    accessToken = userStore.accessToken;
+  }
+
+  final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
+  final serverURL = 'http://k9c105.p.ssafy.io:8761';
+
   final TextEditingController inputController = TextEditingController();
   final TextEditingController inputController2 = TextEditingController();
   final List<String> tags = [];
@@ -71,46 +94,48 @@ class _ClothInfoState extends State<ClothInfo> {
 
   //  데이터 보내는 함수
   var data = [];
-  // sendData() async{
-  //   var request = http.MultipartRequest('POST', Uri.parse('https://example.com/api/closet'));
-  //
-  //   // sectionItems 맵을 순회하면서 closetSectionList를 생성
-  //   List<Map<String, dynamic>> sectionList = sectionItems.entries.map((entry) {
-  //     // 각 섹션명과 그에 해당하는 아이템 목록을 사용해 리스트를 생성
-  //     return {
-  //       'sectionName': entry.key,
-  //       'sort': entry.value.map((itemName) {
-  //         return {
-  //           'sortSeq': entry.value.indexOf(itemName), // 아이템의 인덱스를 sortSeq로 사용
-  //           'sort': itemName,
-  //           'sortGroup': {
-  //             'sortGroupSeq': 2,
-  //             'groupName': 'section'
-  //           }
-  //         };
-  //       }).toList()
-  //     };
-  //   }).toList();
-  //
-  //   request.fields['closetName'] = inputController.text;
-  //   request.fields['closetImageName'] = '';
-  //   request.fields['closetSectionList'] = jsonEncode({'closetSectionList': sectionList});
-  //
-  //   // 요청 전송
-  //   var response = await request.send();
-  //
-  //   if (response.statusCode == 200) {
-  //     var responseData = await response.stream.toBytes();
-  //     var responseString = String.fromCharCodes(responseData);
-  //     var result = jsonDecode(responseString);
-  //     setState(() {
-  //       data = result;
-  //     });
-  //     print(data);
-  //   } else {
-  //     _showErrorDialog('오류 발생: ${response.statusCode}');
-  //   }
-  // }
+  Future<dynamic> sendData(token) async {
+    Response response;
+
+    // 파일을 MultipartFile 형식으로 변환
+    var file = await MultipartFile.fromFile(widget.image.path,
+        contentType: MediaType('image', 'jpeg'));
+
+    // JSON 데이터와 파일을 포함하는 FormData 생성
+    FormData formData = FormData.fromMap({
+      "mFile": file,
+      "request": {
+        "sectionSeq": 0,
+        "sort": selectedCloth,
+        "clothName": inputController.text,
+        "tagList": tags,
+        "private": true
+      }
+    });
+
+    try {
+      // final deviceToken = getMyDeviceToken();
+      final response = await dio.post('$serverURL/api/cloth',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+              'Content-Type': 'multipart/form-data',
+            },
+          ),
+          data: formData);
+      print("Response: ${response.data}");
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -182,14 +207,18 @@ class _ClothInfoState extends State<ClothInfo> {
         body: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Container(
-              padding: const EdgeInsets.all(30),
+              padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Center(
-                    child: Image.asset('assets/오레노턴완.jpg'),
+                    child: Image.file(
+                      File(widget.image.path),
+                      width: 200,
+                      height: 300,
+                    ),
                   ),
                   const SizedBox(
                     height: 20,
@@ -261,7 +290,9 @@ class _ClothInfoState extends State<ClothInfo> {
                             //Do something when selected item is changed.
                           },
                           onSaved: (value) {
-                            selectedCloset = value.toString();
+                            setState(() {
+                              selectedCloset = value.toString();
+                            });
                           },
                           buttonStyleData: const ButtonStyleData(
                             padding: EdgeInsets.only(right: 8),
@@ -506,7 +537,9 @@ class _ClothInfoState extends State<ClothInfo> {
                       padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                       child: ButtonTheme(
                           child: TextButton(
-                              onPressed: () async {},
+                              onPressed: () async {
+                                sendData(accessToken);
+                              },
                               style: OutlinedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
