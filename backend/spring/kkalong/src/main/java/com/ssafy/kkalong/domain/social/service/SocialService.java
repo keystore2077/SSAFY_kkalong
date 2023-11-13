@@ -235,4 +235,15 @@ public class SocialService {
                 .build();
     }
 
+    public boolean checkFollow(Member loginMember,Member member){
+        FollowKey followKey =FollowKey.builder()
+                .followingMemberSeq(loginMember.getMemberSeq())
+                .followerMemberSeq(member.getMemberSeq())
+                .build();
+
+        Follow follow  = followRepository.findById(followKey).orElse(null);
+
+        return follow != null;
+    }
+
 }
