@@ -51,6 +51,8 @@ dependencies {
 	//https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
 	implementation 'commons-io:commons-io:2.15.0'
+	//웹소켓
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('test') {

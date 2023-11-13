@@ -2,10 +2,7 @@ package com.ssafy.kkalong.s3;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import com.ssafy.kkalong.common.util.MultipartFileToFile;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,16 +56,21 @@ public class S3Service {
     }
 
     public String generatePresignedUrl(String key) {
-        // 임시 URL 생성
-        java.util.Date expiration = new java.util.Date();
-        long msec = expiration.getTime();
-        msec += 1000 * 60 * 60; // 1 hour
-        expiration.setTime(msec);
+        try {
+            // 임시 URL 생성
+            java.util.Date expiration = new java.util.Date();
+            long msec = expiration.getTime();
+            msec += 1000 * 60 * 60; // 1 hour
+            expiration.setTime(msec);
 
-        GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, key)
-                .withMethod(HttpMethod.GET)
-                .withExpiration(expiration);
-        return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+            GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, key)
+                    .withMethod(HttpMethod.GET)
+                    .withExpiration(expiration);
+            return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+        } catch (AmazonS3Exception e) {
+            // S3에서 key를 찾을 수 없는 경우 처리
+            return generatePresignedUrlForNoImage();
+        }
     }
 
     private String putS3(File uploadFile, String key){
@@ -83,5 +85,19 @@ public class S3Service {
             return;
         }
 //        log.info("File delete fail");
+    }
+
+    private String generatePresignedUrlForNoImage() {
+        // "no_image.jpg"를 key로 사용하여 임시 URL 생성
+        java.util.Date expiration = new java.util.Date();
+        long msec = expiration.getTime();
+        msec += 1000 * 60 * 60; // 1 hour
+        expiration.setTime(msec);
+
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName,
+                "no_image.jpg")
+                .withMethod(HttpMethod.GET)
+                .withExpiration(expiration);
+        return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
     }
 }
