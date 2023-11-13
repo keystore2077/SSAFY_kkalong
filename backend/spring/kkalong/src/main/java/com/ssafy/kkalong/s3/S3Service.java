@@ -80,6 +80,25 @@ public class S3Service {
         }
     }
 
+    public String copyS3(String sourceKey, String destinationKey) {
+        // CopyObjectRequest 생성
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(
+                bucketName, sourceKey,
+                bucketName, destinationKey
+        );
+
+        // 파일 복사 실행
+        CopyObjectResult copyObjectResult = amazonS3.copyObject(copyObjectRequest);
+
+        // 복사된 파일의 URL 생성
+        return generatePresignedUrl(destinationKey);
+    }
+
+    public String copyTempToFashion(String fileName){
+        String newFileName = fileName.replace("temp_", "fashion_");
+        return copyS3("temp/" + fileName + ".jpg", "fashion/" + newFileName + ".jpg");
+    }
+
     private String putS3(File uploadFile, String key){
         amazonS3.putObject(new PutObjectRequest(bucketName, key, uploadFile).withCannedAcl(CannedAccessControlList.PublicRead));
         return amazonS3.getUrl(bucketName, key).toString();
