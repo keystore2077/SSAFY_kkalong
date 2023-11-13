@@ -237,8 +237,8 @@ public class SocialService {
 
     public boolean checkFollow(Member loginMember,Member member){
         FollowKey followKey =FollowKey.builder()
-                .followingMemberSeq(loginMember.getMemberSeq())
-                .followerMemberSeq(member.getMemberSeq())
+                .followingMemberSeq(member.getMemberSeq())
+                .followerMemberSeq(loginMember.getMemberSeq())
                 .build();
 
         Follow follow  = followRepository.findById(followKey).orElse(null);
