@@ -51,8 +51,11 @@ dependencies {
 	//https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
 	implementation 'commons-io:commons-io:2.15.0'
-	//웹소켓
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	// 채팅 구현을 위한 SSE 관련 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+
 }
 
 tasks.named('test') {

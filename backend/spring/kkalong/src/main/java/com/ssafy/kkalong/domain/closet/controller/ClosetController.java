@@ -304,7 +304,6 @@ public class ClosetController {
     @Operation(summary = "옷장 삭제")
     public Api<Object> deleteCloset(@PathVariable int closetSeq) {
         return Api.OK("옷장 삭제");
-
     }
 
 }
