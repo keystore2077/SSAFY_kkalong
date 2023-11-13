@@ -237,7 +237,7 @@ import 'package:dio/dio.dart';
 
 class ChoiceCloth extends StatefulWidget {
   final int photoSeq;
-  String? imageUrl;
+  String imageUrl;
   final String sortName;
   int? selectedIndex;
   int? selectedClothSeq;
@@ -458,7 +458,8 @@ class ChoiceClothState extends State<ChoiceCloth> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const NamedAvata()),
+                              builder: (context) =>
+                                  NamedAvata(imageUrl: widget.imageUrl)),
                         );
                       },
                       style: OutlinedButton.styleFrom(
@@ -559,6 +560,10 @@ class ChoiceClothState extends State<ChoiceCloth> {
                                       widget.imageUrl =
                                           response.data['body']['url'];
                                     });
+                                    // setState(() {
+                                    //   fileName =
+                                    //       response.data['body']['fileName'];
+                                    // });
                                     return response.data;
                                   } catch (e) {
                                     print('그밖의 에러ㅜㅜㅜㅜㅜㅜㅜㅜㅜ: $e');

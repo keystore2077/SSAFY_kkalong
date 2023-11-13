@@ -198,13 +198,31 @@ class WearClothState extends State<WearCloth> {
                         return GestureDetector(
                           onTap: () {
                             String sortName = item["name"] ?? 'Unknown';
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => ChoiceCloth(
+                            //           photoSeq: widget.photoSeq,
+                            //           imageUrl: imageUrl,
+                            //           sortName: sortName)),
+                            // );
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ChoiceCloth(
+                                builder: (context) {
+                                  if (imageUrl != null) {
+                                    return ChoiceCloth(
                                       photoSeq: widget.photoSeq,
-                                      imageUrl: imageUrl,
-                                      sortName: sortName)),
+                                      imageUrl: imageUrl!,
+                                      sortName: sortName,
+                                    );
+                                  } else {
+                                    // imageUrl이 null인 경우에 대한 대체 처리를 여기에 추가
+                                    // 예를 들어 placeholder 이미지를 사용하거나 에러 메시지를 표시할 수 있습니다.
+                                    return Container(); // 빈 컨테이너를 반환
+                                  }
+                                },
+                              ),
                             );
                           },
                           child: Column(
