@@ -145,7 +145,7 @@ public class SocialService {
 
         List<Cloth> clothList = clothRepository.findAllByMemberMemberSeqAndIsClothDeleted(memberSeq,false);
         for(Cloth cloth : clothList){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
             ClothRes clothRes = ClothRes.toRes(cloth,imgUrl);
 
             if(cloth.isPrivate()){
@@ -168,7 +168,7 @@ public class SocialService {
 
         List<Cloth> clothList = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(memberSeq,false,false);
         for(Cloth cloth : clothList){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
             ClothRes clothRes = ClothRes.toRes(cloth,imgUrl );
             result.add(clothRes);
         }
@@ -191,7 +191,7 @@ public class SocialService {
         List<MyDtoRes> clothList = new ArrayList<>();
         List<Cloth> cloths = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(member.getMemberSeq(),false,false);
         for(Cloth cloth : cloths){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
             MyDtoRes dtoRes = new MyDtoRes(cloth.getClothSeq(), imgUrl,cloth.getClothName(), cloth.isPrivate());
             clothList.add(dtoRes);
         }
@@ -221,7 +221,7 @@ public class SocialService {
         List<DtoRes> clothList = new ArrayList<>();
         List<Cloth> cloths = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(member.getMemberSeq(),false,false);
         for(Cloth cloth : cloths){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
             DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), cloth.getClothImgName(),imgUrl);
             clothList.add(dtoRes);
         }
