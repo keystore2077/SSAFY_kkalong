@@ -462,6 +462,7 @@ class NamPage2State extends State<NamPage2> {
   int follwingCount = 0;
   List<dynamic> savecloItem = [];
   List<dynamic> opencloItem = [];
+  bool isfollowing = false;
 
 
   @override
@@ -485,6 +486,17 @@ class NamPage2State extends State<NamPage2> {
           print(savecloItem);
 
        }
+
+       final checkfollow = await pageapi.checkfollow(accessToken, widget.nick);
+      print(checkfollow); 
+       if (checkfollow != null){
+        setState(() {
+          isfollowing = checkfollow['body'];
+        });
+          print(isfollowing);
+
+       }
+
 
     });
     // 초기화 작업 수행
@@ -598,9 +610,49 @@ class NamPage2State extends State<NamPage2> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           ElevatedButton(
-                            onPressed: () {
-                              // 버튼 클릭 이벤트
-                            },
+                            // onPressed: () {
+                            //   final userStore = Provider.of<UserStore>(context, listen: false);
+                            //   final accessToken = userStore.accessToken;
+                            //   isfollowing? pageapi.unfollow(accessToken, widget.nick): pageapi.follow(accessToken, widget.nick);
+                            //   setState(() {
+                            //     isfollowing = !isfollowing;
+                            //   });
+                            //   },
+                            onPressed: (){
+                              Future.delayed(Duration.zero, () async {
+      final userStore = Provider.of<UserStore>(context, listen: false);
+      final accessToken = userStore.accessToken;
+      print(accessToken);
+      isfollowing? await pageapi.unfollow(accessToken, widget.nick): await pageapi.follow(accessToken, widget.nick);
+                              setState(() {
+                                isfollowing = !isfollowing;
+                              });
+
+      final profile = await pageapi.getprofile(accessToken, widget.nick);
+      print(profile); 
+       if (profile != null){
+        setState(() {
+          followerCount = profile['body']['followerCount'];
+          follwingCount = profile['body']['followingCount'];
+        });
+
+       }
+
+       final checkfollow = await pageapi.checkfollow(accessToken, widget.nick);
+      print(checkfollow); 
+       if (checkfollow != null){
+        setState(() {
+          isfollowing = checkfollow['body'];
+        });
+          print(isfollowing);
+
+       }
+
+
+    });
+    // 초기화 작업 수행
+  
+                            },  
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                 borderRadius:
@@ -608,7 +660,7 @@ class NamPage2State extends State<NamPage2> {
                               ),
                               // 다른 스타일 속성들
                             ),
-                            child: const Text('🔥Follow🔥'),
+                            child: Text(isfollowing ? 'Unfollow' : '🔥Follow🔥'),
                           ),
                           ElevatedButton(
                             onPressed: () {
