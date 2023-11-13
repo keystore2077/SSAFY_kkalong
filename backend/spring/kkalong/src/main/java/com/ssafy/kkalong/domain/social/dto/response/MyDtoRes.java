@@ -17,6 +17,10 @@ public class MyDtoRes {
     @Schema(description = "이미지 url ")
     private String imgUrl;
 
+    @Schema(description = "이름")
+    private String name;
+
     @Schema(description = "공개여부")
     private Boolean isPrivate;
+
 }
