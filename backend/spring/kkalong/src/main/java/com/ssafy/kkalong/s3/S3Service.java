@@ -57,16 +57,23 @@ public class S3Service {
 
     public String generatePresignedUrl(String key) {
         try {
-            // 임시 URL 생성
-            java.util.Date expiration = new java.util.Date();
-            long msec = expiration.getTime();
-            msec += 1000 * 60 * 60; // 1 hour
-            expiration.setTime(msec);
+            boolean doesObjectExist = amazonS3.doesObjectExist(bucketName, key);
 
-            GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, key)
-                    .withMethod(HttpMethod.GET)
-                    .withExpiration(expiration);
-            return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+            if (doesObjectExist) {
+                // 원본 key를 사용하여 임시 URL 생성
+                java.util.Date expiration = new java.util.Date();
+                long msec = expiration.getTime();
+                msec += 1000 * 60 * 60; // 1 hour
+                expiration.setTime(msec);
+
+                GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, key)
+                        .withMethod(HttpMethod.GET)
+                        .withExpiration(expiration);
+                return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+            } else {
+                // "no_image.jpg"를 key로 사용하여 임시 URL 생성
+                return generatePresignedUrlForNoImage();
+            }
         } catch (AmazonS3Exception e) {
             // S3에서 key를 찾을 수 없는 경우 처리
             return generatePresignedUrlForNoImage();
