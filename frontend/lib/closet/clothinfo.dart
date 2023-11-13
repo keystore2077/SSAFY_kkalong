@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:dio/dio.dart';
@@ -109,20 +108,19 @@ class ClothInfoState extends State<ClothInfo> {
     // JSON 데이터와 파일을 포함하는 FormData 생성
     FormData formData = FormData.fromMap({
       "mFile": file,
-        "sectionSeq": selectedSection,
-        "sort": selectedCloth,
-        "clothName": inputController.text,
-        "tagList": tags,
-        "private": true
+      "sectionSeq": selectedSection,
+      "sort": selectedCloth,
+      "clothName": inputController.text,
+      "tagList": tags,
+      "private": true
     });
 
     // FormData formData = FormData();
     // 파일 추가
     // formData.files.add(MapEntry('file', file));
-    
+
     // formData.fields.add(MapEntry('closetName', inputController.text));
     // formData.fields.addAll(closetSectionListEntries);
-
 
     print(formData.fields);
     print(selectedSection);
@@ -153,15 +151,14 @@ class ClothInfoState extends State<ClothInfo> {
 
   Future<dynamic> closetData(token) async {
     try {
-      final response =
-          await dio.get('$serverURL/api/closet/list',
-              // queryParameters: {'userEmail': id}
-              options: Options(
-                headers: {
-                  'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
-                  // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
-                },
-              ));
+      final response = await dio.get('$serverURL/api/closet/list',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
       var result = response.data['body'];
       var namesList = result.map((item) => item['name']).toList();
       List<String> strclosets = List<String>.from(namesList);
@@ -183,15 +180,14 @@ class ClothInfoState extends State<ClothInfo> {
 
   Future<dynamic> sectionData(token, closetSeq) async {
     try {
-      final response =
-          await dio.get('$serverURL/api/closet/list/$closetSeq',
-              // queryParameters: {'userEmail': id}
-              options: Options(
-                headers: {
-                  'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
-                  // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
-                },
-              ));
+      final response = await dio.get('$serverURL/api/closet/list/$closetSeq',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
       var result = response.data['body'];
       print(result);
       var namesList = result.map((item) => item['name']).toList();
@@ -225,7 +221,7 @@ class ClothInfoState extends State<ClothInfo> {
               Navigator.of(ctx).pop();
             },
           )
-        ],  
+        ],
       ),
     );
   }
@@ -635,7 +631,8 @@ class ClothInfoState extends State<ClothInfo> {
                                 sendData(accessToken);
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => Main()),
+                                  MaterialPageRoute(
+                                      builder: (context) => Main()),
                                 );
                               },
                               style: OutlinedButton.styleFrom(

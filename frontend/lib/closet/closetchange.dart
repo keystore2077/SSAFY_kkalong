@@ -210,13 +210,13 @@ class ClosetChangeState extends State<ClosetChange> {
     formData.files.add(MapEntry('file', multipartFile));
     formData.fields.add(MapEntry('closetSeq', widget.closetSeq.toString()));
     formData.fields.add(MapEntry('closetName', inputController.text));
-    formData.fields.addAll(closetSectionUpdateListEntries);
+    // formData.fields.addAll(closetSectionUpdateListEntries);
     formData.fields.addAll(closetSectionAddListEntries);
     formData.fields.addAll(closetSectionDeleteListEntries);
 
     try {
       // final deviceToken = getMyDeviceToken();
-      final response = await dio.post('$serverURL/api/closet',
+      final response = await dio.put('$serverURL/api/closet',
           options: Options(
             headers: {
               'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
@@ -427,7 +427,7 @@ class ClosetChangeState extends State<ClosetChange> {
                         .toList(),
                     validator: (value) {
                       if (value == null) {
-                        return '옷 종류를 선택해주세요.';
+                        return '세부 구역을 선택해주세요.';
                       }
                       return null;
                     },
