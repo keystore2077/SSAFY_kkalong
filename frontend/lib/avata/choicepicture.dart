@@ -710,7 +710,7 @@
 
 import 'package:flutter/material.dart';
 import '../avata/avatacamera.dart';
-// import '../avata/wearcloth.dart';
+import '../avata/wearcloth.dart';
 //api
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
@@ -728,6 +728,7 @@ class ChoicePicture extends StatefulWidget {
 
 class _ChoicePictureState extends State<ChoicePicture> {
   int? selectedIndex;
+  int? selectedPhotoSeq;
 
   @override
   void initState() {
@@ -790,8 +791,9 @@ class _ChoicePictureState extends State<ChoicePicture> {
                 AppBar(
                   toolbarHeight: 100,
                   centerTitle: true,
-                  title: const Text(
-                    '내 사진을 골라주세요!(총 몇건)',
+                  title: Text(
+                    '내 사진을 골라주세요! (총 ${widget.photoList.length}건)',
+                    // '내 사진을 골라주세요!',
                     style: TextStyle(
                       fontSize: 25,
                       color: Colors.black,
@@ -825,6 +827,7 @@ class _ChoicePictureState extends State<ChoicePicture> {
                     onTap: () {
                       setState(() {
                         selectedIndex = index; // 선택된 인덱스 업데이트
+                        selectedPhotoSeq = photoSeq;
                       });
                     },
                     child: Container(
@@ -864,16 +867,51 @@ class _ChoicePictureState extends State<ChoicePicture> {
       ),
       // Bottom Navigation Bar
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            SizedBox(
+              width: 500,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (selectedPhotoSeq != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              WearCloth(photoSeq: selectedPhotoSeq!)),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFF5BEB5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                ),
+                child: const Text(
+                  '선택완료',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) => const AvataPicture()),
+                      // );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF5BEB5),
                       shape: RoundedRectangleBorder(
@@ -881,7 +919,7 @@ class _ChoicePictureState extends State<ChoicePicture> {
                       ),
                     ),
                     child: const Text(
-                      '다시선택',
+                      '내 패션찰칵',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -893,11 +931,11 @@ class _ChoicePictureState extends State<ChoicePicture> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => const WearCloth()),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AvataPicture()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF5BEB5),
@@ -906,7 +944,7 @@ class _ChoicePictureState extends State<ChoicePicture> {
                       ),
                     ),
                     child: const Text(
-                      '선택완료',
+                      '사진찍기',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -917,51 +955,51 @@ class _ChoicePictureState extends State<ChoicePicture> {
               ],
             ),
             const SizedBox(height: 10),
-            SizedBox(
-              width: 400,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AvataPicture()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF5BEB5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                ),
-                child: const Text(
-                  '사진찍기',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: 400,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF5BEB5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                ),
-                child: const Text(
-                  '내 패션 찰칵',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   width: 400,
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => const AvataPicture()),
+            //       );
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: const Color(0xFFF5BEB5),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(5.0),
+            //       ),
+            //     ),
+            //     child: const Text(
+            //       '사진찍기',
+            //       style: TextStyle(
+            //         color: Colors.white,
+            //         fontWeight: FontWeight.w700,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // const SizedBox(height: 10),
+            // SizedBox(
+            //   width: 400,
+            //   child: ElevatedButton(
+            //     onPressed: () {},
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: const Color(0xFFF5BEB5),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(5.0),
+            //       ),
+            //     ),
+            //     child: const Text(
+            //       '내 패션 찰칵',
+            //       style: TextStyle(
+            //         color: Colors.white,
+            //         fontWeight: FontWeight.w700,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
