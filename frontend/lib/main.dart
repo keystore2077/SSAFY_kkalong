@@ -81,7 +81,7 @@ class _MainState extends State<Main> {
         child: Scaffold(
           body: SafeArea(
             child: TabBarView(
-              children: const [
+              children: [
                 ChoicePicture(),
                 MyCloset(),
                 CategoryPage(),
