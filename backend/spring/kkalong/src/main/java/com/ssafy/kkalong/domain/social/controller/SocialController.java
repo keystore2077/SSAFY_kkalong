@@ -30,17 +30,17 @@ public class SocialController {
     @GetMapping("/follow/{nickName}")
     public Api<Object> followMember( @PathVariable String nickName){
 
-        Member followingMember = memberService.getLoginUserInfo();
-        Member followerMember = memberService.checkNickName(nickName);
+        Member member = memberService.getLoginUserInfo();
+        Member nickNameMember = memberService.checkNickName(nickName);
 
-        if(followingMember==null){
+        if(member==null){
             return Api.ERROR(ErrorCode.BAD_REQUEST,"로그인된 회원 정보를 찾지 못했습니다.");
         }
-        if (followerMember==null) {
+        if (nickNameMember==null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST,String.format("해당 닉네임[%s]을/를 가진 회원을 찾지 못했습니다.", nickName));
         }
 
-        return Api.OK(socialService.followMember(followingMember,followerMember));
+        return Api.OK(socialService.followMember(member,nickNameMember));
 
     }
 
