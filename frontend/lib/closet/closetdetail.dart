@@ -40,6 +40,7 @@ class _ClosetDetailState extends State<ClosetDetail> {
   final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
   final serverURL = 'http://k9c105.p.ssafy.io:8761';
 
+  var flag = 0;
   var data = {};
   var sections = [];
   var imgUrl =
@@ -65,6 +66,7 @@ class _ClosetDetailState extends State<ClosetDetail> {
         imgUrl = result['closetPictureUrl'];
         closetName = result['closetName'];
       });
+      // print(result);
       return response.data;
     } catch (e) {
       print(e);
@@ -100,15 +102,45 @@ class _ClosetDetailState extends State<ClosetDetail> {
       final userStore = Provider.of<UserStore>(context, listen: false);
       final accessToken2 = userStore.accessToken;
 
-      final response = await dio.put('$serverURL/api/closet/${widget.closetSeq}',
-          // queryParameters: {'userEmail': id}
-          options: Options(
-            headers: {
-              'Authorization': 'Bearer $accessToken2', // 토큰을 'Bearer' 스타일로 포함
-              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
-            },
-          ));
+      final response =
+          await dio.put('$serverURL/api/closet/${widget.closetSeq}',
+              // queryParameters: {'userEmail': id}
+              options: Options(
+                headers: {
+                  'Authorization':
+                      'Bearer $accessToken2', // 토큰을 'Bearer' 스타일로 포함
+                  // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+                },
+              ));
       print('옷삭제 api ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
+
+  Future<dynamic> cleanCloset(token) async {
+    try {
+      final userStore = Provider.of<UserStore>(context, listen: false);
+      final accessToken2 = userStore.accessToken;
+
+      final response =
+          await dio.put('$serverURL/api/cloth/del/closet/${widget.closetSeq}',
+              // queryParameters: {'userEmail': id}
+              options: Options(
+                headers: {
+                  'Authorization':
+                      'Bearer $accessToken2', // 토큰을 'Bearer' 스타일로 포함
+                  // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+                },
+              ));
+      print('옷장비움 api ${response.data}');
       return response.data;
     } catch (e) {
       print(e);
@@ -125,122 +157,148 @@ class _ClosetDetailState extends State<ClosetDetail> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: sections.isNotEmpty ? 
-          DefaultTabController(
-            length: sections.length,
-            child: NestedScrollView(
-              controller: scrollController,
-              headerSliverBuilder: (context, isScrolled) {
-                return [
-                  SliverAppBar(
-                    title: Text(
-                      closetName,
-                      style: TextStyle(color: Colors.white), // 텍스트의 색상을 흰색으로 설정
-                    ),
-                    centerTitle: true,
-                    backgroundColor: const Color.fromARGB(255, 246, 212, 206),
-                    iconTheme: const IconThemeData(color: Colors.black),
-                    collapsedHeight: 325,
-                    expandedHeight: 325,
-                    flexibleSpace: Image.network(
-                      imgUrl,
-                    ),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined), // 두 번째 아이콘
-                        onPressed: () {
-                          // 두 번째 아이콘을 클릭했을 때 실행할 작업
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => ClosetChange(closetSeq: widget.closetSeq)),
-                          );
-                        },
+        body: sections.isNotEmpty
+            ? DefaultTabController(
+                length: sections.length,
+                child: NestedScrollView(
+                  controller: scrollController,
+                  headerSliverBuilder: (context, isScrolled) {
+                    return [
+                      SliverAppBar(
+                        title: Text(
+                          closetName,
+                          style: TextStyle(
+                              color: Colors.white), // 텍스트의 색상을 흰색으로 설정
+                        ),
+                        centerTitle: true,
+                        backgroundColor:
+                            const Color.fromARGB(255, 246, 212, 206),
+                        iconTheme: const IconThemeData(color: Colors.black),
+                        collapsedHeight: 325,
+                        expandedHeight: 325,
+                        flexibleSpace: Image.network(
+                          imgUrl,
+                        ),
+                        actions: [
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined), // 첫 번째 아이콘
+                            onPressed: () {
+                              // 첫 번째 아이콘을 클릭했을 때 실행할 작업
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ClosetChange(
+                                        closetSeq: widget.closetSeq)),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.format_paint), // 두 번째 아이콘
+                            onPressed: () {
+                              // 두 번째 아이콘을 클릭했을 때 실행할 작업
+                              // if (flag == 0) {
+                              //   setState(() {
+                              //     flag = 1;
+                              //   });
+                              // } else {
+                              //   setState(() {
+                              //     flag = 0;
+                              //   });
+                              // }
+                              cleanCloset(accessToken);
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text('비움 성공'),
+                                  content: Text('옷장 비움 성공!'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text('확인'),
+                                      onPressed: () {
+                                        Navigator.of(ctx).pop();
+                                      },
+                                    )
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_forever_outlined),
+                            onPressed: () {
+                              deleteCloset(accessToken);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => Main()),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_forever_outlined),
-                        onPressed: () {
-                          deleteCloset(accessToken);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Main()),
-                          );
-                        },
-                      ),
-                    ],
+                      SliverPersistentHeader(
+                        delegate: MyDelegate(TabBar(
+                          labelColor: Colors.black,
+                          indicatorWeight: 4,
+                          unselectedLabelColor: Color(0xffD0D0D0),
+                          labelPadding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+                          labelStyle: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 16),
+                          indicatorColor: Color.fromARGB(255, 68, 25, 80),
+                          indicatorSize: TabBarIndicatorSize.label,
+                          tabs: sections
+                              .map((sectionTitle) =>
+                                  Text(sectionTitle['sectionName']))
+                              .toList(),
+                        )),
+                        floating: true,
+                        pinned: true,
+                      )
+                    ];
+                  },
+                  body: TabBarView(
+                    children: sections.map((section) {
+                      return ClosetClothList(
+                          sectionSeq: section['sectionSeq'], flag: flag);
+                    }).toList(),
                   ),
-                  SliverPersistentHeader(
-                    delegate: MyDelegate(TabBar(
-                      labelColor: Colors.black,
-                      indicatorWeight: 4,
-                      unselectedLabelColor: Color(0xffD0D0D0),
-                      labelPadding: EdgeInsets.fromLTRB(0, 10, 0, 5),
-                      labelStyle:
-                          TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                      indicatorColor: Color.fromARGB(255, 68, 25, 80),
-                      indicatorSize: TabBarIndicatorSize.label,
-                      tabs: sections
-                          .map((sectionTitle) =>
-                              Text(sectionTitle['sectionName']))
-                          .toList(),
-                    )),
-                    floating: true,
-                    pinned: true,
-                  )
-                ];
-              },
-              body: TabBarView(
-                children: sections.map((section) {
-                  return ClosetClothList(sectionSeq: section['sectionSeq']);
-                }).toList(),
-              ),
-            ))
+                ))
             : Center(child: CircularProgressIndicator()),
-
-
-        // floatingActionButton: FloatingActionButton.small(
-        //   onPressed: () {
-        //     scrollController.animateTo(
-        //       scrollController.position.minScrollExtent,
-        //       duration: const Duration(milliseconds: 500),
-        //       curve: Curves.fastOutSlowIn,
-        //     );
-        //   },
-        //   backgroundColor: Colors.grey[50],
-        //   shape: RoundedRectangleBorder(
-        //       side: const BorderSide(width: 1, color: Color(0xFFF5BEB5)),
-        //       borderRadius: BorderRadius.circular(12)),
-        //   child:
-        //       const Icon(Icons.arrow_upward_sharp, color: Color(0xFFF5BEB5)),
-        // )
-
-        floatingActionButton: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ClothCamera()),
-            );
-          },
-          // onPressed: () async {
-          //   final ImagePicker picker = ImagePicker();
-          //   final XFile? image =
-          //       await picker.pickImage(source: ImageSource.camera);
-
-          //   if (image != null) {
-          //     // 이미지가 선택되면 처리할 작업을 여기에 추가합니다.
-          //     // image.path를 사용하여 이미지 파일에 접근할 수 있습니다.
-          //   } else {
-          //     // 이미지가 선택되지 않았을 때 처리할 작업을 추가합니다.
-          //   }
-          // },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[50],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
-            ),
-            // 다른 스타일 속성들
-          ),
-          child: const Text(' + 옷등록'),
-        ),
+        floatingActionButton: flag == 1
+            ? ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ClothCamera()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[50],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+                  ),
+                  // 다른 스타일 속성들
+                ),
+                child: const Text(' + 옷등록'),
+              )
+            : ElevatedButton(
+                onPressed: () {
+                  // deleteClothes(accessToken);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ClothCamera()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[50],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+                  ),
+                  // 다른 스타일 속성들
+                ),
+                child: const Text('비우기'),
+              ),
       ),
     );
   }
