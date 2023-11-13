@@ -9,7 +9,11 @@ import java.util.Optional;
 //repository
 //jpa상속받아서 crud제공하는곳
 public interface ClosetRepository extends JpaRepository<Closet, Integer> {
-    List<Closet> findAllByMemberMemberSeq(int member);
+
 
     Optional<Closet> findByClosetSeqAndIsClosetDeleted(int closetSeq, boolean isDeleted);
+
+    List<Closet> findAllByMemberMemberSeqAndIsClosetDeleted(int memberSeq, boolean isDeleted);
 }
+
+
