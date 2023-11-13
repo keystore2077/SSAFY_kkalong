@@ -185,5 +185,20 @@ public class SocialController {
         }
     }
 
+    @Operation(summary = "팔로우 상태인지 체크(팔로우 중이면 : true)")
+    @GetMapping("/follow/check/{nickName}")
+    public Api<Object> checkFollow( @PathVariable String nickName){
+        Member loginMember = memberService.getLoginUserInfo();
+        if (loginMember == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+        Member member = memberService.checkNickName(nickName);
+        if (member==null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST,String.format("해당 닉네임[%s]을/를 가진 회원을 찾지 못했습니다.", nickName));
+        }
+
+        return Api.OK(socialService.checkFollow(loginMember, member));
+    }
+
 
 }
