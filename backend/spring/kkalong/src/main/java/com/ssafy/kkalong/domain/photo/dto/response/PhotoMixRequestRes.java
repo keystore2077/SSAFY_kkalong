@@ -11,5 +11,6 @@ public class PhotoMixRequestRes {
     private String url;
     @Schema(description = "반환 메세지")
     private String msg;
-
+    @Schema(description = "사진 파일의 이름")
+    private String fileName;
 }
