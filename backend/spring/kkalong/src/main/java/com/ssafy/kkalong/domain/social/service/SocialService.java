@@ -184,7 +184,7 @@ public class SocialService {
         List<Fashion> fashions = fashionRepository.findAllByMemberMemberSeqAndIsFashionDeleted(member.getMemberSeq(),false);
         for(Fashion fashion : fashions){
             String imgUrl = s3Service.generatePresignedUrl("fashion/" + fashion.getFashionImgName());
-            MyDtoRes dtoRes = new MyDtoRes(fashion.getFashionSeq(), imgUrl,fashion.isFashionPrivate());
+            MyDtoRes dtoRes = new MyDtoRes(fashion.getFashionSeq(), imgUrl,fashion.getFashionName(),fashion.isFashionPrivate());
             fashionList.add(dtoRes);
         }
 
@@ -192,7 +192,7 @@ public class SocialService {
         List<Cloth> cloths = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(member.getMemberSeq(),false,false);
         for(Cloth cloth : cloths){
             String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
-            MyDtoRes dtoRes = new MyDtoRes(cloth.getClothSeq(), imgUrl,cloth.isPrivate());
+            MyDtoRes dtoRes = new MyDtoRes(cloth.getClothSeq(), imgUrl,cloth.getClothName(), cloth.isPrivate());
             clothList.add(dtoRes);
         }
 
@@ -214,7 +214,7 @@ public class SocialService {
         List<Fashion> fashions = fashionRepository.findAllByMemberMemberSeqAndIsFashionDeletedAndIsFashionPrivate(member.getMemberSeq(),false,false);
         for(Fashion fashion : fashions){
             String imgUrl = s3Service.generatePresignedUrl("fashion/" + fashion.getFashionImgName());
-            DtoRes dtoRes = new DtoRes(fashion.getFashionSeq(), imgUrl);
+            DtoRes dtoRes = new DtoRes(fashion.getFashionSeq(), fashion.getFashionName(),imgUrl);
             fashionList.add(dtoRes);
         }
 
@@ -222,7 +222,7 @@ public class SocialService {
         List<Cloth> cloths = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(member.getMemberSeq(),false,false);
         for(Cloth cloth : cloths){
             String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
-            DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), imgUrl);
+            DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), cloth.getClothImgName(),imgUrl);
             clothList.add(dtoRes);
         }
 
