@@ -75,7 +75,7 @@ public class SocialService {
     public void deleteFollow(Member followingMember, Member followerMember){
         int followingSeq = followingMember.getMemberSeq();
         int followerSeq = followerMember.getMemberSeq();
-        Optional<Follow> optionalValue = followRepository.findByFollowingMemberMemberSeqAndFollowerMemberMemberSeqAndIsFollowDeleted(followerSeq, followingSeq,false);
+        Optional<Follow> optionalValue = followRepository.findByFollowingMemberMemberSeqAndFollowerMemberMemberSeqAndIsFollowDeleted(followingSeq, followerSeq,false);
         optionalValue.ifPresentOrElse(
                 value -> {
                     // Optional이 비어있지 않을 때 로직 수행
@@ -236,12 +236,8 @@ public class SocialService {
     }
 
     public boolean checkFollow(Member loginMember,Member member){
-        FollowKey followKey =FollowKey.builder()
-                .followingMemberSeq(member.getMemberSeq())
-                .followerMemberSeq(loginMember.getMemberSeq())
-                .build();
 
-        Follow follow  = followRepository.findById(followKey).orElse(null);
+        Follow follow  = followRepository.findByFollowingMemberMemberSeqAndFollowerMemberMemberSeqAndIsFollowDeleted(member.getMemberSeq(),loginMember.getMemberSeq(),false).orElse(null);
 
         return follow != null;
     }

@@ -61,16 +61,16 @@ public class SocialController {
     @Operation(summary = "팔로우 취소")
     @PutMapping("/follow/{nickName}")
     public Api<Object> deleteFollow( @PathVariable String nickName){
-        Member followingMember = memberService.getLoginUserInfo();
-        Member followerMember = memberService.checkNickName(nickName);
+        Member loginMember = memberService.getLoginUserInfo();
+        Member member = memberService.checkNickName(nickName);
 
-        if(followingMember==null){
+        if(loginMember==null){
             return Api.ERROR(ErrorCode.BAD_REQUEST,"로그인된 회원 정보를 찾지 못했습니다.");
         }
-        if (followerMember==null) {
+        if (member==null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST,String.format("해당 닉네임[%s]을/를 가진 회원을 찾지 못했습니다.", nickName));
         }
-        socialService.deleteFollow(followingMember,followerMember);
+        socialService.deleteFollow(member,loginMember);
         return Api.OK("팔로우가 취소 되었습니다.");
     }
 
