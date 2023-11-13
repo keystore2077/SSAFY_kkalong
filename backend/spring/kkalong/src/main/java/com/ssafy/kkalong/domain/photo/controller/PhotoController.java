@@ -288,6 +288,6 @@ public class PhotoController {
         // 5. S3에서 URL 획득
         String url = s3Service.generatePresignedUrl("temp/" + fileName + ".jpg");
 
-        return Api.OK(new PhotoMixRequestRes(url, "성공"));
+        return Api.OK(new PhotoMixRequestRes(url, "성공", fileName));
     }
 }

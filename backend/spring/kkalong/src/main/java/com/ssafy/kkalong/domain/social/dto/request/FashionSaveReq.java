@@ -17,5 +17,8 @@ public class FashionSaveReq {
     @Schema(description = "공개여부")
     private boolean isFashionPrivate;
 
+    @Schema(description = "사진파일명")
+    private String imgName;
+
 
 }

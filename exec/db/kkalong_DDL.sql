@@ -137,7 +137,7 @@ CREATE TABLE `sort_group` (
 DROP TABLE IF EXISTS `chat_room`;
 
 CREATE TABLE `chat_room` (
-	`seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
+	`chat_room_seq`	int	NOT NULL AUTO_INCREMENT PRIMARY KEY	COMMENT '인덱스',
 	`chat_room_latest_log`	varchar(100)	NULL	COMMENT '마지막 채팅 내용',
 	`chat_room_latest_date`	datetime	NULL	COMMENT '마지막 채팅 보낸 일시',
 	`member_fir_seq`	int	NOT NULL	COMMENT '채팅 요청한 사용자 인덱스',

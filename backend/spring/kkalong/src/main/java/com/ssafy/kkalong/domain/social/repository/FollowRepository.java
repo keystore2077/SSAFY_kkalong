@@ -11,5 +11,4 @@ public interface  FollowRepository extends JpaRepository <Follow, FollowKey> {
     Optional<Follow> findByFollowingMemberMemberSeqAndFollowerMemberMemberSeqAndIsFollowDeleted(int followingId, int followerId, boolean isDeleted);
     List<Follow> findAllByFollowingMemberMemberSeqAndIsFollowDeleted(int followingId, boolean isDeleted);
     List<Follow> findAllByFollowerMemberMemberSeqAndIsFollowDeleted(int followerId, boolean isDeleted);
-
 }
