@@ -133,6 +133,8 @@ class ClosetInfoState extends State<ClosetInfo> {
           data: formData);
       // print("Response: ${response.data}");
       print(formData.fields);
+      print('해치웠나?');
+      print(response);
       return response.data;
     } catch (e) {
       print(e);

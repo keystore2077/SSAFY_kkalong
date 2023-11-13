@@ -6,16 +6,16 @@ import 'package:provider/provider.dart';
 import '../store/userstore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import 'dart:convert';
 class ClosetChange extends StatefulWidget {
   const ClosetChange({
     super.key,
     this.storage,
-    required this.image,
+    required this.closetSeq,
   });
 
   final storage;
-  final XFile image;
+  final closetSeq;
 
   @override
   State<ClosetChange> createState() => ClosetChangeState();
@@ -60,6 +60,42 @@ class ClosetChangeState extends State<ClosetChange> {
     });
   }
 
+  var sections2 = [];
+  var imgUrl =
+      'https://mblogthumb-phinf.pstatic.net/MjAxODEyMTlfMTcz/MDAxNTQ1MjA0MTk4NDQy.-lCTSpFhyK1yb6_e8FaFoZwZmMb_-rRZ04AnFmNijB4g.ID8x5cmkX8obTOxG8yoq39JRURXvKBPjbxY_z5M90bkg.JPEG.cine_play/707211_1532672215.jpg?type=w800';
+  // var imgUrl = '';
+  var closetName = '';
+
+  Future<dynamic> dioData(token) async {
+    try {
+      final response =
+          await dio.get('$serverURL/api/closet/${widget.closetSeq}',
+              // queryParameters: {'userEmail': id}
+              options: Options(
+                headers: {
+                  'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+                  // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+                },
+              ));
+      var result = response.data['body'];
+      setState(() {
+        data = result;
+        sections2 = result['closetSectionList'];
+        imgUrl = result['closetPictureUrl'];
+        closetName = result['closetName'];
+      });
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
+
   //  데이터 보내는 함수
   var data = [];
 
@@ -80,26 +116,46 @@ class ClosetChangeState extends State<ClosetChange> {
     //   };
     // }).toList();
 
-    List<Map<String, dynamic>> sectionList =
-        sectionItems.entries.expand((entry) {
-      return entry.value.map((itemName) {
-        return {
-          "sectionName": itemName,
-          "sort": entry.key,
-        };
-      });
-    }).toList();
+    // List<Map<String, dynamic>> sectionList =
+    //     sectionItems.entries.expand((entry) {
+    //   return entry.value.map((itemName) {
+    //     return {
+    //       "sectionName": itemName,
+    //       "sort": entry.key,
+    //     };
+    //   });
+    // }).toList();
+
+    // 기존의 sectionItems에서 FormData에 추가할 각 항목을 생성
+    List<MapEntry<String, String>> closetSectionListEntries = [];
+    for (var entry in sectionItems.entries) {
+      for (var i = 0; i < entry.value.length; i++) {
+        var itemName = entry.value[i];
+        closetSectionListEntries.add(MapEntry('closetSectionList[$i].sort', entry.key));
+        closetSectionListEntries.add(MapEntry('closetSectionList[$i].sectionName', itemName));
+      }
+    }
+
+    // closetSectionList를 JSON 문자열로 변환
+    // String closetSectionListJson = jsonEncode(sectionList);
 
     // 파일을 MultipartFile 형식으로 변환
-    var file = await MultipartFile.fromFile(widget.image.path,
-        filename: widget.image.name);
+    // var file = await MultipartFile.fromFile(widget.image.path,
+    //     filename: widget.image.name);
 
     // JSON 데이터와 파일을 포함하는 FormData 생성
-    FormData formData = FormData.fromMap({
-      "file": file,
-      "closetName": inputController.text,
-      "closetSectionList": sectionList
-    });
+    FormData formData = FormData();
+    // 파일 추가
+    // formData.files.add(MapEntry('file', file));
+    
+    formData.fields.add(MapEntry('closetName', inputController.text));
+    formData.fields.addAll(closetSectionListEntries);
+
+    // FormData formData = FormData.fromMap({
+    //   "file": file,
+    //   "closetName": inputController.text,
+    //   "closetSectionList": closetSectionListEntries,
+    // }, ListFormat.multiCompatible);
 
     try {
       // final deviceToken = getMyDeviceToken();
@@ -111,13 +167,18 @@ class ClosetChangeState extends State<ClosetChange> {
             },
           ),
           data: formData);
-      print("Response: ${response.data}");
+      // print("Response: ${response.data}");
+      print(formData.fields);
+      print('해치웠나?');
+      print(response);
       return response.data;
     } catch (e) {
       print(e);
       if (e is DioError) {
         // DioError를 확인
         _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        print(formData.fields);
+        // print(closetSectionListJson);
       } else {
         _showErrorDialog('오류발생!');
       }
@@ -209,7 +270,7 @@ class ClosetChangeState extends State<ClosetChange> {
         backgroundColor: const Color(0xFFF5BEB5),
         toolbarHeight: 55,
         title: const Text(
-          '옷장등록',
+          '옷장 수정',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -223,8 +284,9 @@ class ClosetChangeState extends State<ClosetChange> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Center(
-                child: Image.file(
-                  File(widget.image.path),
+                child: Image.network(
+                  // File(widget.image.path),
+                  imgUrl,
                   width: 200,
                   height: 300,
                 ),

@@ -198,7 +198,7 @@ class ClothChangeState extends State<ClothChange> {
           backgroundColor: const Color(0xFFF5BEB5),
           toolbarHeight: 55,
           title: const Text(
-            '나의 옷',
+            '옷 수정',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
