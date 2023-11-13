@@ -199,4 +199,43 @@ class PageApi {
       print(e.toString());
     }
   }
+
+
+
+Future<dynamic> getprofile(token, nick) async {
+    print(token);
+    print(token.runtimeType);
+    try {
+      final response = await dio.get('$serverURL/api/social/$nick',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('프로필 조회 ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+ Future<dynamic> getfollow(token, nick) async {
+    print(token);
+    print(token.runtimeType);
+    try {
+      final response = await dio.get('$serverURL/api/social/follow/list/$nick',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('팔로잉 조회 ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  } 
+
 }
