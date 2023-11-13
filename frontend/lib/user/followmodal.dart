@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/user/nampage%20copy.dart';
+import 'package:flutter_mycloset/user/nampage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -137,9 +139,9 @@ class FollowModalState extends State<FollowModal> {
                             ElevatedButton(
                               onPressed: () {
                                 // 버튼 클릭 이벤트
-                                showDialog(context: context, builder: (context) {
-                                  return DialogUI(followings: followings, followers: followers);
-                                });
+                                // showDialog(context: context, builder: (context) {
+                                //   return DialogUI2(followings: followings, followers: followers);
+                                // });
                               },
                               style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
@@ -273,10 +275,11 @@ void showSnackBar(BuildContext context, String text) {
   // ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
-class DialogUI extends StatelessWidget {
-  DialogUI({Key? key, required this.followings, required this.followers}) : super(key: key);
-  final List<String> followings;
-  final List<String> followers;
+class DialogUI2 extends StatelessWidget {
+  DialogUI2({Key? key, required this.followings, required this.followers, this.nick}) : super(key: key);
+  final List<dynamic> followings;
+  final List<dynamic> followers;
+  final nick;
 
   @override
   Widget build(BuildContext context) {
@@ -299,7 +302,7 @@ class DialogUI extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.fromLTRB(20, 5, 0, 5),
                       child: Text(
-                        '나',
+                        nick,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w300,
@@ -351,6 +354,12 @@ class DialogUI extends StatelessWidget {
                         children: followings.map((following) => GestureDetector(
                           onTap: () {
                             // navigateTaglist(context, tag);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                              builder: (context) => NamPage2(nick:following),
+                              ),
+                            );
                           },
                           child: Container(
                             margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
@@ -401,6 +410,12 @@ class DialogUI extends StatelessWidget {
                         children: followers.map((follower) => GestureDetector(
                         onTap: () {
                         // navigateTaglist(context, tag);
+                        Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                              builder: (context) => NamPage2(nick:follower),
+                              ),
+                            );
                         },
                         child: Container(
                           margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),

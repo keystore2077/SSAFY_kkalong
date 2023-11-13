@@ -30,17 +30,17 @@ public class SocialController {
     @GetMapping("/follow/{nickName}")
     public Api<Object> followMember( @PathVariable String nickName){
 
-        Member followingMember = memberService.getLoginUserInfo();
-        Member followerMember = memberService.checkNickName(nickName);
+        Member member = memberService.getLoginUserInfo();
+        Member nickNameMember = memberService.checkNickName(nickName);
 
-        if(followingMember==null){
+        if(member==null){
             return Api.ERROR(ErrorCode.BAD_REQUEST,"로그인된 회원 정보를 찾지 못했습니다.");
         }
-        if (followerMember==null) {
+        if (nickNameMember==null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST,String.format("해당 닉네임[%s]을/를 가진 회원을 찾지 못했습니다.", nickName));
         }
 
-        return Api.OK(socialService.followMember(followingMember,followerMember));
+        return Api.OK(socialService.followMember(member,nickNameMember));
 
     }
 
@@ -183,6 +183,21 @@ public class SocialController {
         else{
             return Api.OK(socialService.getListProfile(member));
         }
+    }
+
+    @Operation(summary = "팔로우 상태인지 체크(팔로우 중이면 : true)")
+    @GetMapping("/follow/check/{nickName}")
+    public Api<Object> checkFollow( @PathVariable String nickName){
+        Member loginMember = memberService.getLoginUserInfo();
+        if (loginMember == null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+        Member member = memberService.checkNickName(nickName);
+        if (member==null) {
+            return Api.ERROR(ErrorCode.BAD_REQUEST,String.format("해당 닉네임[%s]을/를 가진 회원을 찾지 못했습니다.", nickName));
+        }
+
+        return Api.OK(socialService.checkFollow(loginMember, member));
     }
 
 

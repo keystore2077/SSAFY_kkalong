@@ -48,9 +48,15 @@ springdoc:
       disabled: true
 
 logging.level:
-  org.hibernate:
-    SQL: debug
-    type: trace
+  org:
+    hibernate:
+      SQL: debug
+      type: trace
+    springframework:
+                data:
+                    mongodb:
+                        core:
+                            MongoTemplate: DEBUG
 
 server:
   port: 8761

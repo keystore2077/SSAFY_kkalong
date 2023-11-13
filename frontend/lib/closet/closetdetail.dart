@@ -214,6 +214,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_mycloset/user/mypage.dart';
 import 'package:flutter_mycloset/user/nampage.dart';
@@ -308,6 +309,29 @@ class _ClosetDetailState extends State<ClosetDetail> {
     );
   }
 
+  Future<dynamic> deleteCloset(token) async {
+    try {
+      final response = await dio.put('$serverURL/api/closet/${widget.closetSeq}',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('옷삭제 api ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -340,7 +364,13 @@ class _ClosetDetailState extends State<ClosetDetail> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete_forever_outlined),
-                        onPressed: () {},
+                        onPressed: () {
+                          deleteCloset(accessToken);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Main()),
+                          );
+                        },
                       ),
                     ],
                   ),

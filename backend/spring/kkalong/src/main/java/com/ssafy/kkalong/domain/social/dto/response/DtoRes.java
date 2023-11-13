@@ -14,6 +14,10 @@ public class DtoRes {
     @Schema(description = "일련번호 ")
     private int seq;
 
+    @Schema(description = "이름")
+    private String name;
+
     @Schema(description = "이미지 url ")
     private String imgUrl;
+
 }

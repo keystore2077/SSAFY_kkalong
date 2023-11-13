@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_mycloset/closet/clothchange.dart';
 import 'package:flutter_mycloset/closet/tagsselect.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
@@ -135,8 +136,12 @@ class ClothDetailState extends State<ClothDetail> {
           actions: [
             IconButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (c) => Text('옷수정하는 창')));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ClothChange(clothSeq: widget.clothSeq)),
+                  );
                 },
                 icon: Icon(
                   Icons.border_color,

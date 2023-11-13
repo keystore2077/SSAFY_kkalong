@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 import '../store/userstore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'dart:convert';
-class ClosetInfo extends StatefulWidget {
-  const ClosetInfo({
+
+class ClosetChange extends StatefulWidget {
+  const ClosetChange({
     super.key,
     this.storage,
     required this.image,
@@ -18,10 +18,10 @@ class ClosetInfo extends StatefulWidget {
   final XFile image;
 
   @override
-  State<ClosetInfo> createState() => ClosetInfoState();
+  State<ClosetChange> createState() => ClosetChangeState();
 }
 
-class ClosetInfoState extends State<ClosetInfo> {
+class ClosetChangeState extends State<ClosetChange> {
   static final storage = FlutterSecureStorage();
   String? accessToken;
 
@@ -80,46 +80,26 @@ class ClosetInfoState extends State<ClosetInfo> {
     //   };
     // }).toList();
 
-    // List<Map<String, dynamic>> sectionList =
-    //     sectionItems.entries.expand((entry) {
-    //   return entry.value.map((itemName) {
-    //     return {
-    //       "sectionName": itemName,
-    //       "sort": entry.key,
-    //     };
-    //   });
-    // }).toList();
-
-    // 기존의 sectionItems에서 FormData에 추가할 각 항목을 생성
-    List<MapEntry<String, String>> closetSectionListEntries = [];
-    for (var entry in sectionItems.entries) {
-      for (var i = 0; i < entry.value.length; i++) {
-        var itemName = entry.value[i];
-        closetSectionListEntries.add(MapEntry('closetSectionList[$i].sort', entry.key));
-        closetSectionListEntries.add(MapEntry('closetSectionList[$i].sectionName', itemName));
-      }
-    }
-
-    // closetSectionList를 JSON 문자열로 변환
-    // String closetSectionListJson = jsonEncode(sectionList);
+    List<Map<String, dynamic>> sectionList =
+        sectionItems.entries.expand((entry) {
+      return entry.value.map((itemName) {
+        return {
+          "sectionName": itemName,
+          "sort": entry.key,
+        };
+      });
+    }).toList();
 
     // 파일을 MultipartFile 형식으로 변환
     var file = await MultipartFile.fromFile(widget.image.path,
         filename: widget.image.name);
 
     // JSON 데이터와 파일을 포함하는 FormData 생성
-    FormData formData = FormData();
-    // 파일 추가
-    formData.files.add(MapEntry('file', file));
-    
-    formData.fields.add(MapEntry('closetName', inputController.text));
-    formData.fields.addAll(closetSectionListEntries);
-
-    // FormData formData = FormData.fromMap({
-    //   "file": file,
-    //   "closetName": inputController.text,
-    //   "closetSectionList": closetSectionListEntries,
-    // }, ListFormat.multiCompatible);
+    FormData formData = FormData.fromMap({
+      "file": file,
+      "closetName": inputController.text,
+      "closetSectionList": sectionList
+    });
 
     try {
       // final deviceToken = getMyDeviceToken();
@@ -131,16 +111,13 @@ class ClosetInfoState extends State<ClosetInfo> {
             },
           ),
           data: formData);
-      // print("Response: ${response.data}");
-      print(formData.fields);
+      print("Response: ${response.data}");
       return response.data;
     } catch (e) {
       print(e);
       if (e is DioError) {
         // DioError를 확인
         _showErrorDialog('오류 발생: ${e.response?.statusCode}');
-        print(formData.fields);
-        // print(closetSectionListJson);
       } else {
         _showErrorDialog('오류발생!');
       }
