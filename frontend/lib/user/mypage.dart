@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mycloset/main.dart';
+import 'package:flutter_mycloset/user/followmodal.dart';
 import 'package:flutter_mycloset/user/login.dart';
 import 'package:flutter_mycloset/user/pageapi.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -21,6 +22,19 @@ class MyPageState extends State<MyPage> {
 
   String nick = '';
   String email = '';
+  List<dynamic> followings = [];
+  List<dynamic> followers = [];
+   
+  List<dynamic> savecloItem = [];
+    // "list": [
+    //   {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
+    //   {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
+    //   {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
+    //   {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
+    // ]
+    List<dynamic> saveCloth = [];
+
+  
 
   @override
   void initState() {
@@ -32,9 +46,34 @@ class MyPageState extends State<MyPage> {
       final info = await pageapi.getinfo(accessToken);
       print(info);
 
-      if (info != null) {
-        nick = info['body']['memberNickname'];
+      if (info != null){
+        setState(() {
+          nick = info['body']['memberNickname'];
+        });
         print(nick);
+
+      }
+
+      final profile = await pageapi.getprofile(accessToken, nick);
+      print(profile); 
+       if (profile != null){
+        setState(() {
+          savecloItem = profile['body']['fashionList'];
+          saveCloth = profile['body']['clothList'];
+        });
+          print(savecloItem);
+
+       }
+
+
+      final followlist = await pageapi.getfollow(accessToken, nick);
+      print(followlist); 
+      if (followlist != null){
+        setState(() {
+          followings = followlist['body']['followingList'];
+          followers = followlist['body']['followerList'];
+        });
+
       }
 
       // if (info != null) {
@@ -67,14 +106,7 @@ class MyPageState extends State<MyPage> {
     // 초기화 작업 수행
   }
 
-  final savecloItem = {
-    "list": [
-      {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
-      {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
-      {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
-      {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
-    ]
-  };
+
 // BearList? bearList;
 
   @override
@@ -326,7 +358,7 @@ class MyPageState extends State<MyPage> {
                   children: [
                     Container(
                       margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
@@ -346,7 +378,7 @@ class MyPageState extends State<MyPage> {
                               Padding(
                                 padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                 child: Text(
-                                  '나는야김싸피',
+                                  nick,
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w600,
@@ -403,7 +435,12 @@ class MyPageState extends State<MyPage> {
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                                // 버튼 클릭 이벤트
+                                showDialog(context: context, builder: (context) {
+                                  return DialogUI2(followings: followings, followers: followers, nick:nick);
+                                });
+                              },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                 borderRadius:
@@ -472,7 +509,7 @@ class MyPageState extends State<MyPage> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    final item = savecloItem['list']?[index];
+                    final item = savecloItem?[index];
                     if (item == null) {
                       return const SizedBox(); // If the item is null, return an empty container
                     }
@@ -484,8 +521,8 @@ class MyPageState extends State<MyPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Image.asset(
-                              item["image"] ?? "Assets/Image/logo.png",
+                            Image.network(
+                              item["imgUrl"] ?? null,
                               height: 100,
                               width: 100,
                             ),
@@ -501,7 +538,99 @@ class MyPageState extends State<MyPage> {
                       ),
                     );
                   },
-                  childCount: savecloItem['list']?.length ?? 0,
+                  childCount: savecloItem?.length ?? 0,
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Expanded(
+                  //   child:
+                  Column(
+                    children: const [
+                      SizedBox(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(30, 0, 30, 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '공개한 옷 ',
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    '(3건)',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // GestureDetector(
+                              //   onTap: () {
+                              //     // 이동 로직을 추가하세요.
+                              //   },
+                              //   child: Text('더보기'),
+                              // ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.all(
+                  20), // Use your desired padding value here.
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 5.0,
+                  mainAxisSpacing: 5.0,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    final item = saveCloth?[index];
+                    if (item == null) {
+                      return const SizedBox(); // If the item is null, return an empty container
+                    }
+                    return GestureDetector(
+                      onTap: () {
+                        // 클릭 이벤트
+                      },
+                      child: Card(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Image.network(
+                              item["imgUrl"] ?? null,
+                              height: 100,
+                              width: 100,
+                            ),
+                            Text(
+                              item["name"] ?? "Unknown",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  childCount: saveCloth?.length ?? 0,
                 ),
               ),
             ),
@@ -515,7 +644,17 @@ class MyPageState extends State<MyPage> {
                     child: ListTile(
                       title: const Text('로그아웃'),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () {},
+                      onTap: () async {
+                    await storage.delete(key: "login");
+                    await pageapi.logout(context.read<UserStore>().accessToken);
+                    await context.read<UserStore>().changeAccessToken('');
+
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => LogIn()),
+                        (route) => false);
+                     },
                     ),
                   ),
                   ListTileTheme(
@@ -523,7 +662,11 @@ class MyPageState extends State<MyPage> {
                     child: ListTile(
                       title: const Text('정보수정'),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () {},
+                      onTap: () {
+                    showDialog(context: context, builder: (context) {
+                      return DialogUI(nick:nick);
+                    });
+                  },
                     ),
                   ),
                 ],
@@ -966,3 +1109,4 @@ class _DialogUIState extends State<DialogUI> {
     );
   }
 }
+
