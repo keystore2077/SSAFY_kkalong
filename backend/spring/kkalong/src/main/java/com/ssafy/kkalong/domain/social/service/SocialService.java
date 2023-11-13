@@ -145,7 +145,7 @@ public class SocialService {
 
         List<Cloth> clothList = clothRepository.findAllByMemberMemberSeqAndIsClothDeleted(memberSeq,false);
         for(Cloth cloth : clothList){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
             ClothRes clothRes = ClothRes.toRes(cloth,imgUrl);
 
             if(cloth.isPrivate()){
@@ -168,7 +168,7 @@ public class SocialService {
 
         List<Cloth> clothList = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(memberSeq,false,false);
         for(Cloth cloth : clothList){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
             ClothRes clothRes = ClothRes.toRes(cloth,imgUrl );
             result.add(clothRes);
         }
@@ -184,15 +184,15 @@ public class SocialService {
         List<Fashion> fashions = fashionRepository.findAllByMemberMemberSeqAndIsFashionDeleted(member.getMemberSeq(),false);
         for(Fashion fashion : fashions){
             String imgUrl = s3Service.generatePresignedUrl("fashion/" + fashion.getFashionImgName());
-            MyDtoRes dtoRes = new MyDtoRes(fashion.getFashionSeq(), imgUrl,fashion.isFashionPrivate());
+            MyDtoRes dtoRes = new MyDtoRes(fashion.getFashionSeq(), imgUrl,fashion.getFashionName(),fashion.isFashionPrivate());
             fashionList.add(dtoRes);
         }
 
         List<MyDtoRes> clothList = new ArrayList<>();
         List<Cloth> cloths = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(member.getMemberSeq(),false,false);
         for(Cloth cloth : cloths){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
-            MyDtoRes dtoRes = new MyDtoRes(cloth.getClothSeq(), imgUrl,cloth.isPrivate());
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
+            MyDtoRes dtoRes = new MyDtoRes(cloth.getClothSeq(), imgUrl,cloth.getClothName(), cloth.isPrivate());
             clothList.add(dtoRes);
         }
 
@@ -214,15 +214,15 @@ public class SocialService {
         List<Fashion> fashions = fashionRepository.findAllByMemberMemberSeqAndIsFashionDeletedAndIsFashionPrivate(member.getMemberSeq(),false,false);
         for(Fashion fashion : fashions){
             String imgUrl = s3Service.generatePresignedUrl("fashion/" + fashion.getFashionImgName());
-            DtoRes dtoRes = new DtoRes(fashion.getFashionSeq(), imgUrl);
+            DtoRes dtoRes = new DtoRes(fashion.getFashionSeq(), fashion.getFashionName(),imgUrl);
             fashionList.add(dtoRes);
         }
 
         List<DtoRes> clothList = new ArrayList<>();
         List<Cloth> cloths = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(member.getMemberSeq(),false,false);
         for(Cloth cloth : cloths){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
-            DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), imgUrl);
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
+            DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), cloth.getClothImgName(),imgUrl);
             clothList.add(dtoRes);
         }
 
