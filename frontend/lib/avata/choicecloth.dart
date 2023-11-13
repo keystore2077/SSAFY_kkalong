@@ -237,7 +237,7 @@ import 'package:dio/dio.dart';
 
 class ChoiceCloth extends StatefulWidget {
   final int photoSeq;
-  final String? imageUrl;
+  String? imageUrl;
   final String sortName;
   int? selectedIndex;
   int? selectedClothSeq;
@@ -257,6 +257,8 @@ class ChoiceCloth extends StatefulWidget {
 }
 
 class ChoiceClothState extends State<ChoiceCloth> {
+  Dio dio = Dio();
+  final serverURL = 'http://k9c105.p.ssafy.io:8761';
   @override
   void initState() {
     super.initState();
@@ -266,8 +268,9 @@ class ChoiceClothState extends State<ChoiceCloth> {
 
   void fetchData() async {
     var accessToken = context.read<UserStore>().accessToken;
-    Dio dio = Dio();
-    const serverURL = 'http://k9c105.p.ssafy.io:8761';
+    // Dio dio = Dio();
+    // const serverURL = 'http://k9c105.p.ssafy.io:8761';
+    // const serverURL = 'http://192.168.100.37:8761';
 
     try {
       Map<String, dynamic> headers = {};
@@ -521,9 +524,11 @@ class ChoiceClothState extends State<ChoiceCloth> {
                                   var accessToken =
                                       context.read<UserStore>().accessToken;
                                   print(accessToken);
-                                  Dio dio = Dio();
-                                  const serverURL =
-                                      'http://k9c105.p.ssafy.io:8761';
+                                  // Dio dio = Dio();
+                                  // const serverURL =
+                                  //     'http://k9c105.p.ssafy.io:8761';
+                                  // const serverURL =
+                                  //     'http://192.168.100.37:8761';
 
                                   try {
                                     // print('capturedImage path: ${capturedImage!}');
@@ -550,7 +555,10 @@ class ChoiceClothState extends State<ChoiceCloth> {
 
                                     print('사진합성요청완료---------------------');
                                     print(response.data);
-
+                                    setState(() {
+                                      widget.imageUrl =
+                                          response.data['body']['url'];
+                                    });
                                     return response.data;
                                   } catch (e) {
                                     print('그밖의 에러ㅜㅜㅜㅜㅜㅜㅜㅜㅜ: $e');
