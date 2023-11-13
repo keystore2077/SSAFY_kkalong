@@ -436,10 +436,39 @@ class MyPageState extends State<MyPage> {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                                // 버튼 클릭 이벤트
-                                showDialog(context: context, builder: (context) {
+                              Future.delayed(Duration.zero, () async {
+      final userStore = Provider.of<UserStore>(context, listen: false);
+      final accessToken = userStore.accessToken;
+      print(accessToken);
+      final info = await pageapi.getinfo(accessToken);
+      print(info);
+
+      if (info != null){
+        setState(() {
+          nick = info['body']['memberNickname'];
+        });
+        print(nick);
+
+      }
+
+
+      final followlist = await pageapi.getfollow(accessToken, nick);
+      print(followlist); 
+      if (followlist != null){
+        setState(() {
+          followings = followlist['body']['followingList'];
+          followers = followlist['body']['followerList'];
+        });
+
+      }
+
+      showDialog(context: context, builder: (context) {
                                   return DialogUI2(followings: followings, followers: followers, nick:nick);
                                 });
+     
+    });
+                                // 버튼 클릭 이벤트
+                                
                               },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
