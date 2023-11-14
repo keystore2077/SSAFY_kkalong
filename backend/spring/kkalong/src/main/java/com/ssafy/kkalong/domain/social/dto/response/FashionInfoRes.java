@@ -9,6 +9,10 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class FashionInfoRes {
+
+    @Schema(description = "회원 닉네임")
+    private String memberNickname ;
+
     @Schema(description = "인덱스")
     int fashionSeq;
 
@@ -32,6 +36,7 @@ public class FashionInfoRes {
 
     public static FashionInfoRes toRes(Fashion fashion, String imgUrl,int cntLike,int cntHate){
         return FashionInfoRes.builder()
+                .memberNickname(fashion.getMember().getMemberNickname())
                 .fashionSeq(fashion.getFashionSeq())
                 .fashionName(fashion.getFashionName())
                 .isFashionPrivate(fashion.isFashionPrivate())
