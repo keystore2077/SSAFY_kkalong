@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mycloset/avata/choicecloth.dart';
 
 class Completecody extends StatefulWidget {
-  const Completecody({
-    super.key,
-    this.storage,
-  });
+  String memberNickname;
+  String fashionName;
+  String imgUrl;
+
+  Completecody(
+      {super.key,
+      this.storage,
+      required this.fashionName,
+      required this.memberNickname,
+      required this.imgUrl});
 
   final storage;
 
@@ -44,20 +50,20 @@ class CompletecodyState extends State<Completecody> {
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: CustomScrollView(
         slivers: <Widget>[
-          const SliverAppBar(
+          SliverAppBar(
             backgroundColor: Color(0xFFF5BEB5),
             expandedHeight: 55.0,
             floating: true,
             pinned: true,
             title: Text(
-              'complete깔롱코디',
+              '${widget.memberNickname}의 깔롱코디',
               style: TextStyle(color: Colors.white),
             ),
             centerTitle: true,
             elevation: 0,
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 1,
@@ -73,15 +79,25 @@ class CompletecodyState extends State<Completecody> {
                   return GestureDetector(
                     onTap: () {},
                     child: Container(
-                      // height: 500.0,
                       color: const Color.fromARGB(255, 251, 235, 233),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Image.asset(
-                            item["image"] ?? "Assets/Image/logo.png",
-                            height: 400,
-                            width: 180,
+                          Image.network(
+                            widget.imgUrl ??
+                                "https://example.com/default_image.png",
+                            height: 300,
+                            width: 300,
+                            fit: BoxFit.cover,
+                            errorBuilder: (BuildContext context, Object error,
+                                StackTrace? stackTrace) {
+                              // 이미지 로드 실패 시 대체 이미지 표시
+                              return Image.asset(
+                                "Assets/Image/logo.png",
+                                height: 200,
+                                width: 180,
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -92,7 +108,7 @@ class CompletecodyState extends State<Completecody> {
               ),
             ),
           ),
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.fromLTRB(18, 2, 18, 2),
               child: Column(
@@ -102,7 +118,7 @@ class CompletecodyState extends State<Completecody> {
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(2, 0, 2, 0),
                       child: Text(
-                        '몰디브 한잔',
+                        widget.fashionName,
                         style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w600,
@@ -116,7 +132,7 @@ class CompletecodyState extends State<Completecody> {
                       padding: EdgeInsets.fromLTRB(2, 0, 2, 0),
                       child: SizedBox(
                         child: Text(
-                          '완성된 코디는 내 프로필에 저장됩니다.',
+                          widget.fashionName,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w400,

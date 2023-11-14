@@ -3,6 +3,7 @@ import 'package:flutter_mycloset/closet/clothdetail.dart';
 import 'package:flutter_mycloset/main.dart';
 import 'package:flutter_mycloset/user/followmodal.dart';
 import 'package:flutter_mycloset/user/login.dart';
+import '../avata/completecody.dart';
 import 'package:flutter_mycloset/user/pageapi.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,9 @@ class MyPageState extends State<MyPage> {
   String nick = '';
   String email = '';
   int fashionSeq = 1;
+  String memberNickname = '';
+  String fashionName = '';
+  String imgUrl = '';
   List<dynamic> followings = [];
   List<dynamic> followers = [];
 
@@ -331,12 +335,23 @@ class MyPageState extends State<MyPage> {
                             options: Options(headers: headers),
                           );
 
+                          setState(() {
+                            memberNickname =
+                                response.data['body']['memberNickname'];
+                            fashionName = response.data['body']['fashionName'];
+                            imgUrl = response.data['body']['imgUrl'];
+                          });
+
                           print('리스판스데이타출력++++++++++++++');
                           print(response.data);
-                          // var cloList = response.data['body'];
-                          // setState(() {
-                          //   widget.photoList = response.data['body'];
-                          // });
+
+                          Navigator.of(context)
+                              .pushReplacement(MaterialPageRoute(
+                            builder: (_) => Completecody(
+                                memberNickname: memberNickname,
+                                fashionName: fashionName,
+                                imgUrl: imgUrl),
+                          ));
                           return response.data;
                         } catch (e) {
                           print('에러: $e');
