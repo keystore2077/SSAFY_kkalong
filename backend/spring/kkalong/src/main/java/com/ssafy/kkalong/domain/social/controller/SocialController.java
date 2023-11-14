@@ -6,6 +6,7 @@ import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.domain.social.dto.request.FashionSaveReq;
+import com.ssafy.kkalong.domain.social.entity.Fashion;
 import com.ssafy.kkalong.domain.social.service.SocialService;
 import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
@@ -185,6 +186,22 @@ public class SocialController {
 
         return Api.OK(socialService.checkFollow(loginMember, member));
     }
+
+//    @Operation(summary = "코디 상세보기")
+//    @GetMapping("/fashion/{fashionSeq}")
+//    public Api<Object> getfashion( @PathVariable int fashionSeq){
+//        Member loginMember = memberService.getLoginUserInfo();
+//        if (loginMember == null) {
+//            return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+//        }
+//        Fashion fashion = socialService.getfashion(fashionSeq,loginMember.getMemberSeq());
+//        if (fashion==null) {
+//            return Api.ERROR(ErrorCode.BAD_REQUEST,"코디 사진 정보를 찾을 수 없습니다.");
+//        }
+//
+//        return Api.OK();
+//    }
+
 
 
 }
