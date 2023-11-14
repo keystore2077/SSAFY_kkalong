@@ -238,4 +238,54 @@ Future<dynamic> getprofile(token, nick) async {
     }
   } 
 
+  Future<dynamic> checkfollow(token, nick) async {
+    try {
+      final response = await dio.get('$serverURL/api/social/follow/check/$nick',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('팔로우 현황 조회 ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  } 
+
+  Future<dynamic> follow(token, nick) async {
+    try {
+      final response = await dio.get('$serverURL/api/social/follow/$nick',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('팔로우 성공 ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  } 
+
+    Future<dynamic> unfollow(token, nick) async {
+    try {
+      final response = await dio.put('$serverURL/api/social/follow/$nick',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('언팔로우 성공 ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  } 
+
+
+
 }

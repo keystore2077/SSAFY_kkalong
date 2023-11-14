@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/closet/clothdetail.dart';
 import 'package:flutter_mycloset/main.dart';
 import 'package:flutter_mycloset/user/followmodal.dart';
 import 'package:flutter_mycloset/user/login.dart';
@@ -436,10 +437,39 @@ class MyPageState extends State<MyPage> {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                                // 버튼 클릭 이벤트
-                                showDialog(context: context, builder: (context) {
+                              Future.delayed(Duration.zero, () async {
+      final userStore = Provider.of<UserStore>(context, listen: false);
+      final accessToken = userStore.accessToken;
+      print(accessToken);
+      final info = await pageapi.getinfo(accessToken);
+      print(info);
+
+      if (info != null){
+        setState(() {
+          nick = info['body']['memberNickname'];
+        });
+        print(nick);
+
+      }
+
+
+      final followlist = await pageapi.getfollow(accessToken, nick);
+      print(followlist); 
+      if (followlist != null){
+        setState(() {
+          followings = followlist['body']['followingList'];
+          followers = followlist['body']['followerList'];
+        });
+
+      }
+
+      showDialog(context: context, builder: (context) {
                                   return DialogUI2(followings: followings, followers: followers, nick:nick);
                                 });
+     
+    });
+                                // 버튼 클릭 이벤트
+                                
                               },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -457,7 +487,7 @@ class MyPageState extends State<MyPage> {
                   // Expanded(
                   //   child:
                   Column(
-                    children: const [
+                    children: [
                       SizedBox(
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(30, 0, 30, 4),
@@ -475,7 +505,7 @@ class MyPageState extends State<MyPage> {
                                     ),
                                   ),
                                   Text(
-                                    '(3건)',
+                                    '(${savecloItem.length.toString()}건)',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -549,7 +579,7 @@ class MyPageState extends State<MyPage> {
                   // Expanded(
                   //   child:
                   Column(
-                    children: const [
+                    children: [
                       SizedBox(
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(30, 0, 30, 4),
@@ -567,7 +597,7 @@ class MyPageState extends State<MyPage> {
                                     ),
                                   ),
                                   Text(
-                                    '(3건)',
+                                    '(${saveCloth.length.toString()}건)',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -608,6 +638,12 @@ class MyPageState extends State<MyPage> {
                     return GestureDetector(
                       onTap: () {
                         // 클릭 이벤트
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ClothDetail(clothSeq: item['seq'])),
+                        );
                       },
                       child: Card(
                         child: Column(

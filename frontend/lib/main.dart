@@ -2,8 +2,6 @@ import 'package:flutter_mycloset/pages/swipe.dart';
 import 'package:provider/provider.dart';
 import 'store/userstore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../user/pageapi.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mycloset/avata/choicepicture.dart';
 import './reafeat/splash.dart';
@@ -83,7 +81,7 @@ class _MainState extends State<Main> {
         child: Scaffold(
           body: SafeArea(
             child: TabBarView(
-              children: const [
+              children: [
                 ChoicePicture(),
                 MyCloset(),
                 CategoryPage(),
