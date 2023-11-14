@@ -307,7 +307,7 @@ public class ClothController {
         }
         ClothSaveRes clothSaveRes = clothService.updateCloth(cloth, clothUpdateReq);
 
-        if(!file.isEmpty()){
+        if(file!=null || !file.isEmpty()){
             fastApiCallerService.callU2Net(member, fileName, clothSaveRes.getClothRes().getClothSeq());
         }
 
