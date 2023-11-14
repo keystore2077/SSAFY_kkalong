@@ -25,17 +25,15 @@ class MyPageState extends State<MyPage> {
   String email = '';
   List<dynamic> followings = [];
   List<dynamic> followers = [];
-   
-  List<dynamic> savecloItem = [];
-    // "list": [
-    //   {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
-    //   {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
-    //   {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
-    //   {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
-    // ]
-    List<dynamic> saveCloth = [];
 
-  
+  List<dynamic> savecloItem = [];
+  // "list": [
+  //   {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
+  //   {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
+  //   {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
+  //   {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
+  // ]
+  List<dynamic> saveCloth = [];
 
   @override
   void initState() {
@@ -47,34 +45,30 @@ class MyPageState extends State<MyPage> {
       final info = await pageapi.getinfo(accessToken);
       print(info);
 
-      if (info != null){
+      if (info != null) {
         setState(() {
           nick = info['body']['memberNickname'];
         });
         print(nick);
-
       }
 
       final profile = await pageapi.getprofile(accessToken, nick);
-      print(profile); 
-       if (profile != null){
+      print(profile);
+      if (profile != null) {
         setState(() {
           savecloItem = profile['body']['fashionList'];
           saveCloth = profile['body']['clothList'];
         });
-          print(savecloItem);
-
-       }
-
+        print(savecloItem);
+      }
 
       final followlist = await pageapi.getfollow(accessToken, nick);
-      print(followlist); 
-      if (followlist != null){
+      print(followlist);
+      if (followlist != null) {
         setState(() {
           followings = followlist['body']['followingList'];
           followers = followlist['body']['followerList'];
         });
-
       }
 
       // if (info != null) {
@@ -106,7 +100,6 @@ class MyPageState extends State<MyPage> {
 
     // 초기화 작업 수행
   }
-
 
 // BearList? bearList;
 
@@ -438,39 +431,44 @@ class MyPageState extends State<MyPage> {
                           ElevatedButton(
                             onPressed: () {
                               Future.delayed(Duration.zero, () async {
-      final userStore = Provider.of<UserStore>(context, listen: false);
-      final accessToken = userStore.accessToken;
-      print(accessToken);
-      final info = await pageapi.getinfo(accessToken);
-      print(info);
+                                final userStore = Provider.of<UserStore>(
+                                    context,
+                                    listen: false);
+                                final accessToken = userStore.accessToken;
+                                print(accessToken);
+                                final info = await pageapi.getinfo(accessToken);
+                                print(info);
 
-      if (info != null){
-        setState(() {
-          nick = info['body']['memberNickname'];
-        });
-        print(nick);
+                                if (info != null) {
+                                  setState(() {
+                                    nick = info['body']['memberNickname'];
+                                  });
+                                  print(nick);
+                                }
 
-      }
+                                final followlist =
+                                    await pageapi.getfollow(accessToken, nick);
+                                print(followlist);
+                                if (followlist != null) {
+                                  setState(() {
+                                    followings =
+                                        followlist['body']['followingList'];
+                                    followers =
+                                        followlist['body']['followerList'];
+                                  });
+                                }
 
-
-      final followlist = await pageapi.getfollow(accessToken, nick);
-      print(followlist); 
-      if (followlist != null){
-        setState(() {
-          followings = followlist['body']['followingList'];
-          followers = followlist['body']['followerList'];
-        });
-
-      }
-
-      showDialog(context: context, builder: (context) {
-                                  return DialogUI2(followings: followings, followers: followers, nick:nick);
-                                });
-     
-    });
-                                // 버튼 클릭 이벤트
-                                
-                              },
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return DialogUI2(
+                                          followings: followings,
+                                          followers: followers,
+                                          nick: nick);
+                                    });
+                              });
+                              // 버튼 클릭 이벤트
+                            },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                 borderRadius:
@@ -539,7 +537,7 @@ class MyPageState extends State<MyPage> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    final item = savecloItem?[index];
+                    final item = savecloItem[index];
                     if (item == null) {
                       return const SizedBox(); // If the item is null, return an empty container
                     }
@@ -552,7 +550,7 @@ class MyPageState extends State<MyPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Image.network(
-                              item["imgUrl"] ?? null,
+                              item["imgUrl"],
                               height: 100,
                               width: 100,
                             ),
@@ -568,7 +566,7 @@ class MyPageState extends State<MyPage> {
                       ),
                     );
                   },
-                  childCount: savecloItem?.length ?? 0,
+                  childCount: savecloItem.length ?? 0,
                 ),
               ),
             ),
@@ -631,7 +629,7 @@ class MyPageState extends State<MyPage> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    final item = saveCloth?[index];
+                    final item = saveCloth[index];
                     if (item == null) {
                       return const SizedBox(); // If the item is null, return an empty container
                     }
@@ -650,7 +648,7 @@ class MyPageState extends State<MyPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Image.network(
-                              item["imgUrl"] ?? null,
+                              item["imgUrl"],
                               height: 100,
                               width: 100,
                             ),
@@ -666,7 +664,7 @@ class MyPageState extends State<MyPage> {
                       ),
                     );
                   },
-                  childCount: saveCloth?.length ?? 0,
+                  childCount: saveCloth.length ?? 0,
                 ),
               ),
             ),
@@ -681,16 +679,17 @@ class MyPageState extends State<MyPage> {
                       title: const Text('로그아웃'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () async {
-                    await storage.delete(key: "login");
-                    await pageapi.logout(context.read<UserStore>().accessToken);
-                    await context.read<UserStore>().changeAccessToken('');
+                        await storage.delete(key: "login");
+                        await pageapi
+                            .logout(context.read<UserStore>().accessToken);
+                        await context.read<UserStore>().changeAccessToken('');
 
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) => LogIn()),
-                        (route) => false);
-                     },
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => LogIn()),
+                            (route) => false);
+                      },
                     ),
                   ),
                   ListTileTheme(
@@ -699,10 +698,12 @@ class MyPageState extends State<MyPage> {
                       title: const Text('정보수정'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
-                    showDialog(context: context, builder: (context) {
-                      return DialogUI(nick:nick);
-                    });
-                  },
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return DialogUI(nick: nick);
+                            });
+                      },
                     ),
                   ),
                 ],
@@ -1145,4 +1146,3 @@ class _DialogUIState extends State<DialogUI> {
     );
   }
 }
-
