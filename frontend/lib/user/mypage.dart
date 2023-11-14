@@ -554,7 +554,7 @@ class MyPageState extends State<MyPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Image.network(
-                                    item["imgUrl"] ?? null,
+                                    item["imgUrl"],
                                     height: 100,
                                     width: 100,
                                   ),
@@ -573,19 +573,24 @@ class MyPageState extends State<MyPage> {
                               right: 8.0,
                               child: IconButton(
                                 icon: Icon(Icons.lock),
-                                color: item['isPrivate']? Colors.yellow: Colors.black,
+                                color: item['isPrivate']
+                                    ? Color.fromARGB(255, 219, 201, 248)
+                                    : Color.fromARGB(255, 121, 120, 121),
                                 onPressed: () {
                                   Future.delayed(Duration.zero, () async {
-                                    final userStore = Provider.of<UserStore>(context, listen: false);
+                                    final userStore = Provider.of<UserStore>(
+                                        context,
+                                        listen: false);
                                     final accessToken = userStore.accessToken;
                                     print(accessToken);
-                                    final lock = await pageapi.lockfashion(accessToken, item['seq']);
-                                    if (lock != null){
+                                    final lock = await pageapi.lockfashion(
+                                        accessToken, item['seq']);
+                                    if (lock != null) {
                                       setState(() {
                                         item['isPrivate'] = !item['isPrivate'];
                                       });
                                     }
-                                    });
+                                  });
                                   // 자물쇠 버튼 클릭 이벤트
                                 },
                               ),
