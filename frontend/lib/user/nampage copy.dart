@@ -690,7 +690,7 @@ class NamPage2State extends State<NamPage2> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              const Row(
+                               Row(
                                 children: [
                                   Text(
                                     '저장한 코디 ',
@@ -700,7 +700,7 @@ class NamPage2State extends State<NamPage2> {
                                     ),
                                   ),
                                   Text(
-                                    '(3건)',
+                                    '(${savecloItem.length.toString()}건)',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -897,7 +897,7 @@ class NamPage2State extends State<NamPage2> {
                   // Expanded(
                   //   child:
                   Column(
-                    children: const [
+                    children: [
                       SizedBox(
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(30, 0, 30, 4),
@@ -915,7 +915,7 @@ class NamPage2State extends State<NamPage2> {
                                     ),
                                   ),
                                   Text(
-                                    '(3건)',
+                                    '(${opencloItem.length.toString()}건)',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
