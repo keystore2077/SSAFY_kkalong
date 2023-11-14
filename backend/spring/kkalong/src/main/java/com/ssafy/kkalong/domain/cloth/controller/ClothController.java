@@ -249,7 +249,7 @@ public class ClothController {
 
         String imgUrl="";
         String fileName="";
-        if (!file.isEmpty()) {
+        if (file!=null && !file.isEmpty()) {
 
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
                 //1.원본 사진 저장
