@@ -206,7 +206,7 @@ public class ClothController {
 
     @Operation(summary = "옷 정보수정")
     @PutMapping(value = "" )
-    public Api<Object> updateCloth(@RequestParam("mFile") MultipartFile file, @ModelAttribute ClothUpdateReq request) {
+    public Api<Object> updateCloth(@RequestParam(value = "mFile",required = false ) MultipartFile file, @ModelAttribute ClothUpdateReq request) {
         System.out.println(file);
         System.out.println(request.toString());
 

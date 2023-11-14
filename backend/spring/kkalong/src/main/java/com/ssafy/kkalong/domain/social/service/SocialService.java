@@ -242,4 +242,8 @@ public class SocialService {
         return follow != null;
     }
 
+    public Fashion getfashion (int fashionSeq,int memberSeq){
+        return fashionRepository.findByFashionSeqAndMemberMemberSeqAndIsFashionDeleted(fashionSeq, memberSeq,false).orElse(null);
+    }
+
 }
