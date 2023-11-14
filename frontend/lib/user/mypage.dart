@@ -27,9 +27,15 @@ class MyPageState extends State<MyPage> {
   List<dynamic> followers = [];
 
   List<dynamic> savecloItem = [];
-  List<dynamic> reversedList = [];
-
-  List<dynamic> saveCloth = [];
+    // "list": [
+    //   {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
+    //   {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
+    //   {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
+    //   {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
+    // ]
+    List<dynamic> saveCloth = [];
+    bool showCody = false;
+    bool showCloth = false;
 
   void updateReversedList() {
     reversedList = List.from(savecloItem.reversed);
@@ -267,8 +273,13 @@ class MyPageState extends State<MyPage> {
                                 ],
                               ),
                               GestureDetector(
-                                onTap: () {},
-                                child: Text('더보기'),
+                                onTap: () {
+                                  // 이동 로직을 추가하세요.
+                                  setState(() {
+                                    showCody = !showCody;
+                                  });
+                                },
+                                child: showCody? Text('간략히') : Text('더보기'),
                               ),
                             ],
                           ),
@@ -290,10 +301,10 @@ class MyPageState extends State<MyPage> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    final item = savecloItem[index];
-                    if (item == null) {
-                      return const SizedBox(); // If the item is null, return an empty container
-                    }
+                    if (savecloItem == null || index >= savecloItem.length || (!showCody && index >= 4)) {
+                  return const SizedBox(); // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
+                }
+                final item = savecloItem[index];
                     return GestureDetector(
                       onTap: () {
                         print(item['seq']);
@@ -354,7 +365,7 @@ class MyPageState extends State<MyPage> {
                       ),
                     );
                   },
-                  childCount: savecloItem.length ?? 0,
+                  childCount: showCody? (savecloItem?.length ?? 0) : 4,
                 ),
               ),
             ),
@@ -391,12 +402,15 @@ class MyPageState extends State<MyPage> {
                                   ),
                                 ],
                               ),
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     // 이동 로직을 추가하세요.
-                              //   },
-                              //   child: Text('더보기'),
-                              // ),
+                              GestureDetector(
+                                onTap: () {
+                                  // 이동 로직을 추가하세요.
+                                  setState(() {
+                                    showCloth = !showCloth;
+                                  });
+                                },
+                                child: showCloth? Text('간략히') : Text('더보기'),
+                              ),
                             ],
                           ),
                         ),
@@ -417,10 +431,10 @@ class MyPageState extends State<MyPage> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    final item = saveCloth[index];
-                    if (item == null) {
-                      return const SizedBox(); // If the item is null, return an empty container
+                     if (saveCloth == null || index >= saveCloth.length || (!showCloth && index >= 4)) {
+                     return const SizedBox(); // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
                     }
+                    final item = saveCloth[index];
                     return GestureDetector(
                       onTap: () {
                         // 클릭 이벤트
@@ -452,7 +466,7 @@ class MyPageState extends State<MyPage> {
                       ),
                     );
                   },
-                  childCount: saveCloth.length ?? 0,
+                  childCount: showCloth? (saveCloth?.length ?? 0) : 4,
                 ),
               ),
             ),

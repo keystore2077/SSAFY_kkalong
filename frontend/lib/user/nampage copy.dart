@@ -465,6 +465,9 @@ class NamPage2State extends State<NamPage2> {
   List<dynamic> opencloItem = [];
   bool isfollowing = false;
 
+  bool showCody = false;
+  bool showCloth = false;
+
 
   @override
   void initState() {
@@ -709,12 +712,15 @@ class NamPage2State extends State<NamPage2> {
                                   ),
                                 ],
                               ),
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     // 이동 로직을 추가하세요.
-                              //   },
-                              //   child: const Text('더보기'),
-                              // ),
+                              GestureDetector(
+                                onTap: () {
+                                  // 이동 로직을 추가하세요.
+                                  setState(() {
+                                    showCody = !showCody;
+                                  });
+                                },
+                                child: showCody? Text('간략히') : Text('더보기'),
+                              ),
                             ],
                           ),
                         ),
@@ -776,10 +782,10 @@ class NamPage2State extends State<NamPage2> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    final item = savecloItem?[index];
-                    if (item == null) {
-                      return const SizedBox(); // If the item is null, return an empty container
-                    }
+                  if (savecloItem == null || index >= savecloItem.length || (!showCody && index >= 4)) {
+                  return const SizedBox(); // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
+                  }
+                  final item = savecloItem[index];
                     return GestureDetector(
                       onTap: () {
                         // 클릭 이벤트
@@ -805,7 +811,7 @@ class NamPage2State extends State<NamPage2> {
                       ),
                     );
                   },
-                  childCount: savecloItem?.length ?? 0,
+                  childCount: showCody? (savecloItem?.length ?? 0) : 4,
                 ),
               ),
             ),
@@ -924,12 +930,15 @@ class NamPage2State extends State<NamPage2> {
                                   ),
                                 ],
                               ),
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     // 이동 로직을 추가하세요.
-                              //   },
-                              //   child: Text('더보기'),
-                              // ),
+                              GestureDetector(
+                                onTap: () {
+                                  // 이동 로직을 추가하세요.
+                                  setState(() {
+                                    showCloth = !showCloth;
+                                  });
+                                },
+                                child: showCloth? Text('간략히') : Text('더보기'),
+                              ),
                             ],
                           ),
                         ),
@@ -950,10 +959,10 @@ class NamPage2State extends State<NamPage2> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    final item = opencloItem?[index];
-                    if (item == null) {
-                      return const SizedBox(); // If the item is null, return an empty container
+                     if (opencloItem == null || index >= opencloItem.length || (!showCloth && index >= 4)) {
+                     return const SizedBox(); // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
                     }
+                    final item = opencloItem[index];
                     return GestureDetector(
                       onTap: () {
                         // 클릭 이벤트
@@ -986,7 +995,7 @@ class NamPage2State extends State<NamPage2> {
                       ),
                     );
                   },
-                  childCount: opencloItem?.length ?? 0,
+                  childCount: showCloth? (opencloItem?.length ?? 0) : 4,
                 ),
               ),
             ),
