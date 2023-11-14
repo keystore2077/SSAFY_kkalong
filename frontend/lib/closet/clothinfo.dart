@@ -299,6 +299,7 @@ class ClothInfoState extends State<ClothInfo> {
                       height: 50,
                       child: TextField(
                         controller: inputController,
+                        autofocus: true,
                         decoration: const InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
                                 vertical: 16.0, horizontal: 30.0),
@@ -551,7 +552,6 @@ class ClothInfoState extends State<ClothInfo> {
                         Expanded(
                           child: TextField(
                             controller: inputController2,
-                            autofocus: true,
                             decoration: const InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
                                 vertical: 16.0,

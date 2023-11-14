@@ -17,6 +17,8 @@ class CategorySelect extends StatefulWidget {
 class _CategorySelectState extends State<CategorySelect> {
   final ScrollController scrollController = ScrollController();
 
+  var flag = 0;
+  
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -39,6 +41,20 @@ class _CategorySelectState extends State<CategorySelect> {
                   // collapsedHeight: 325,
                   // expandedHeight: 325,
                   actions: [
+                    IconButton(
+                            icon: const Icon(Icons.local_shipping), // 두 번째 아이콘
+                            onPressed: () {
+                              if (flag == 0) {
+                                setState(() {
+                                  flag = 1;
+                                });
+                              } else {
+                                setState(() {
+                                  flag = 0;
+                                });
+                              }
+                            },
+                          ),
                     IconButton(
                       icon: const Icon(Icons.delete_forever_outlined),
                       onPressed: () {},
@@ -69,32 +85,47 @@ class _CategorySelectState extends State<CategorySelect> {
               ];
             },
             body: TabBarView(children: [
-              CategoryClothList(category: 0),
-              CategoryClothList(category: 1),
-              CategoryClothList(category: 2),
-              CategoryClothList(category: 3),
-              CategoryClothList(category: 4),
-              CategoryClothList(category: 5),
+              CategoryClothList(category: 0, flag: flag),
+              CategoryClothList(category: 1, flag: flag),
+              CategoryClothList(category: 2, flag: flag),
+              CategoryClothList(category: 3, flag: flag),
+              CategoryClothList(category: 4, flag: flag),
+              CategoryClothList(category: 5, flag: flag),
             ]),
           ),
         ),
 
-        floatingActionButton: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ClothCamera()),
-            );
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[50],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
-            ),
-            // 다른 스타일 속성들
-          ),
-          child: const Text(' + 옷등록'),
-        ),
+        floatingActionButton: flag == 0
+            ? ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ClothCamera()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[50],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+                  ),
+                  // 다른 스타일 속성들
+                ),
+                child: const Text(' + 옷등록'),
+              )
+            : ElevatedButton(
+                onPressed: () {
+                  // 옮기기 로직
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[50],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+                  ),
+                  // 다른 스타일 속성들
+                ),
+                child: const Text('옮기기'),
+              ),
         // floatingActionButton: ElevatedButton(
         //   onPressed: () {
         //     print('여기까지 잘왔니??????');

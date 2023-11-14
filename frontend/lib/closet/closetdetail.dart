@@ -263,7 +263,7 @@ class _ClosetDetailState extends State<ClosetDetail> {
                   ),
                 ))
             : Center(child: CircularProgressIndicator()),
-        floatingActionButton: flag == 1
+        floatingActionButton: flag == 0
             ? ElevatedButton(
                 onPressed: () {
                   Navigator.push(
