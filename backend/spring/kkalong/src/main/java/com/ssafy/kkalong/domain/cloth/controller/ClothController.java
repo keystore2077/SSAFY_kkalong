@@ -207,6 +207,7 @@ public class ClothController {
     @Operation(summary = "옷 정보수정")
     @PutMapping(value = "" )
     public Api<Object> updateCloth(@RequestParam("mFile") MultipartFile file, @ModelAttribute ClothUpdateReq request) {
+        System.out.println(file);
         System.out.println(request.toString());
 
         Member member = memberService.getLoginUserInfo();
@@ -249,7 +250,7 @@ public class ClothController {
 
         String imgUrl="";
         String fileName="";
-        if (!file.isEmpty()) {
+        if (file!=null && !file.isEmpty()) {
 
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
                 //1.원본 사진 저장
