@@ -1,5 +1,6 @@
 package com.ssafy.kkalong.domain.social.service;
 
+import com.ssafy.kkalong.domain.assess.repository.AssessRepository;
 import com.ssafy.kkalong.domain.cloth.dto.response.ClothRes;
 import com.ssafy.kkalong.domain.cloth.entity.Cloth;
 import com.ssafy.kkalong.domain.cloth.repository.ClothRepository;
@@ -27,6 +28,7 @@ public class SocialService {
     private final FollowRepository followRepository;
     private final FashionRepository fashionRepository;
     private final ClothRepository clothRepository;
+    private final AssessRepository assessRepository;
 
     private final S3Service s3Service;
 
@@ -242,8 +244,16 @@ public class SocialService {
         return follow != null;
     }
 
-    public Fashion getfashion (int fashionSeq,int memberSeq){
+    public Fashion getFashion (int fashionSeq,int memberSeq){
         return fashionRepository.findByFashionSeqAndMemberMemberSeqAndIsFashionDeleted(fashionSeq, memberSeq,false).orElse(null);
     }
+
+    public FashionInfoRes getFashionInfo (Fashion fashion){
+        String imgUrl = s3Service.generatePresignedUrl("fashion/" + fashion.getFashionImgName());
+        int cntLike = assessRepository.findByFashionFashionSeqAndIsLike(fashion.getFashionSeq(),true).size();
+        int cntHate = assessRepository.findByFashionFashionSeqAndIsLike(fashion.getFashionSeq(),false).size();
+        return FashionInfoRes.toRes(fashion,imgUrl,cntLike,cntHate);
+    }
+
 
 }
