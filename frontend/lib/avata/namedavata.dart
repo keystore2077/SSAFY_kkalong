@@ -356,6 +356,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mycloset/avata/choicecloth.dart';
 import '../avata/completecody.dart';
 import 'package:http_parser/http_parser.dart';
+import '../user/mypage.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
@@ -364,10 +365,16 @@ import 'package:dio/dio.dart';
 class NamedAvata extends StatefulWidget {
   Dio dio = Dio();
   final serverURL = 'http://k9c105.p.ssafy.io:8761';
-  String imageUrl;
+  final String imageUrl;
+  final String fileName;
+
   final dynamic storage;
 
-  NamedAvata({super.key, this.storage, required this.imageUrl});
+  NamedAvata(
+      {super.key,
+      this.storage,
+      required this.imageUrl,
+      required this.fileName});
 
   // final storage;
 
@@ -911,66 +918,100 @@ class NamedAvataState extends State<NamedAvata> {
 
                               print('____코디네임: $codiName');
                               print('____선택했니?: $isSelectedYes');
+                              print('파일네임');
+                              print(widget.fileName);
                               try {
                                 Map<String, dynamic> headers = {};
                                 if (accessToken.isNotEmpty) {
                                   headers['Authorization'] =
                                       'Bearer $accessToken';
-                                  headers['Content-Type'] =
-                                      'multipart/form-data';
+                                  // headers['Content-Type'] =
+                                  //     'multipart/form-data';
                                 }
                                 print('___________토큰: $accessToken');
-
-                                // 코디 정보를 Map으로 생성
-                                Map<String, dynamic> requestData = {
-                                  "fashionName": codiName,
-                                  "ai": true,
-                                  "fashionPrivate": isSelectedYes,
-                                  // "imgName": "string",
-                                };
-
-                                // FormData 객체 생성
-                                FormData formData = FormData();
-
-                                // formData.files.add(
-                                //   MapEntry(
-                                //     "mFile",
-                                //     await MultipartFile.fromFile(
-                                //       widget.imageUrl,
-                                //       contentType: MediaType('image', 'jpeg'),
-                                //     ),
-                                //   ),
-                                // );
-
-                                // requestData를 FormData에 추가 (이미지 파일과 함께)
-                                // formData.fields.add(
-                                //   MapEntry("request", jsonEncode(requestData)),
-                                // );
-
-                                // print('___________폼데이타: $formData');
 
                                 // 코디 정보를 서버에 보내는 API 요청
                                 final response = await widget.dio.post(
                                   '${widget.serverURL}/api/social/save',
-                                  data: formData,
+                                  data: {
+                                    "fashionName": codiName,
+                                    "ai": true,
+                                    "fashionPrivate": isSelectedYes,
+                                    "imgName": widget.fileName,
+                                  },
                                   options: Options(headers: headers),
                                 );
-                                // var fileName =
-                                //     response.data['body']['fileName'];
+                                print('요청보냄');
+                                print(response.data);
 
-                                if (response.statusCode == 200) {
-                                  // 성공적으로 저장된 경우
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const Completecody(),
-                                    ),
+                                if (response.data['result']['resultCode'] ==
+                                    200) {
+                                  // showDialog(
+                                  //   context: context,
+                                  //   builder: (BuildContext context) {
+                                  //     return AlertDialog(
+                                  //       title: Text(
+                                  //         ' 🎉 저장 성공 🎉 ',
+                                  //         textAlign: TextAlign.center, // 여기에 추가
+                                  //       ),
+                                  //       content: Text(
+                                  //         '완성된 코디는 내프로필에 저장됩니다!',
+                                  //         textAlign: TextAlign.center, // 여기에 추가
+                                  //       ),
+                                  //       actions: <Widget>[
+                                  //         TextButton(
+                                  //           child: Text('확인'),
+                                  //           onPressed: () {
+                                  //             Navigator.of(context).pop();
+                                  //             Navigator.of(context)
+                                  //                 .pushReplacement(
+                                  //                     MaterialPageRoute(
+                                  //               builder: (_) => MyPage(),
+                                  //             ));
+                                  //           },
+                                  //         ),
+                                  //       ],
+                                  //     );
+                                  //   },
+                                  // );
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text(
+                                          ' 🎉 저장 성공 🎉 ',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        content: Text(
+                                          '완성된 코디는 내프로필에 저장됩니다!',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        actions: <Widget>[
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment
+                                                .center, // 중앙 정렬 설정
+                                            children: [
+                                              TextButton(
+                                                child: Text('확인'),
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(); // 대화 상자 닫기
+                                                  Navigator.of(context)
+                                                      .pushReplacement(
+                                                    MaterialPageRoute(
+                                                      builder: (_) => MyPage(),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   );
                                 } else {
-                                  // 저장에 실패한 경우
-                                  // 실패 처리 로직을 추가하세요.
-                                  print('저장에 실패했습니다.');
+                                  print('코디저장에 실패했습니다.');
                                 }
                                 return response.data;
                               } catch (e) {

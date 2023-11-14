@@ -238,17 +238,19 @@ import 'package:dio/dio.dart';
 class ChoiceCloth extends StatefulWidget {
   final int photoSeq;
   String imageUrl;
+  String fileName = '';
   final String sortName;
   int? selectedIndex;
   int? selectedClothSeq;
   List<dynamic> cloList = [];
 
-  ChoiceCloth(
-      {super.key,
-      this.storage,
-      required this.photoSeq,
-      required this.imageUrl,
-      required this.sortName});
+  ChoiceCloth({
+    super.key,
+    this.storage,
+    required this.photoSeq,
+    required this.imageUrl,
+    required this.sortName,
+  });
 
   final storage;
 
@@ -458,8 +460,9 @@ class ChoiceClothState extends State<ChoiceCloth> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  NamedAvata(imageUrl: widget.imageUrl)),
+                              builder: (context) => NamedAvata(
+                                  imageUrl: widget.imageUrl,
+                                  fileName: widget.fileName)),
                         );
                       },
                       style: OutlinedButton.styleFrom(
@@ -560,10 +563,13 @@ class ChoiceClothState extends State<ChoiceCloth> {
                                       widget.imageUrl =
                                           response.data['body']['url'];
                                     });
-                                    // setState(() {
-                                    //   fileName =
-                                    //       response.data['body']['fileName'];
-                                    // });
+                                    setState(() {
+                                      widget.fileName =
+                                          response.data['body']['fileName'];
+                                    });
+
+                                    print('파일네임잘담겼나???______________');
+                                    print(widget.fileName);
                                     return response.data;
                                   } catch (e) {
                                     print('그밖의 에러ㅜㅜㅜㅜㅜㅜㅜㅜㅜ: $e');
