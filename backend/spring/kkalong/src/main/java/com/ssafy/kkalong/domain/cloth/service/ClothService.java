@@ -155,60 +155,66 @@ public class ClothService {
         Cloth clothUp =clothRepository.save(cloth);
         
         //태그 삭제
-        List<Integer> tagSeqList = req.getTagSegDeleteList();
-        for (Integer seq : tagSeqList){
-            TagRelationKey tagRelationKey = new TagRelationKey(clothUp.getClothSeq(),seq );
-            TagRelation tagRelation = tagRelaionRepository.findById(tagRelationKey).orElse(null);
-            if(tagRelation != null){
-                tagRelation.setTagRelationDelDate(LocalDateTime.now());
-                tagRelation.setTagRelationDelete(true);
-                tagRelaionRepository.save(tagRelation);
+        if(req.getTagSegDeleteList()!=null && !req.getTagSegDeleteList().isEmpty()){
+            List<Integer> tagSeqList = req.getTagSegDeleteList();
+            for (Integer seq : tagSeqList){
+                TagRelationKey tagRelationKey = new TagRelationKey(clothUp.getClothSeq(),seq );
+                TagRelation tagRelation = tagRelaionRepository.findById(tagRelationKey).orElse(null);
+                if(tagRelation != null){
+                    tagRelation.setTagRelationDelDate(LocalDateTime.now());
+                    tagRelation.setTagRelationDelete(true);
+                    tagRelaionRepository.save(tagRelation);
+                }
             }
         }
 
+
         //태그 추가
-        List<String> tagList = req.getTagAddList();
-        for (String tagName : tagList){
-            Tag tag = tagRepository.findByTag(tagName).orElse(null);
-            if(tag == null){
-                //태그 생성
-                tag = tagRepository.save(new Tag(tagName));
-                //옷태그 관계 생성
-                TagRelationKey tagRelationKey = TagRelationKey.builder()
-                        .clothSeq(clothUp.getClothSeq())
-                        .tagSeq(tag.getTagSeq())
-                        .build();
-                TagRelation tagRelation = TagRelation.builder()
-                        .tagRelationKey(tagRelationKey)
-                        .cloth(clothUp)
-                        .tag(tag)
-                        .build();
-                tagRelaionRepository.save(tagRelation);
-
-            }
-            else{
-                //1. 태그 관계가 있는지 확인
-                TagRelationKey tagRelationKey = new TagRelationKey(clothUp.getClothSeq(),tag.getTagSeq() );
-                TagRelation tagRelation = tagRelaionRepository.findById(tagRelationKey).orElse(null);
-
-                //2.태그 관계가 있는 경우 삭제를 false로 전환
-                if(tagRelation != null){
-                    tagRelation.setTagRelationDelDate(null);
-                    tagRelation.setTagRelationDelete(false);
-                    tagRelaionRepository.save(tagRelation);
-                }
-                //3.태그 관계가 없는 경우 생성
-                else{
-                    TagRelation tagRelationAdd = TagRelation.builder()
+        if(req.getTagAddList()!=null && !req.getTagAddList().isEmpty()){
+            List<String> tagList = req.getTagAddList();
+            for (String tagName : tagList){
+                Tag tag = tagRepository.findByTag(tagName).orElse(null);
+                if(tag == null){
+                    //태그 생성
+                    tag = tagRepository.save(new Tag(tagName));
+                    //옷태그 관계 생성
+                    TagRelationKey tagRelationKey = TagRelationKey.builder()
+                            .clothSeq(clothUp.getClothSeq())
+                            .tagSeq(tag.getTagSeq())
+                            .build();
+                    TagRelation tagRelation = TagRelation.builder()
                             .tagRelationKey(tagRelationKey)
                             .cloth(clothUp)
                             .tag(tag)
                             .build();
-                    tagRelaionRepository.save(tagRelationAdd);
-                }
+                    tagRelaionRepository.save(tagRelation);
 
+                }
+                else{
+                    //1. 태그 관계가 있는지 확인
+                    TagRelationKey tagRelationKey = new TagRelationKey(clothUp.getClothSeq(),tag.getTagSeq() );
+                    TagRelation tagRelation = tagRelaionRepository.findById(tagRelationKey).orElse(null);
+
+                    //2.태그 관계가 있는 경우 삭제를 false로 전환
+                    if(tagRelation != null){
+                        tagRelation.setTagRelationDelDate(null);
+                        tagRelation.setTagRelationDelete(false);
+                        tagRelaionRepository.save(tagRelation);
+                    }
+                    //3.태그 관계가 없는 경우 생성
+                    else{
+                        TagRelation tagRelationAdd = TagRelation.builder()
+                                .tagRelationKey(tagRelationKey)
+                                .cloth(clothUp)
+                                .tag(tag)
+                                .build();
+                        tagRelaionRepository.save(tagRelationAdd);
+                    }
+
+                }
             }
         }
+
         List<Tag> resulttagList =getTagList(clothUp.getClothSeq());
 
         String filePathNobg = "cloth/no_bg/" + clothUp.getClothImgName() +".png";
