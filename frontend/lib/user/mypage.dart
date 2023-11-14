@@ -548,19 +548,48 @@ class MyPageState extends State<MyPage> {
                         // 클릭 이벤트
                       },
                       child: Card(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Image.network(
-                              item["imgUrl"] ?? null,
-                              height: 100,
-                              width: 100,
+                        child: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.center, // 이미지와 텍스트를 가운데 정렬
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Image.network(
+                                    item["imgUrl"] ?? null,
+                                    height: 100,
+                                    width: 100,
+                                  ),
+                                  Text(
+                                    item["name"] ?? "Unknown",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Text(
-                              item["name"] ?? "Unknown",
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                            Positioned(
+                              top: 8.0,
+                              right: 8.0,
+                              child: IconButton(
+                                icon: Icon(Icons.lock),
+                                color: item['isPrivate']? Colors.yellow: Colors.black,
+                                onPressed: () {
+                                  Future.delayed(Duration.zero, () async {
+                                    final userStore = Provider.of<UserStore>(context, listen: false);
+                                    final accessToken = userStore.accessToken;
+                                    print(accessToken);
+                                    final lock = await pageapi.lockfashion(accessToken, item['seq']);
+                                    if (lock != null){
+                                      setState(() {
+                                        item['isPrivate'] = !item['isPrivate'];
+                                      });
+                                    }
+                                    });
+                                  // 자물쇠 버튼 클릭 이벤트
+                                },
                               ),
                             ),
                           ],
