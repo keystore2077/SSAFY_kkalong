@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatRepository  extends JpaRepository<ChatRoom,Integer> {
-    Optional<ChatRoom> findAllByMemberFirMemberSeqAndMemberSecMemberSeq(int memberSeq1, int memberSeq2);
+    Optional<ChatRoom> findByMemberFirMemberSeqAndMemberSecMemberSeq(int memberSeq1, int memberSeq2);
 
     Optional<List<ChatRoom>> findAllByMemberFir(Member member);
 
     Optional<List<ChatRoom>> findAllByMemberSec(Member member);
+
+    Optional<ChatRoom> findByChatRoomSeq(Integer roomSeq);
 }
