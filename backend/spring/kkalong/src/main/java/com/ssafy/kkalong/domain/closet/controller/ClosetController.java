@@ -29,7 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/closet")
 public class ClosetController {
-    // http://localhost:8761/api/closetㅉ
+    // http://localhost:8761/api/closet
     @Autowired
     private ClosetService closetService;
     @Autowired
