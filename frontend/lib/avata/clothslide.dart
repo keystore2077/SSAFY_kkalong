@@ -14,6 +14,7 @@ class ClothSlide extends StatefulWidget {
 
 class _ClothSlideState extends State<ClothSlide> {
   int? selectedIndex;
+  int? selectedClothSeq;
   List<dynamic> cloList = [];
 
   @override
@@ -91,48 +92,53 @@ class _ClothSlideState extends State<ClothSlide> {
                             setState(() {
                               selectedIndex = i;
                             });
-
-                            var accessToken =
-                                context.read<UserStore>().accessToken;
-                            print(accessToken);
-                            Dio dio = Dio();
-                            const serverURL = 'http://k9c105.p.ssafy.io:8761';
-
-                            try {
-                              // print('capturedImage path: ${capturedImage!}');
-                              // print('capturedImage path: ${capturedImage!.path}');
-                              print('어디까지 왔나');
-                              Map<String, dynamic> headers = {};
-                              if (accessToken.isNotEmpty) {
-                                headers['Authorization'] =
-                                    'Bearer $accessToken';
-                              }
-
-                              FormData formData = FormData.fromMap({
-                                // "photoSeq": cloList[i].,
-                                "clothSeq": cloList[i].clothSeq,
+                            if (cloList[i].containsKey('clothSeq')) {
+                              print(cloList[i]['clothSeq']);
+                              setState(() {
+                                selectedClothSeq = cloList[i]['clothSeq'];
                               });
+                            } else {
+                              print('키없음');
+                            }
 
-                              final response = await dio.post(
-                                '$serverURL/api/photo/mix',
-                                data: formData,
-                                options: Options(
-                                  headers: headers,
-                                ), // 수정된 부분
-                              );
+                            // var accessToken =
+                            //     context.read<UserStore>().accessToken;
+                            // print(accessToken);
+                            // Dio dio = Dio();
+                            // const serverURL = 'http://k9c105.p.ssafy.io:8761';
 
-                              print('디오요청완료');
-                              print(response.data);
-                              // var photoSeq = response.data['body'][i];
+                            // try {
+                            //   // print('capturedImage path: ${capturedImage!}');
+                            //   // print('capturedImage path: ${capturedImage!.path}');
+                            //   print('어디까지 왔나');
+                            //   Map<String, dynamic> headers = {};
+                            //   if (accessToken.isNotEmpty) {
+                            //     headers['Authorization'] =
+                            //         'Bearer $accessToken';
+                            //   }
 
-                              // print('포토시퀀스ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ');
-                              // print(photoSeq);
-                              // return response.data;
-                            } catch (e) {
-                              print('그밖의 에러ㅜㅜㅜㅜㅜㅜㅜㅜㅜ: $e');
-                            } finally {}
+                            //   FormData formData = FormData.fromMap({
+                            //     // "photoSeq": cloList[i].,
+                            //     "clothSeq": cloList[i].clothSeq,
+                            //   });
 
-                            print('완료');
+                            //   final response = await dio.post(
+                            //     '$serverURL/api/photo/mix',
+                            //     data: formData,
+                            //     options: Options(
+                            //       headers: headers,
+                            //     ), // 수정된 부분
+                            //   );
+
+                            //   print('디오요청완료');
+                            //   print(response.data);
+
+                            //   return response.data;
+                            // } catch (e) {
+                            //   print('그밖의 에러ㅜㅜㅜㅜㅜㅜㅜㅜㅜ: $e');
+                            // } finally {}
+
+                            // print('완료');
                           },
                           child: Container(
                             decoration: BoxDecoration(

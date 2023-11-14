@@ -297,33 +297,32 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
 
     Future.delayed(Duration(seconds: 2), () async {
       final userToken = await storage.read(key: "login");
-      if (userToken != null) {
-        final response =
-            await pageapi.tokenValidation(userToken.toString().split(" ")[1]);
-        if (response == 'success') {
-          // 토큰이 유효한 경우 메인 페이지로 이동
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (_) => const Main(),
-          ));
-        } else {
-          // 토큰이 유효하지 않은 경우 처리
-          await storage.delete(key: "login");
-          await context.read<UserStore>().changeAccessToken('');
 
-          setState(() {});
-        }
-      } else {
-        // 토큰이 없는 경우 로그인 페이지로 이동
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (_) => LogIn(),
-        ));
-        // Navigator.of(context).pushReplacementAndRemoveUntil(
-        //   MaterialPageRoute(
-        //     builder: (_) => LogIn(storage: storage), // 이동할 새로운 페이지
-        //   ),
-        //   (route) => false, // 모든 이전 페이지를 제거하려면 false를 반환
-        // );
-      }
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (_) => LogIn(),
+      ));
+
+      // if (userToken != null) {
+      //   final response =
+      //       await pageapi.tokenValidation(userToken.toString().split(" ")[1]);
+      //   if (response == 'success') {
+      //     // 토큰이 유효한 경우 메인 페이지로 이동
+      //     Navigator.of(context).pushReplacement(MaterialPageRoute(
+      //       builder: (_) => const Main(),
+      //     ));
+      //   } else {
+      //     // 토큰이 유효하지 않은 경우 처리
+      //     await storage.delete(key: "login");
+      //     await context.read<UserStore>().changeAccessToken('');
+
+      //     setState(() {});
+      //   }
+      // } else {
+      //   // 토큰이 없는 경우 로그인 페이지로 이동
+      //   Navigator.of(context).pushReplacement(MaterialPageRoute(
+      //     builder: (_) => LogIn(),
+      //   ));
+      // }
     });
   }
 
