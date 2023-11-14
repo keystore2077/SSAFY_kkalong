@@ -486,7 +486,7 @@ class MyPageState extends State<MyPage> {
                   // Expanded(
                   //   child:
                   Column(
-                    children: const [
+                    children: [
                       SizedBox(
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(30, 0, 30, 4),
@@ -504,7 +504,7 @@ class MyPageState extends State<MyPage> {
                                     ),
                                   ),
                                   Text(
-                                    '(3건)',
+                                    '(${savecloItem.length.toString()}건)',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -578,7 +578,7 @@ class MyPageState extends State<MyPage> {
                   // Expanded(
                   //   child:
                   Column(
-                    children: const [
+                    children: [
                       SizedBox(
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(30, 0, 30, 4),
@@ -596,7 +596,7 @@ class MyPageState extends State<MyPage> {
                                     ),
                                   ),
                                   Text(
-                                    '(3건)',
+                                    '(${saveCloth.length.toString()}건)',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
