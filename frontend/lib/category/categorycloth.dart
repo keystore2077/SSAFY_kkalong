@@ -6,11 +6,12 @@ import 'package:provider/provider.dart';
 import '../store/userstore.dart';
 
 class CategoryClothList extends StatefulWidget {
-  const CategoryClothList({super.key, this.storage, required this.category, required this.flag});
+  const CategoryClothList({super.key, this.storage, required this.category, required this.flag, required this.onStateChanged});
 
   final storage;
   final int category;
   final int flag;
+  final Function(Map<int, bool>) onStateChanged;
 
   @override
   State<CategoryClothList> createState() => _CategoryClothListState();
@@ -41,6 +42,13 @@ class _CategoryClothListState extends State<CategoryClothList> {
 
   // 각 아이템의 체크 상태를 저장하는 맵
   Map<int, bool> itemCheckStates = {};
+
+  void _handleCheckStateChange(int key, bool value) {
+    setState(() {
+      itemCheckStates[key] = value;
+    });
+    widget.onStateChanged(itemCheckStates);
+  }
 
   Future<dynamic> dioData(token) async {
     try {
@@ -163,11 +171,8 @@ class _CategoryClothListState extends State<CategoryClothList> {
                     widget.flag == 1
                             ? GestureDetector(
                                 onTap: () {
-                                  // 체크박스 토글 로직
-                                  setState(() {
-                                    itemCheckStates[index] =
-                                        !(itemCheckStates[index] ?? false);
-                                  });
+                                  // 체크박스 토글 로직을 _handleCheckStateChange 함수로 이동
+                                  _handleCheckStateChange(index, !(itemCheckStates[index] ?? false));
                                 },
                                 child: Padding(
                                   padding:
