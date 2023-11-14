@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/closet/clothdetail.dart';
 import 'package:flutter_mycloset/main.dart';
 import 'package:flutter_mycloset/user/followmodal.dart';
 import 'package:flutter_mycloset/user/login.dart';
@@ -637,6 +638,12 @@ class MyPageState extends State<MyPage> {
                     return GestureDetector(
                       onTap: () {
                         // 클릭 이벤트
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ClothDetail(clothSeq: item['seq'])),
+                        );
                       },
                       child: Card(
                         child: Column(
