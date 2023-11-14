@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_mycloset/user/nampage%20copy.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
@@ -37,6 +38,7 @@ class SwipeState extends State<Swipe> {
       'https://mblogthumb-phinf.pstatic.net/MjAxODEyMTlfMTcz/MDAxNTQ1MjA0MTk4NDQy.-lCTSpFhyK1yb6_e8FaFoZwZmMb_-rRZ04AnFmNijB4g.ID8x5cmkX8obTOxG8yoq39JRURXvKBPjbxY_z5M90bkg.JPEG.cine_play/707211_1532672215.jpg?type=w800';
   var fashionSeq = 0;
   var fashionName = '';
+  var nickName = '';
 
   Future<dynamic> dioData(token) async {
     try {
@@ -53,6 +55,7 @@ class SwipeState extends State<Swipe> {
         imgUrl = result['imgUrl'];
         fashionSeq = result['fashionSeq'];
         fashionName = result['fashionName'];
+        nickName = result['memberNickName'];
       });
       print(imgUrl);
       return response.data;
@@ -164,16 +167,24 @@ class SwipeState extends State<Swipe> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Padding(
+                  GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => NamPage2(nick:nickName)),
+                    );
+                  },
+                  child: Padding(
                     padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                     child: Text(
-                      fashionName,
+                      nickName,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFFF5BEB5),
                       ),
                     ),
+                  ),
                   ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 5, 0, 5),

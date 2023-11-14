@@ -286,6 +286,22 @@ Future<dynamic> getprofile(token, nick) async {
     }
   } 
 
+  Future<dynamic> lockfashion(token, seq) async {
+    try {
+      final response = await dio.put('$serverURL/api/social/fashion/$seq',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('잠금 성공 ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e.toString());
+    }
+  } 
+
 
 
 }
