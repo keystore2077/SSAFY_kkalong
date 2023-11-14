@@ -58,9 +58,10 @@ class _ClosetClothListState extends State<ClosetClothList> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
+        _showErrorDialog(
+            '오류 발생 diodata: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생 diodata!');
       }
     }
   }
@@ -103,7 +104,14 @@ class _ClosetClothListState extends State<ClosetClothList> {
 
       return response.data;
     } catch (e) {
-      print(e.toString());
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog(
+            '오류 발생 diolock: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
+      } else {
+        _showErrorDialog('오류발생 diolock!');
+      }
     }
   }
 
@@ -128,129 +136,126 @@ class _ClosetClothListState extends State<ClosetClothList> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog('오류 발생 clean: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생 clean!');
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        GestureDetector(
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            color: Color(0xFFE7E3E7),
-            child: Center(child: Icon(Icons.format_paint)),
-          ),
-          onTap: () {
-            cleanSection(accessToken);
-            showDialog(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                title: Text('비움 성공'),
-                content: Text('구역 비움 성공!'),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text('확인'),
-                    onPressed: () {
-                      Navigator.of(ctx).pop();
-                    },
-                  )
-                ],
-              ),
-            );
-          },
-        ),
+    return
+        // GestureDetector(
+        //       child: Container(
+        //         padding: const EdgeInsets.all(10),
+        //         color: Color(0xFFE7E3E7),
+        //         child: Center(child: Icon(Icons.format_paint)),
+        //       ),
+        //       onTap: () {
+        //         cleanSection(accessToken);
+        //         showDialog(
+        //           context: context,
+        //           builder: (ctx) => AlertDialog(
+        //             title: Text('비움 성공'),
+        //             content: Text('구역 비움 성공!'),
+        //             actions: <Widget>[
+        //               TextButton(
+        //                 child: Text('확인'),
+        //                 onPressed: () {
+        //                   Navigator.of(ctx).pop();
+        //                 },
+        //               )
+        //             ],
+        //           ),
+        //         );
+        //       },
+        //     )
         ListView.builder(
-          shrinkWrap: true,
-          itemCount: data.length, // 3줄을 나타내도록 설정
-          itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
-                onTap: () {
-                  // 클릭 이벤트 -> 옷상세로 넘어가게 할거임..
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            ClothDetail(clothSeq: data[index]['clothSeq'])),
-                  );
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.all(8.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              data[index]['imgUrl'],
-                              height: 100,
-                              width: 150,
-                              fit: BoxFit.fill,
+            shrinkWrap: true,
+            itemCount: data.length, // 3줄을 나타내도록 설정
+            itemBuilder: (BuildContext context, int index) {
+              return GestureDetector(
+                  onTap: () {
+                    // 클릭 이벤트 -> 옷상세로 넘어가게 할거임..
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ClothDetail(clothSeq: data[index]['clothSeq'])),
+                    );
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.all(8.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                data[index]['imgUrl'],
+                                height: 100,
+                                width: 150,
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           ),
-                        ),
-                        Flexible(
-                          // Flexible 추가
-                          child: Container(
-                            padding: const EdgeInsets.only(right: 20),
-                            child: Text(
-                              data[index]['clothName'],
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
+                          Flexible(
+                            // Flexible 추가
+                            child: Container(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: Text(
+                                data[index]['clothName'],
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.clip, // 글자를 자르도록 설정
                               ),
-                              overflow: TextOverflow.clip, // 글자를 자르도록 설정
                             ),
                           ),
-                        ),
-                        widget.flag == 1
-                            ? GestureDetector(
-                                onTap: () {
-                                  // 체크박스 토글 로직
-                                  setState(() {
-                                    itemCheckStates[index] =
-                                        !(itemCheckStates[index] ?? false);
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                                  child: Icon(itemCheckStates[index] == true
-                                      ? Icons.check_box
-                                      : Icons.check_box_outline_blank),
+                          widget.flag == 1
+                              ? GestureDetector(
+                                  onTap: () {
+                                    // 체크박스 토글 로직
+                                    setState(() {
+                                      itemCheckStates[index] =
+                                          !(itemCheckStates[index] ?? false);
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                                    child: Icon(itemCheckStates[index] == true
+                                        ? Icons.check_box
+                                        : Icons.check_box_outline_blank),
+                                  ),
+                                )
+                              : GestureDetector(
+                                  onTap: () {
+                                    diolock(
+                                        accessToken, data[index]['clothSeq']);
+                                  },
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                                    child: Icon(data[index]['private'] == true
+                                        ? Icons.lock
+                                        : Icons.lock_open),
+                                  ),
                                 ),
-                              )
-                            : GestureDetector(
-                                onTap: () {
-                                  diolock(accessToken, data[index]['clothSeq']);
-                                },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                                  child: Icon(data[index]['private'] == true
-                                      ? Icons.lock
-                                      : Icons.lock_open),
-                                ),
-                              ),
-                      ],
-                    ),
-                    const Divider(
-                      height: 1,
-                      thickness: 1,
-                    ), // 구분선
-                  ],
-                ));
-          },
-        ),
-      ],
-    );
+                        ],
+                      ),
+                      const Divider(
+                        height: 1,
+                        thickness: 1,
+                      ), // 구분선
+                    ],
+                  ));
+            });
   }
 }

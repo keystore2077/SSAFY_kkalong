@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mycloset/closet/clothinfo.dart';
-import 'package:image_picker/image_picker.dart';
 import './categorycloth.dart';
-import '../closet/closetcloth.dart';
 import '../closet/clothcamera.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -23,6 +20,8 @@ class _CategorySelectState extends State<CategorySelect> {
   static final storage = FlutterSecureStorage();
   String? accessToken;
 
+  late Future<dynamic> Function() childFunction;
+
   @override
   void initState() {
     super.initState();
@@ -37,20 +36,21 @@ class _CategorySelectState extends State<CategorySelect> {
 
   var flag = 0;
   var data = [];
+  var movelist = [];
 
-  Map<int, bool> itemCheckStates = {};
+  // Map<int, bool> itemCheckStates = {};
 
-  void _handleItem(Map<int, bool> states) {
-    setState(() {
-      itemCheckStates = states;
-    });
-    // 여기에서 itemCheckStates를 사용하여 데이터 생성 및 POST 요청
-  }
+  // void _handleItem(Map<int, bool> states) {
+  //   setState(() {
+  //     itemCheckStates = states;
+  //   });
+  //   // 여기에서 itemCheckStates를 사용하여 데이터 생성 및 POST 요청
+  // }
 
   Future<dynamic> dioData(token) async {
     try {
       final response =
-          await dio.get('$serverURL/api/cloth/sort/${widget.category}',
+          await dio.get('$serverURL/api/cloth/sort/${sort[widget.category]}',
               // queryParameters: {'userEmail': id}
               options: Options(
                 headers: {
@@ -67,47 +67,9 @@ class _CategorySelectState extends State<CategorySelect> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog('오류 발생 diodata select: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('오류발생!');
-      }
-    }
-  }
-
-  Future<dynamic> clothesmove(token) async {
-    var movelist = List.generate(data.length, (index) => data[index]['name']);
-    // var filteredList = data.where((item) {
-    //   // 조건문을 여기에 작성합니다.
-    //   // 예시: item의 'type' 필드가 특정 값과 일치하는 경우만 선택
-    //   return item['type'] == '특정값';
-    // }).map((item) {
-    //   // 필터링된 각 요소에 대해 수행할 작업을 정의합니다.
-    //   // 예시: 각 요소의 'name' 필드 값을 새 리스트에 추가
-    //   return item['name'];
-    // }).toList();
-
-    print(movelist);
-    try {
-      final response = await dio.put('$serverURL/api/cloth/input/section',
-          data: {
-            "sectionSeq": movelist,
-            "clothSeqList": movelist,
-          },
-          options: Options(
-            headers: {
-              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
-              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
-            },
-          ));
-      print('유저 정보 수정 ${response.data}');
-      return response.data;
-    } catch (e) {
-      print(e);
-      if (e is DioError) {
-        // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
-      } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! diodata select');
       }
     }
   }
@@ -130,7 +92,6 @@ class _CategorySelectState extends State<CategorySelect> {
     );
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -154,19 +115,19 @@ class _CategorySelectState extends State<CategorySelect> {
                   // expandedHeight: 325,
                   actions: [
                     IconButton(
-                            icon: const Icon(Icons.local_shipping), // 두 번째 아이콘
-                            onPressed: () {
-                              if (flag == 0) {
-                                setState(() {
-                                  flag = 1;
-                                });
-                              } else {
-                                setState(() {
-                                  flag = 0;
-                                });
-                              }
-                            },
-                          ),
+                      icon: const Icon(Icons.local_shipping), // 두 번째 아이콘
+                      onPressed: () {
+                        if (flag == 0) {
+                          setState(() {
+                            flag = 1;
+                          });
+                        } else {
+                          setState(() {
+                            flag = 0;
+                          });
+                        }
+                      },
+                    ),
                     IconButton(
                       icon: const Icon(Icons.delete_forever_outlined),
                       onPressed: () {},
@@ -197,12 +158,48 @@ class _CategorySelectState extends State<CategorySelect> {
               ];
             },
             body: TabBarView(children: [
-              CategoryClothList(category: 0, flag: flag, onStateChanged: _handleItem),
-              CategoryClothList(category: 1, flag: flag, onStateChanged: _handleItem),
-              CategoryClothList(category: 2, flag: flag, onStateChanged: _handleItem),
-              CategoryClothList(category: 3, flag: flag, onStateChanged: _handleItem),
-              CategoryClothList(category: 4, flag: flag, onStateChanged: _handleItem),
-              CategoryClothList(category: 5, flag: flag, onStateChanged: _handleItem),
+              CategoryClothList(
+                category: 0,
+                flag: flag,
+                callbackFunction: (Future<dynamic> Function() callback) {
+                  childFunction = callback;
+                },
+              ),
+              CategoryClothList(
+                category: 1,
+                flag: flag,
+                callbackFunction: (Future<dynamic> Function() callback) {
+                  childFunction = callback;
+                },
+              ),
+              CategoryClothList(
+                category: 2,
+                flag: flag,
+                callbackFunction: (Future<dynamic> Function() callback) {
+                  childFunction = callback;
+                },
+              ),
+              CategoryClothList(
+                category: 3,
+                flag: flag,
+                callbackFunction: (Future<dynamic> Function() callback) {
+                  childFunction = callback;
+                },
+              ),
+              CategoryClothList(
+                category: 4,
+                flag: flag,
+                callbackFunction: (Future<dynamic> Function() callback) {
+                  childFunction = callback;
+                },
+              ),
+              CategoryClothList(
+                category: 5,
+                flag: flag,
+                callbackFunction: (Future<dynamic> Function() callback) {
+                  childFunction = callback;
+                },
+              ),
             ]),
           ),
         ),
@@ -226,9 +223,19 @@ class _CategorySelectState extends State<CategorySelect> {
                 child: const Text(' + 옷등록'),
               )
             : ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // 옮기기 로직
                   // clothesmove(accessToken);
+                  // itemCheckStates.forEach((key, value) {
+                  //   // 여기서 key와 value를 사용할 수 있습니다.
+                  //   if (value == true) {
+                  //     setState(() {
+                  //       // movelist.add(data[key]['clothSeq']);
+                  //     });
+                  //   }
+                  //   print(data[key]);
+                  // });
+                  var result2 = await childFunction();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[50],
