@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_mycloset/main.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
@@ -8,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:http_parser/http_parser.dart'; // MediaType을 사용하기 위해 추가
 
 class ClothChange extends StatefulWidget {
@@ -28,20 +30,30 @@ class ClothChangeState extends State<ClothChange> {
   static final storage = FlutterSecureStorage();
   String? accessToken;
 
-  @override
-  void initState() {
-    super.initState();
-    final userStore = Provider.of<UserStore>(context, listen: false);
-    accessToken = userStore.accessToken;
-    dioData(accessToken);
-    closetData(accessToken);
-  }
-
   final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
   final serverURL = 'http://k9c105.p.ssafy.io:8761';
   // final serverURL = 'http://192.168.100.37:8761';
-  final TextEditingController inputController = TextEditingController();
+  
+  TextEditingController? inputController;
   final TextEditingController inputController2 = TextEditingController();
+  
+  @override
+  void initState() {
+    super.initState();
+    // Future.delayed 사용하여 컨텍스트가 완전히 구성된 후 데이터를 가져옴
+    Future.delayed(Duration.zero, () async {
+      final userStore = Provider.of<UserStore>(context, listen: false);
+      accessToken = userStore.accessToken;
+      dioData(accessToken).then((_) {
+      // dioData가 완료된 후에 inputController를 초기화
+      setState(() {
+        inputController = TextEditingController(text: clothName);
+      });
+    });
+      closetData(accessToken);
+    });
+  }
+
   final List<String> tags = [];
   var tags2 = [];
   var rmvTags = [];
@@ -50,6 +62,9 @@ class ClothChangeState extends State<ClothChange> {
   var data = [];
   var data2 = [];
   var ddata = {};
+  var clothName = '';
+  var imgString = '';
+  var imgUrl = 'https://mblogthumb-phinf.pstatic.net/MjAxODEyMTlfMTcz/MDAxNTQ1MjA0MTk4NDQy.-lCTSpFhyK1yb6_e8FaFoZwZmMb_-rRZ04AnFmNijB4g.ID8x5cmkX8obTOxG8yoq39JRURXvKBPjbxY_z5M90bkg.JPEG.cine_play/707211_1532672215.jpg?type=w800';
 
   List<String> closets = [
     '공주옷장',
@@ -86,6 +101,7 @@ class ClothChangeState extends State<ClothChange> {
       if (tagText.isNotEmpty) {
         setState(() {
           tags.add(tagText);
+          print(tags);
         });
         inputController2.clear();
       }
@@ -97,6 +113,7 @@ class ClothChangeState extends State<ClothChange> {
     setState(() {
       if (tags.isNotEmpty) {
         tags.removeAt(index);
+        print(tags);
       }
     });
   }
@@ -105,8 +122,8 @@ class ClothChangeState extends State<ClothChange> {
     if (tags2.isNotEmpty) {
       setState(() {
         rmvTags.add(tags2[index]);
-        tags2.removeAt(index);
         print(rmvTags);
+        tags2.removeAt(index);
       });
     }
     ;
@@ -126,7 +143,11 @@ class ClothChangeState extends State<ClothChange> {
       setState(() {
         ddata = result;
         tags2 = result['tagList'];
-        selectedSection = result['clothRes']['sectionSeq'];
+        selectedSection = result['clothRes']['sectionSeq'].toString();
+        // print(result['clothRes']['clothName']);
+        clothName = result['clothRes']['clothName'];
+        inputController = TextEditingController(text: clothName);
+        imgUrl = result['clothRes']['imgUrl'];
       });
       return response.data;
     } catch (e) {
@@ -135,7 +156,30 @@ class ClothChangeState extends State<ClothChange> {
         // DioError를 확인
         _showErrorDialog('오류 발생: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! diodata');
+      }
+    }
+  }
+
+  // 이미지 가져오는 함수
+  Future<dynamic> getData(token) async {
+    try {
+      final response = await dio.get(imgUrl,
+          options: Options(responseType: ResponseType.bytes));
+      var result = response.data;
+      setState(() {
+        imgString = base64Encode(response.data);
+      });
+      // print(result);
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생! img');
+        print(imgString);
       }
     }
   }
@@ -164,7 +208,7 @@ class ClothChangeState extends State<ClothChange> {
         // DioError를 확인
         _showErrorDialog('오류 발생: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! closetdata');
       }
     }
   }
@@ -194,7 +238,7 @@ class ClothChangeState extends State<ClothChange> {
         // DioError를 확인
         _showErrorDialog('오류 발생: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! sectiondata');
       }
     }
   }
@@ -204,23 +248,48 @@ class ClothChangeState extends State<ClothChange> {
     Response response;
 
     // 파일을 MultipartFile 형식으로 변환
-    // var file = await MultipartFile.fromFile(widget.image.path,
-    //     contentType: MediaType('image', 'jpeg'));
+    MultipartFile multipartFile = MultipartFile.fromString(imgString,
+        filename: 'image.jpg', contentType: MediaType('image', 'jpeg'));
 
     // delete
-    List<MapEntry<String, String>> tagSegDeleteListEntries = [];
-    for (var i = 0; i < rmvTags.length; i++) {
-      var itemName = rmvTags[i]['tagSeq'].toString();
-      tagSegDeleteListEntries.add(MapEntry('tagSegDeleteList[$i]', itemName));
-    }
+    // List<MapEntry<String, String>> tagSegDeleteListEntries = [];
+    // for (var i = 0; i < rmvTags.length; i++) {
+    //   var itemName = rmvTags[i]['tagSeq'].toString();
+    //   tagSegDeleteListEntries.add(MapEntry('tagSegDeleteList[$i]', itemName));
+    // }
+
+    List<String> tagSeqList = rmvTags.map((tag) => tag['tagSeq'].toString()).toList();
+    print(tagSeqList);
     // JSON 데이터와 파일을 포함하는 FormData 생성
+    
+    // 빈 MultipartFile 인스턴스 생성
+    MultipartFile emptyFile = MultipartFile.fromBytes([]);
+
+    // FormData formData = FormData();
+
+    // 파일 추가
+    // formData.files.add(MapEntry('file', multipartFile));
+    // formData.fields.add(MapEntry('clothSeq', widget.clothSeq.toString()));
+    // formData.fields.add(MapEntry('sectionSeq', selectedSection ?? ''));
+    // formData.fields.add(MapEntry('sort', selectedSection ?? ''));
+    // formData.fields.add(MapEntry('clothName', inputController?.text ?? ''));
+    // for (var i = 0; i < tags.length; i++) {
+    //   formData.fields.add(MapEntry('tagAddList[$i]', tags[i]));
+    // }
+    // for (var i = 0; i < tags.length; i++) {
+    //   formData.fields.add(MapEntry('tagSegDeleteList[$i]', tagSeqList[i]));
+    // }
+    // // formData.fields.addAll(closetSectionDeleteListEntries);
+    // formData.fields.add(MapEntry('private', ddata['clothRes']['private'].toString()));
+
     FormData formData = FormData.fromMap({
+      "mFile": null,
       "clothSeq": widget.clothSeq,
       "sectionSeq": selectedSection,
       "sort": selectedCloth,
-      "clothName": inputController.text,
-      "tagAddList": tags,
-      "tagSegDeleteList": tagSegDeleteListEntries,
+      "clothName": inputController?.text ?? null,
+      "tagAddList": tags ?? [],
+      "tagSegDeleteList": tagSeqList ?? null,
       "private": ddata['clothRes']['private'],
     });
 
@@ -244,7 +313,7 @@ class ClothChangeState extends State<ClothChange> {
         _showErrorDialog('오류 발생: ${e.response?.statusCode}');
         print(formData.fields);
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! senddata');
       }
     }
   }
@@ -302,7 +371,7 @@ class ClothChangeState extends State<ClothChange> {
   List<Widget> _buildItemList2() {
     return tags2.asMap().entries.map((entry) {
       int index = entry.key;
-      String tag = entry.value['sectionName'];
+      String tag = entry.value['tag'];
 
       return GestureDetector(
         onTap: () => _removeItem2(index),
@@ -335,8 +404,6 @@ class ClothChangeState extends State<ClothChange> {
     // 데이터 로딩 중 표시
     return Center(child: CircularProgressIndicator());
   }
-
-  String imgUrl = ddata['clothRes']?['imgUrl'] ?? 'https://mblogthumb-phinf.pstatic.net/MjAxODEyMTlfMTcz/MDAxNTQ1MjA0MTk4NDQy.-lCTSpFhyK1yb6_e8FaFoZwZmMb_-rRZ04AnFmNijB4g.ID8x5cmkX8obTOxG8yoq39JRURXvKBPjbxY_z5M90bkg.JPEG.cine_play/707211_1532672215.jpg?type=w800';
 
     return GestureDetector(
       onTap: () {
@@ -379,6 +446,7 @@ class ClothChangeState extends State<ClothChange> {
                       height: 50,
                       child: TextField(
                         controller: inputController,
+                        autofocus: true,
                         decoration: const InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
                                 vertical: 16.0, horizontal: 30.0),
@@ -624,13 +692,21 @@ class ClothChangeState extends State<ClothChange> {
                   const SizedBox(
                     height: 20,
                   ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _buildItemList2(),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   SizedBox(
                     child: Row(
                       children: [
                         Expanded(
                           child: TextField(
                             controller: inputController2,
-                            autofocus: true,
                             decoration: const InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
                                 vertical: 16.0,
@@ -708,6 +784,10 @@ class ClothChangeState extends State<ClothChange> {
                           child: TextButton(
                               onPressed: () async {
                                 sendData(accessToken);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => Main()),
+                                );
                               },
                               style: OutlinedButton.styleFrom(
                                 shape: RoundedRectangleBorder(

@@ -144,7 +144,7 @@ class ClosetChangeState extends State<ClosetChange> {
         // DioError를 확인
         _showErrorDialog('오류 발생: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! diodata');
       }
     }
   }
@@ -379,6 +379,7 @@ class ClosetChangeState extends State<ClosetChange> {
                       height: 50,
                       child: TextField(
                         controller: inputController,
+                        autofocus: true,
                         decoration: const InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
                                 vertical: 16.0, horizontal: 30.0),
@@ -480,7 +481,6 @@ class ClosetChangeState extends State<ClosetChange> {
                         Expanded(
                           child: TextField(
                             controller: inputController2,
-                            autofocus: true,
                             decoration: const InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
                                 vertical: 16.0,
