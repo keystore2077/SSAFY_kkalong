@@ -7,9 +7,10 @@ import 'package:flutter_mycloset/user/pageapi.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
+import 'package:dio/dio.dart';
 
 class MyPage extends StatefulWidget {
-  const MyPage({super.key});
+  MyPage({super.key});
 
   // final storage;
 
@@ -23,23 +24,24 @@ class MyPageState extends State<MyPage> {
 
   String nick = '';
   String email = '';
+  int fashionSeq = 1;
   List<dynamic> followings = [];
   List<dynamic> followers = [];
 
   List<dynamic> savecloItem = [];
-    // "list": [
-    //   {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
-    //   {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
-    //   {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
-    //   {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
-    // ]
-    List<dynamic> saveCloth = [];
-    bool showCody = false;
-    bool showCloth = false;
+  // "list": [
+  //   {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
+  //   {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
+  //   {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
+  //   {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
+  // ]
+  List<dynamic> saveCloth = [];
+  bool showCody = false;
+  bool showCloth = false;
 
-  void updateReversedList() {
-    reversedList = List.from(savecloItem.reversed);
-  }
+  // void updateReversedList() {
+  //   reversedList = List.from(savecloItem.reversed);
+  // }
 
   @override
   void initState() {
@@ -64,10 +66,10 @@ class MyPageState extends State<MyPage> {
         setState(() {
           savecloItem = profile['body']['fashionList'];
           saveCloth = profile['body']['clothList'];
-          updateReversedList();
+          // updateReversedList();
         });
         print(savecloItem);
-        print(reversedList);
+        // print(reversedList);
       }
 
       final followlist = await pageapi.getfollow(accessToken, nick);
@@ -279,7 +281,7 @@ class MyPageState extends State<MyPage> {
                                     showCody = !showCody;
                                   });
                                 },
-                                child: showCody? Text('간략히') : Text('더보기'),
+                                child: showCody ? Text('간략히') : Text('더보기'),
                               ),
                             ],
                           ),
@@ -301,14 +303,44 @@ class MyPageState extends State<MyPage> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    if (savecloItem == null || index >= savecloItem.length || (!showCody && index >= 4)) {
-                  return const SizedBox(); // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
-                }
-                final item = savecloItem[index];
+                    if (index >= savecloItem.length ||
+                        (!showCody && index >= 4)) {
+                      return null; // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
+                    }
+                    final item = savecloItem[index];
                     return GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         print(item['seq']);
-                        
+                        setState(() {
+                          fashionSeq = item['seq'];
+                        });
+                        Dio dio = Dio();
+                        const serverURL = 'http://k9c105.p.ssafy.io:8761';
+
+                        try {
+                          Map<String, dynamic> headers = {};
+                          var accessToken =
+                              context.read<UserStore>().accessToken;
+
+                          if (accessToken.isNotEmpty) {
+                            headers['Authorization'] = 'Bearer $accessToken';
+                          }
+
+                          final response = await dio.get(
+                            '$serverURL/api/social/fashion/$fashionSeq',
+                            options: Options(headers: headers),
+                          );
+
+                          print('리스판스데이타출력++++++++++++++');
+                          print(response.data);
+                          // var cloList = response.data['body'];
+                          // setState(() {
+                          //   widget.photoList = response.data['body'];
+                          // });
+                          return response.data;
+                        } catch (e) {
+                          print('에러: $e');
+                        }
                       },
                       child: Card(
                         child: Stack(
@@ -365,7 +397,7 @@ class MyPageState extends State<MyPage> {
                       ),
                     );
                   },
-                  childCount: showCody? (savecloItem?.length ?? 0) : 4,
+                  childCount: showCody ? (savecloItem.length ?? 0) : 4,
                 ),
               ),
             ),
@@ -409,7 +441,7 @@ class MyPageState extends State<MyPage> {
                                     showCloth = !showCloth;
                                   });
                                 },
-                                child: showCloth? Text('간략히') : Text('더보기'),
+                                child: showCloth ? Text('간략히') : Text('더보기'),
                               ),
                             ],
                           ),
@@ -431,8 +463,9 @@ class MyPageState extends State<MyPage> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                     if (saveCloth == null || index >= saveCloth.length || (!showCloth && index >= 4)) {
-                     return const SizedBox(); // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
+                    if (index >= saveCloth.length ||
+                        (!showCloth && index >= 4)) {
+                      return null; // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
                     }
                     final item = saveCloth[index];
                     return GestureDetector(
@@ -466,7 +499,7 @@ class MyPageState extends State<MyPage> {
                       ),
                     );
                   },
-                  childCount: showCloth? (saveCloth?.length ?? 0) : 4,
+                  childCount: showCloth ? (saveCloth.length ?? 0) : 4,
                 ),
               ),
             ),
