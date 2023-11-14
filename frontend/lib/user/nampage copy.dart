@@ -441,6 +441,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/closet/clothdetail.dart';
 import 'package:flutter_mycloset/user/pageapi.dart';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
@@ -956,6 +957,13 @@ class NamPage2State extends State<NamPage2> {
                     return GestureDetector(
                       onTap: () {
                         // 클릭 이벤트
+                        print('cc');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ClothDetail(clothSeq: item['seq'])),
+                        );
                       },
                       child: Card(
                         child: Column(

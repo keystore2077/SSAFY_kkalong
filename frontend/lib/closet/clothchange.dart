@@ -39,7 +39,7 @@ class ClothChangeState extends State<ClothChange> {
 
   final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
   final serverURL = 'http://k9c105.p.ssafy.io:8761';
-
+  // final serverURL = 'http://192.168.100.37:8761';
   final TextEditingController inputController = TextEditingController();
   final TextEditingController inputController2 = TextEditingController();
   final List<String> tags = [];
@@ -126,6 +126,7 @@ class ClothChangeState extends State<ClothChange> {
       setState(() {
         ddata = result;
         tags2 = result['tagList'];
+        selectedSection = result['clothRes']['sectionSeq'];
       });
       return response.data;
     } catch (e) {
@@ -241,6 +242,7 @@ class ClothChangeState extends State<ClothChange> {
       if (e is DioError) {
         // DioError를 확인
         _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        print(formData.fields);
       } else {
         _showErrorDialog('오류발생!');
       }
@@ -329,6 +331,13 @@ class ClothChangeState extends State<ClothChange> {
 
   @override
   Widget build(BuildContext context) {
+    if (ddata.isEmpty) {
+    // 데이터 로딩 중 표시
+    return Center(child: CircularProgressIndicator());
+  }
+
+  String imgUrl = ddata['clothRes']?['imgUrl'] ?? 'https://mblogthumb-phinf.pstatic.net/MjAxODEyMTlfMTcz/MDAxNTQ1MjA0MTk4NDQy.-lCTSpFhyK1yb6_e8FaFoZwZmMb_-rRZ04AnFmNijB4g.ID8x5cmkX8obTOxG8yoq39JRURXvKBPjbxY_z5M90bkg.JPEG.cine_play/707211_1532672215.jpg?type=w800';
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -357,7 +366,7 @@ class ClothChangeState extends State<ClothChange> {
                   Center(
                     child: Image.network(
                       // File(image.path),
-                      ddata['clothRes']['imgUrl'],
+                      imgUrl,
                       width: 200,
                       height: 300,
                     ),

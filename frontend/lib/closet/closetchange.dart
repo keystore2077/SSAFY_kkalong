@@ -28,20 +28,32 @@ class ClosetChangeState extends State<ClosetChange> {
   static final storage = FlutterSecureStorage();
   String? accessToken;
 
+  final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
+  final serverURL = 'http://k9c105.p.ssafy.io:8761';
+  // final serverURL = 'http://192.168.100.37:8761';
+  // 옷장이름
+  TextEditingController? inputController;
+  // 구역이름
+  final TextEditingController inputController2 = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-    final userStore = Provider.of<UserStore>(context, listen: false);
-    accessToken = userStore.accessToken;
-    dioData(accessToken);
+
+    // Future.delayed 사용하여 컨텍스트가 완전히 구성된 후 데이터를 가져옴
+    Future.delayed(Duration.zero, () async {
+      final userStore = Provider.of<UserStore>(context, listen: false);
+      accessToken = userStore.accessToken;
+      dioData(accessToken).then((_) {
+      // dioData가 완료된 후에 inputController를 초기화
+      setState(() {
+        inputController = TextEditingController(text: closetName);
+      });
+    });
+    });
+
   }
 
-  final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
-  final serverURL = 'http://k9c105.p.ssafy.io:8761';
-  // 옷장이름
-  final TextEditingController inputController = TextEditingController();
-  // 구역이름
-  final TextEditingController inputController2 = TextEditingController();
 
   final List<String> sections = ['행거', '수납장', '선반', '박스'];
   String? selectedSection;
@@ -102,6 +114,7 @@ class ClosetChangeState extends State<ClosetChange> {
   var data = {};
   var imgString = '';
 
+// 초기데이터 가져오는 함수
   Future<dynamic> dioData(token) async {
     try {
       final response =
@@ -119,6 +132,7 @@ class ClosetChangeState extends State<ClosetChange> {
         sections2 = result['closetSectionList'];
         imgUrl = result['closetPictureUrl'];
         closetName = result['closetName'];
+        inputController = TextEditingController(text: closetName);
       });
       print(result);
       print('diodata');
@@ -135,6 +149,7 @@ class ClosetChangeState extends State<ClosetChange> {
     }
   }
 
+// 이미지 가져오는 함수
   Future<dynamic> getData(token) async {
     try {
       final response = await dio.get(imgUrl,
@@ -207,9 +222,9 @@ class ClosetChangeState extends State<ClosetChange> {
     FormData formData = FormData();
 
     // 파일 추가
-    formData.files.add(MapEntry('file', multipartFile));
+    // formData.files.add(MapEntry('file', multipartFile));
     formData.fields.add(MapEntry('closetSeq', widget.closetSeq.toString()));
-    formData.fields.add(MapEntry('closetName', inputController.text));
+    formData.fields.add(MapEntry('closetName', inputController?.text ?? ''));
     // formData.fields.addAll(closetSectionUpdateListEntries);
     formData.fields.addAll(closetSectionAddListEntries);
     formData.fields.addAll(closetSectionDeleteListEntries);
@@ -333,7 +348,7 @@ class ClosetChangeState extends State<ClosetChange> {
           backgroundColor: const Color(0xFFF5BEB5),
           toolbarHeight: 55,
           title: const Text(
-            '나의 옷',
+            '옷장 수정',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
@@ -379,10 +394,6 @@ class ClosetChangeState extends State<ClosetChange> {
                   const SizedBox(
                     height: 20,
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
