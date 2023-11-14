@@ -441,25 +441,29 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mycloset/closet/clothdetail.dart';
 import 'package:flutter_mycloset/user/pageapi.dart';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
 
-class NamPage extends StatefulWidget {
-  const NamPage({super.key, this.storage, this.nick});
+class NamPage2 extends StatefulWidget {
+  const NamPage2({super.key, this.storage, this.nick});
 
   final storage;
   final nick;
 
   @override
-  State<NamPage> createState() => NamPageState();
+  State<NamPage2> createState() => NamPage2State();
 }
 
-class NamPageState extends State<NamPage> {
+class NamPage2State extends State<NamPage2> {
   final PageApi pageapi = PageApi();
 
   int followerCount = 0;
   int follwingCount = 0;
+  List<dynamic> savecloItem = [];
+  List<dynamic> opencloItem = [];
+  bool isfollowing = false;
 
 
   @override
@@ -477,31 +481,42 @@ class NamPageState extends State<NamPage> {
         setState(() {
           followerCount = profile['body']['followerCount'];
           follwingCount = profile['body']['followingCount'];
-          // savecloItem = profile['body']['fashionList'];
-          // saveCloth = profile['body']['clothList'];
+          savecloItem = profile['body']['fashionList'];
+          opencloItem = profile['body']['clothList'];
         });
           print(savecloItem);
 
        }
 
+       final checkfollow = await pageapi.checkfollow(accessToken, widget.nick);
+      print(checkfollow); 
+       if (checkfollow != null){
+        setState(() {
+          isfollowing = checkfollow['body'];
+        });
+          print(isfollowing);
+
+       }
+
+
     });
     // 초기화 작업 수행
   }
 
-  final savecloItem = {
-    "list": [
-      {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
-      {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
-      {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
-      {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
-    ]
-  };
-  final opencloItem = {
-    "list": [
-      {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
-      {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
-    ]
-  };
+  // final savecloItem = {
+  //   "list": [
+  //     {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
+  //     {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
+  //     {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
+  //     {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
+  //   ]
+  // };
+  // final opencloItem = {
+  //   "list": [
+  //     {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
+  //     {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
+  //   ]
+  // };
 // BearList? bearList;
 
   @override
@@ -518,7 +533,11 @@ class NamPageState extends State<NamPage> {
         elevation: 0,
         leading: const Text(''),
       ),
-      body: Container(
+      body: 
+      CustomScrollView(
+        slivers:[
+          SliverToBoxAdapter(
+            child: Container(
         padding: const EdgeInsets.all(30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -528,18 +547,6 @@ class NamPageState extends State<NamPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // SizedBox(
-                  //   child: Padding(
-                  //     padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                  //     child: Text(
-                  //       '안녕하세요,',
-                  //       style: TextStyle(
-                  //         fontSize: 20,
-                  //         fontWeight: FontWeight.w600,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                   Row(
                     children: [
                       Padding(
@@ -589,7 +596,11 @@ class NamPageState extends State<NamPage> {
                 ],
               ),
             ),
-            Expanded(
+            ],
+            ),
+            ),
+          ),
+            SliverToBoxAdapter(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -600,9 +611,49 @@ class NamPageState extends State<NamPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           ElevatedButton(
-                            onPressed: () {
-                              // 버튼 클릭 이벤트
-                            },
+                            // onPressed: () {
+                            //   final userStore = Provider.of<UserStore>(context, listen: false);
+                            //   final accessToken = userStore.accessToken;
+                            //   isfollowing? pageapi.unfollow(accessToken, widget.nick): pageapi.follow(accessToken, widget.nick);
+                            //   setState(() {
+                            //     isfollowing = !isfollowing;
+                            //   });
+                            //   },
+                            onPressed: (){
+                              Future.delayed(Duration.zero, () async {
+      final userStore = Provider.of<UserStore>(context, listen: false);
+      final accessToken = userStore.accessToken;
+      print(accessToken);
+      isfollowing? await pageapi.unfollow(accessToken, widget.nick): await pageapi.follow(accessToken, widget.nick);
+                              setState(() {
+                                isfollowing = !isfollowing;
+                              });
+
+      final profile = await pageapi.getprofile(accessToken, widget.nick);
+      print(profile); 
+       if (profile != null){
+        setState(() {
+          followerCount = profile['body']['followerCount'];
+          follwingCount = profile['body']['followingCount'];
+        });
+
+       }
+
+       final checkfollow = await pageapi.checkfollow(accessToken, widget.nick);
+      print(checkfollow); 
+       if (checkfollow != null){
+        setState(() {
+          isfollowing = checkfollow['body'];
+        });
+          print(isfollowing);
+
+       }
+
+
+    });
+    // 초기화 작업 수행
+  
+                            },  
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                 borderRadius:
@@ -610,7 +661,7 @@ class NamPageState extends State<NamPage> {
                               ),
                               // 다른 스타일 속성들
                             ),
-                            child: const Text('🔥Follow🔥'),
+                            child: Text(isfollowing ? 'Unfollow' : '🔥Follow🔥'),
                           ),
                           ElevatedButton(
                             onPressed: () {
@@ -635,12 +686,12 @@ class NamPageState extends State<NamPage> {
                     children: [
                       SizedBox(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
+                          padding: const EdgeInsets.fromLTRB(30, 0, 0, 2),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              const Row(
+                               Row(
                                 children: [
                                   Text(
                                     '저장한 코디 ',
@@ -650,7 +701,7 @@ class NamPageState extends State<NamPage> {
                                     ),
                                   ),
                                   Text(
-                                    '(3건)',
+                                    '(${savecloItem.length.toString()}건)',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -658,20 +709,23 @@ class NamPageState extends State<NamPage> {
                                   ),
                                 ],
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  // 이동 로직을 추가하세요.
-                                },
-                                child: const Text('더보기'),
-                              ),
+                              // GestureDetector(
+                              //   onTap: () {
+                              //     // 이동 로직을 추가하세요.
+                              //   },
+                              //   child: const Text('더보기'),
+                              // ),
                             ],
                           ),
                         ),
                       ),
                     ],
                   ),
-                  // ),
-                  // Expanded(
+                ],
+              ),
+            ),
+                  // Flexible(
+                  //   flex: 3,
                   //   child: GridView.builder(
                   //     gridDelegate:
                   //         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -711,137 +765,241 @@ class NamPageState extends State<NamPage> {
                   //     },
                   //   ),
                   // ),
-                  Flexible(
-                    flex: 3,
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Number of columns in the grid
-                        crossAxisSpacing: 5.0, // Spacing between columns
-                        mainAxisSpacing: 5.0, // Spacing between rows
-                      ),
-                      itemCount: savecloItem['list']?.length ?? 0,
-                      itemBuilder: (BuildContext context, int index) {
-                        final item = savecloItem['list']?[index];
-                        if (item == null) {
-                          return const SizedBox(); // 빈 위젯 반환
-                        }
-                        return GestureDetector(
-                          onTap: () {
-                            // 클릭이벤트
-                          },
-                          child: Card(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Image.asset(
-                                    item["image"] ?? "Assets/Image/logo.png",
-                                    height: 100,
-                                    width: 100),
-                                Text(
-                                  item["name"] ?? "Unknown",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
+                  SliverPadding(
+              padding: const EdgeInsets.all(
+                  20), // Use your desired padding value here.
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 5.0,
+                  mainAxisSpacing: 5.0,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    final item = savecloItem?[index];
+                    if (item == null) {
+                      return const SizedBox(); // If the item is null, return an empty container
+                    }
+                    return GestureDetector(
+                      onTap: () {
+                        // 클릭 이벤트
                       },
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 5),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const Row(
-                                  children: [
-                                    Text(
-                                      '공개한 코디 ',
-                                      style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    Text(
-                                      '(5건)',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    // 이동 로직을 추가하세요.
-                                  },
-                                  child: const Text('더보기'),
-                                ),
-                              ],
+                      child: Card(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Image.network(
+                              item["imgUrl"] ?? "Unknown",
+                              height: 100,
+                              width: 100,
                             ),
+                            Text(
+                              item["name"] ?? "Unknown",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  childCount: savecloItem?.length ?? 0,
+                ),
+              ),
+            ),
+                  // Container(
+                  //   margin: const EdgeInsets.only(top: 5),
+                  //   child: Column(
+                  //     children: [
+                  //       SizedBox(
+                  //         child: Padding(
+                  //           padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
+                  //           child: Row(
+                  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //             crossAxisAlignment: CrossAxisAlignment.end,
+                  //             children: [
+                  //               const Row(
+                  //                 children: [
+                  //                   Text(
+                  //                     '공개한 코디 ',
+                  //                     style: TextStyle(
+                  //                       fontSize: 17,
+                  //                       fontWeight: FontWeight.w600,
+                  //                     ),
+                  //                   ),
+                  //                   Text(
+                  //                     '(5건)',
+                  //                     style: TextStyle(
+                  //                       fontSize: 12,
+                  //                       fontWeight: FontWeight.w600,
+                  //                     ),
+                  //                   ),
+                  //                 ],
+                  //               ),
+                  //               GestureDetector(
+                  //                 onTap: () {
+                  //                   // 이동 로직을 추가하세요.
+                  //                 },
+                  //                 child: const Text('더보기'),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // Expanded(
+                  //   child: GridView.builder(
+                  //     gridDelegate:
+                  //         const SliverGridDelegateWithFixedCrossAxisCount(
+                  //       crossAxisCount: 2, // Number of columns in the grid
+                  //       crossAxisSpacing: 5.0, // Spacing between columns
+                  //       mainAxisSpacing: 5.0, // Spacing between rows
+                  //     ),
+                  //     itemCount: opencloItem['list']?.length ?? 0,
+                  //     itemBuilder: (BuildContext context, int index) {
+                  //       final item = opencloItem['list']?[index];
+                  //       if (item == null) {
+                  //         return const SizedBox(); // 빈 위젯 반환
+                  //       }
+                  //       return GestureDetector(
+                  //         onTap: () {
+                  //           // 클릭이벤트
+                  //         },
+                  //         child: Card(
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.center,
+                  //             children: <Widget>[
+                  //               Image.asset(
+                  //                   item["image"] ?? "Assets/Image/logo.png",
+                  //                   height: 100,
+                  //                   width: 100),
+                  //               Text(
+                  //                 item["name"] ?? "Unknown",
+                  //                 style: const TextStyle(
+                  //                   fontSize: 16,
+                  //                   fontWeight: FontWeight.w600,
+                  //                 ),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
+                  SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Expanded(
+                  //   child:
+                  Column(
+                    children: [
+                      SizedBox(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(30, 0, 30, 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '공개한 옷 ',
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    '(${opencloItem.length.toString()}건)',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // GestureDetector(
+                              //   onTap: () {
+                              //     // 이동 로직을 추가하세요.
+                              //   },
+                              //   child: Text('더보기'),
+                              // ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Number of columns in the grid
-                        crossAxisSpacing: 5.0, // Spacing between columns
-                        mainAxisSpacing: 5.0, // Spacing between rows
                       ),
-                      itemCount: opencloItem['list']?.length ?? 0,
-                      itemBuilder: (BuildContext context, int index) {
-                        final item = opencloItem['list']?[index];
-                        if (item == null) {
-                          return const SizedBox(); // 빈 위젯 반환
-                        }
-                        return GestureDetector(
-                          onTap: () {
-                            // 클릭이벤트
-                          },
-                          child: Card(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Image.asset(
-                                    item["image"] ?? "Assets/Image/logo.png",
-                                    height: 100,
-                                    width: 100),
-                                Text(
-                                  item["name"] ?? "Unknown",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
+            SliverPadding(
+              padding: const EdgeInsets.all(
+                  20), // Use your desired padding value here.
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 5.0,
+                  mainAxisSpacing: 5.0,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    final item = opencloItem?[index];
+                    if (item == null) {
+                      return const SizedBox(); // If the item is null, return an empty container
+                    }
+                    return GestureDetector(
+                      onTap: () {
+                        // 클릭 이벤트
+                        print('cc');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ClothDetail(clothSeq: item['seq'])),
+                        );
+                      },
+                      child: Card(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Image.network(
+                              item["imgUrl"] ?? "Unknwon",
+                              height: 100,
+                              width: 100,
+                            ),
+                            Text(
+                              item["name"] ?? "Unknown",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  childCount: opencloItem?.length ?? 0,
+                ),
+              ),
+            ),
+                ],
+              ),
+            );
+  //         ],
+  //       ),
+  //     ),
+  //     ],
+  //   ));
+  // }
+}
 }
 
 void showSnackBar(BuildContext context, String text) {

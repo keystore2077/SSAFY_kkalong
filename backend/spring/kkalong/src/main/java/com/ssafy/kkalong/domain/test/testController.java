@@ -163,4 +163,10 @@ public class testController {
     public Api<Object> testServer9(){
         return fastApiService.callWelcomeViton();
     }
+
+    @GetMapping("/s3/copy")
+    public Api<Object> testserver10(@RequestParam String fileName){
+        System.out.println(fileName);
+        return Api.OK(s3Service.copyTempToFashion(fileName));
+    }
 }

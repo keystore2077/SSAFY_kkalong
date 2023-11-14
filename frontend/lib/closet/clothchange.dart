@@ -33,24 +33,32 @@ class ClothChangeState extends State<ClothChange> {
     super.initState();
     final userStore = Provider.of<UserStore>(context, listen: false);
     accessToken = userStore.accessToken;
+    dioData(accessToken);
+    closetData(accessToken);
   }
 
   final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
   final serverURL = 'http://k9c105.p.ssafy.io:8761';
-
+  // final serverURL = 'http://192.168.100.37:8761';
   final TextEditingController inputController = TextEditingController();
   final TextEditingController inputController2 = TextEditingController();
   final List<String> tags = [];
+  var tags2 = [];
+  var rmvTags = [];
+  var deltags = [];
   var image = '';
+  var data = [];
+  var data2 = [];
+  var ddata = {};
 
-  final List<String> closets = [
+  List<String> closets = [
     '공주옷장',
     '할머니옷장',
     '아재옷장',
   ];
   String? selectedCloset;
 
-  final List<String> sections = [
+  List<String> sections = [
     '행거1',
     '행거2',
     '수납장1',
@@ -93,8 +101,105 @@ class ClothChangeState extends State<ClothChange> {
     });
   }
 
+  void _removeItem2(int index) {
+    if (tags2.isNotEmpty) {
+      setState(() {
+        rmvTags.add(tags2[index]);
+        tags2.removeAt(index);
+        print(rmvTags);
+      });
+    }
+    ;
+  }
+
+  Future<dynamic> dioData(token) async {
+    try {
+      final response = await dio.get('$serverURL/api/cloth/${widget.clothSeq}',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      var result = response.data['body'];
+      setState(() {
+        ddata = result;
+        tags2 = result['tagList'];
+        selectedSection = result['clothRes']['sectionSeq'];
+      });
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
+
+  Future<dynamic> closetData(token) async {
+    try {
+      final response = await dio.get('$serverURL/api/closet/list',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      var result = response.data['body'];
+      var namesList = result.map((item) => item['name']).toList();
+      List<String> strclosets = List<String>.from(namesList);
+      setState(() {
+        closets = strclosets;
+        data = result;
+      });
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
+
+  Future<dynamic> sectionData(token, closetSeq) async {
+    try {
+      final response = await dio.get('$serverURL/api/closet/list/$closetSeq',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      var result = response.data['body'];
+      print(result);
+      var namesList = result.map((item) => item['name']).toList();
+      List<String> strsections = List<String>.from(namesList);
+      setState(() {
+        data2 = result;
+        sections = strsections;
+      });
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
+
   //  데이터 보내는 함수
-  var data = [];
   Future<dynamic> sendData(token) async {
     Response response;
 
@@ -102,21 +207,26 @@ class ClothChangeState extends State<ClothChange> {
     // var file = await MultipartFile.fromFile(widget.image.path,
     //     contentType: MediaType('image', 'jpeg'));
 
+    // delete
+    List<MapEntry<String, String>> tagSegDeleteListEntries = [];
+    for (var i = 0; i < rmvTags.length; i++) {
+      var itemName = rmvTags[i]['tagSeq'].toString();
+      tagSegDeleteListEntries.add(MapEntry('tagSegDeleteList[$i]', itemName));
+    }
     // JSON 데이터와 파일을 포함하는 FormData 생성
     FormData formData = FormData.fromMap({
-      // "mFile": file,
-      "request": {
-        "sectionSeq": 0,
-        "sort": selectedCloth,
-        "clothName": inputController.text,
-        "tagList": tags,
-        "private": true
-      }
+      "clothSeq": widget.clothSeq,
+      "sectionSeq": selectedSection,
+      "sort": selectedCloth,
+      "clothName": inputController.text,
+      "tagAddList": tags,
+      "tagSegDeleteList": tagSegDeleteListEntries,
+      "private": ddata['clothRes']['private'],
     });
 
     try {
       // final deviceToken = getMyDeviceToken();
-      final response = await dio.post('$serverURL/api/cloth',
+      final response = await dio.put('$serverURL/api/cloth',
           options: Options(
             headers: {
               'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
@@ -132,6 +242,7 @@ class ClothChangeState extends State<ClothChange> {
       if (e is DioError) {
         // DioError를 확인
         _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        print(formData.fields);
       } else {
         _showErrorDialog('오류발생!');
       }
@@ -187,8 +298,46 @@ class ClothChangeState extends State<ClothChange> {
     }).toList();
   }
 
+  //원래 있던 태그들
+  List<Widget> _buildItemList2() {
+    return tags2.asMap().entries.map((entry) {
+      int index = entry.key;
+      String tag = entry.value['sectionName'];
+
+      return GestureDetector(
+        onTap: () => _removeItem2(index),
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Color(0xFFF5BEB5),
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          child: Center(
+            child: Text(
+              '#$tag X',
+              style: TextStyle(
+                color: Color(0xFFF5BEB5),
+              ),
+            ),
+          ),
+        ),
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (ddata.isEmpty) {
+    // 데이터 로딩 중 표시
+    return Center(child: CircularProgressIndicator());
+  }
+
+  String imgUrl = ddata['clothRes']?['imgUrl'] ?? 'https://mblogthumb-phinf.pstatic.net/MjAxODEyMTlfMTcz/MDAxNTQ1MjA0MTk4NDQy.-lCTSpFhyK1yb6_e8FaFoZwZmMb_-rRZ04AnFmNijB4g.ID8x5cmkX8obTOxG8yoq39JRURXvKBPjbxY_z5M90bkg.JPEG.cine_play/707211_1532672215.jpg?type=w800';
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -198,7 +347,7 @@ class ClothChangeState extends State<ClothChange> {
           backgroundColor: const Color(0xFFF5BEB5),
           toolbarHeight: 55,
           title: const Text(
-            '나의 옷',
+            '옷 수정',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
@@ -215,9 +364,9 @@ class ClothChangeState extends State<ClothChange> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Center(
-                    child: Image.file(
+                    child: Image.network(
                       // File(image.path),
-                      File(image),
+                      imgUrl,
                       width: 200,
                       height: 300,
                     ),
@@ -290,10 +439,18 @@ class ClothChangeState extends State<ClothChange> {
                           },
                           onChanged: (value) {
                             //Do something when selected item is changed.
+                            var matchingItem = data.firstWhere(
+                              (item) => item['name'] == value,
+                              orElse: () => null, // 일치하는 요소가 없는 경우 null을 반환합니다.
+                            );
+                            setState(() {
+                              selectedCloset = matchingItem['seq'].toString();
+                            });
+                            sectionData(accessToken, selectedCloset);
                           },
                           onSaved: (value) {
                             setState(() {
-                              selectedCloset = value.toString();
+                              // selectedCloset = value.toString();
                             });
                           },
                           buttonStyleData: const ButtonStyleData(
@@ -361,9 +518,16 @@ class ClothChangeState extends State<ClothChange> {
                           },
                           onChanged: (value) {
                             //Do something when selected item is changed.
+                            var matchingItem = data2.firstWhere(
+                              (item) => item['name'] == value,
+                              orElse: () => null, // 일치하는 요소가 없는 경우 null을 반환합니다.
+                            );
+                            setState(() {
+                              selectedSection = matchingItem['seq'].toString();
+                            });
                           },
                           onSaved: (value) {
-                            selectedSection = value.toString();
+                            // selectedSection = value.toString();
                           },
                           buttonStyleData: const ButtonStyleData(
                             padding: EdgeInsets.only(right: 8),
@@ -430,9 +594,12 @@ class ClothChangeState extends State<ClothChange> {
                     },
                     onChanged: (value) {
                       //Do something when selected item is changed.
+                      setState(() {
+                        selectedCloth = value.toString();
+                      });
                     },
                     onSaved: (value) {
-                      selectedCloth = value.toString();
+                      // selectedCloth = value.toString();
                     },
                     buttonStyleData: const ButtonStyleData(
                       padding: EdgeInsets.only(right: 8),

@@ -35,8 +35,6 @@ public class AssessService {
                         }
                 )
                 .collect(Collectors.toSet());
-        System.out.println(memberSeq);
-        System.out.println(assessList.size());
         List<FashionAssessRes>result = new ArrayList<>();
         List<Fashion>fashionList = new ArrayList<>();
         if(assessList.isEmpty()){

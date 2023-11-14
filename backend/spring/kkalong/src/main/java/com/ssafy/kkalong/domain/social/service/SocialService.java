@@ -30,17 +30,17 @@ public class SocialService {
 
     private final S3Service s3Service;
 
-    public FollowRes followMember(Member followingMember, Member followerMember){
+    public FollowRes followMember(Member member, Member nickNameMember){
         FollowKey followKey =FollowKey.builder()
-                .followingMemberSeq(followingMember.getMemberSeq())
-                .followerMemberSeq(followerMember.getMemberSeq())
+                .followingMemberSeq(nickNameMember.getMemberSeq()) //구독할 곳
+                .followerMemberSeq(member.getMemberSeq()) //팬
                 .build();
 
         Follow follow = Follow.builder()
                 .followId(followKey)
                 .regDate(LocalDateTime.now())
-                .followingMember(followingMember)
-                .followerMember(followerMember)
+                .followingMember(nickNameMember)
+                .followerMember(member)
                 .build();
 
         return FollowRes.toRes(followRepository.save(follow));
@@ -48,7 +48,8 @@ public class SocialService {
     }
 
     public FollowListRes getFollowList(Member member){
-        //찾을 려는 회원을 구독한 회원 닉네임 리스트
+
+        //찾을 려는 회원이 구독한 회원 닉네임 리스트
         List<String> followingList = new ArrayList<>();
         List<Follow> following = followRepository.findAllByFollowerMemberMemberSeqAndIsFollowDeleted(member.getMemberSeq(),false);
 
@@ -56,7 +57,7 @@ public class SocialService {
             followingList.add(follow.getFollowingMember().getMemberNickname());
         }
 
-        //찾을 려는 회원이 구독한 회원 닉네임 리스트
+        //찾을 려는 회원을 구독한 회원 닉네임 리스트
         List<String> followerList = new ArrayList<>();
         List<Follow> follower = followRepository.findAllByFollowingMemberMemberSeqAndIsFollowDeleted(member.getMemberSeq(),false);
         for(Follow follow : follower){
@@ -74,14 +75,13 @@ public class SocialService {
     public void deleteFollow(Member followingMember, Member followerMember){
         int followingSeq = followingMember.getMemberSeq();
         int followerSeq = followerMember.getMemberSeq();
-        Optional<Follow> optionalValue = followRepository.findByFollowingMemberMemberSeqAndFollowerMemberMemberSeqAndIsFollowDeleted(followingSeq,followerSeq, false);
+        Optional<Follow> optionalValue = followRepository.findByFollowingMemberMemberSeqAndFollowerMemberMemberSeqAndIsFollowDeleted(followingSeq, followerSeq,false);
         optionalValue.ifPresentOrElse(
                 value -> {
                     // Optional이 비어있지 않을 때 로직 수행
-                    Follow follow =  optionalValue.get();
-                    follow.setFollowDelDate(LocalDateTime.now());
-                    follow.setFollowDeleted(true);
-                    followRepository.save(follow);
+                    value.setFollowDelDate(LocalDateTime.now());
+                    value.setFollowDeleted(true);
+                    followRepository.save(value);
                 },
                 () -> {
                     throw new NoSuchElementException("팔로우 내역을 찾을 수 없습니다.");
@@ -145,7 +145,7 @@ public class SocialService {
 
         List<Cloth> clothList = clothRepository.findAllByMemberMemberSeqAndIsClothDeleted(memberSeq,false);
         for(Cloth cloth : clothList){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
             ClothRes clothRes = ClothRes.toRes(cloth,imgUrl);
 
             if(cloth.isPrivate()){
@@ -168,7 +168,7 @@ public class SocialService {
 
         List<Cloth> clothList = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(memberSeq,false,false);
         for(Cloth cloth : clothList){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
             ClothRes clothRes = ClothRes.toRes(cloth,imgUrl );
             result.add(clothRes);
         }
@@ -184,15 +184,15 @@ public class SocialService {
         List<Fashion> fashions = fashionRepository.findAllByMemberMemberSeqAndIsFashionDeleted(member.getMemberSeq(),false);
         for(Fashion fashion : fashions){
             String imgUrl = s3Service.generatePresignedUrl("fashion/" + fashion.getFashionImgName());
-            MyDtoRes dtoRes = new MyDtoRes(fashion.getFashionSeq(), imgUrl,fashion.isFashionPrivate());
+            MyDtoRes dtoRes = new MyDtoRes(fashion.getFashionSeq(), imgUrl,fashion.getFashionName(),fashion.isFashionPrivate());
             fashionList.add(dtoRes);
         }
 
         List<MyDtoRes> clothList = new ArrayList<>();
         List<Cloth> cloths = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(member.getMemberSeq(),false,false);
         for(Cloth cloth : cloths){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
-            MyDtoRes dtoRes = new MyDtoRes(cloth.getClothSeq(), imgUrl,cloth.isPrivate());
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
+            MyDtoRes dtoRes = new MyDtoRes(cloth.getClothSeq(), imgUrl,cloth.getClothName(), cloth.isPrivate());
             clothList.add(dtoRes);
         }
 
@@ -214,15 +214,15 @@ public class SocialService {
         List<Fashion> fashions = fashionRepository.findAllByMemberMemberSeqAndIsFashionDeletedAndIsFashionPrivate(member.getMemberSeq(),false,false);
         for(Fashion fashion : fashions){
             String imgUrl = s3Service.generatePresignedUrl("fashion/" + fashion.getFashionImgName());
-            DtoRes dtoRes = new DtoRes(fashion.getFashionSeq(), imgUrl);
+            DtoRes dtoRes = new DtoRes(fashion.getFashionSeq(), fashion.getFashionName(),imgUrl);
             fashionList.add(dtoRes);
         }
 
         List<DtoRes> clothList = new ArrayList<>();
         List<Cloth> cloths = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(member.getMemberSeq(),false,false);
         for(Cloth cloth : cloths){
-            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg" + cloth.getClothImgName()+".png");
-            DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), imgUrl);
+            String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
+            DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), cloth.getClothImgName(),imgUrl);
             clothList.add(dtoRes);
         }
 
@@ -233,6 +233,13 @@ public class SocialService {
                 .fashionList(fashionList)
                 .clothList(clothList)
                 .build();
+    }
+
+    public boolean checkFollow(Member loginMember,Member member){
+
+        Follow follow  = followRepository.findByFollowingMemberMemberSeqAndFollowerMemberMemberSeqAndIsFollowDeleted(member.getMemberSeq(),loginMember.getMemberSeq(),false).orElse(null);
+
+        return follow != null;
     }
 
 }

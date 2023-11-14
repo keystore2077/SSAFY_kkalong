@@ -2,10 +2,7 @@ package com.ssafy.kkalong.s3;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import com.ssafy.kkalong.common.util.MultipartFileToFile;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,16 +56,47 @@ public class S3Service {
     }
 
     public String generatePresignedUrl(String key) {
-        // 임시 URL 생성
-        java.util.Date expiration = new java.util.Date();
-        long msec = expiration.getTime();
-        msec += 1000 * 60 * 60; // 1 hour
-        expiration.setTime(msec);
+        try {
+            boolean doesObjectExist = amazonS3.doesObjectExist(bucketName, key);
 
-        GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, key)
-                .withMethod(HttpMethod.GET)
-                .withExpiration(expiration);
-        return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+            if (doesObjectExist) {
+                // 원본 key를 사용하여 임시 URL 생성
+                java.util.Date expiration = new java.util.Date();
+                long msec = expiration.getTime();
+                msec += 1000 * 60 * 60; // 1 hour
+                expiration.setTime(msec);
+
+                GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, key)
+                        .withMethod(HttpMethod.GET)
+                        .withExpiration(expiration);
+                return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+            } else {
+                // "no_image.jpg"를 key로 사용하여 임시 URL 생성
+                return generatePresignedUrlForNoImage();
+            }
+        } catch (AmazonS3Exception e) {
+            // S3에서 key를 찾을 수 없는 경우 처리
+            return generatePresignedUrlForNoImage();
+        }
+    }
+
+    public String copyS3(String sourceKey, String destinationKey) {
+        // CopyObjectRequest 생성
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(
+                bucketName, sourceKey,
+                bucketName, destinationKey
+        );
+
+        // 파일 복사 실행
+        CopyObjectResult copyObjectResult = amazonS3.copyObject(copyObjectRequest);
+
+        // 복사된 파일의 URL 생성
+        return generatePresignedUrl(destinationKey);
+    }
+
+    public String copyTempToFashion(String fileName){
+        String newFileName = fileName.replace("temp_", "fashion_");
+        return copyS3("temp/" + fileName + ".jpg", "fashion/" + newFileName + ".jpg");
     }
 
     private String putS3(File uploadFile, String key){
@@ -83,5 +111,19 @@ public class S3Service {
             return;
         }
 //        log.info("File delete fail");
+    }
+
+    private String generatePresignedUrlForNoImage() {
+        // "no_image.jpg"를 key로 사용하여 임시 URL 생성
+        java.util.Date expiration = new java.util.Date();
+        long msec = expiration.getTime();
+        msec += 1000 * 60 * 60; // 1 hour
+        expiration.setTime(msec);
+
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName,
+                "no_image.jpg")
+                .withMethod(HttpMethod.GET)
+                .withExpiration(expiration);
+        return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
     }
 }
