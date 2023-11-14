@@ -6,10 +6,11 @@ import 'package:provider/provider.dart';
 import '../store/userstore.dart';
 
 class CategoryClothList extends StatefulWidget {
-  const CategoryClothList({super.key, this.storage, required this.category});
+  const CategoryClothList({super.key, this.storage, required this.category, required this.flag});
 
   final storage;
   final int category;
+  final int flag;
 
   @override
   State<CategoryClothList> createState() => _CategoryClothListState();
@@ -38,6 +39,9 @@ class _CategoryClothListState extends State<CategoryClothList> {
   var data = [];
   var lock = [];
 
+  // 각 아이템의 체크 상태를 저장하는 맵
+  Map<int, bool> itemCheckStates = {};
+
   Future<dynamic> dioData(token) async {
     try {
       final response =
@@ -58,7 +62,7 @@ class _CategoryClothListState extends State<CategoryClothList> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
       } else {
         _showErrorDialog('오류발생!');
       }
@@ -156,17 +160,35 @@ class _CategoryClothListState extends State<CategoryClothList> {
                         ),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        diolock(accessToken, data[index]['clothSeq']);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                        child: Icon(data[index]['private'] == true
-                            ? Icons.lock
-                            : Icons.lock_open),
-                      ),
-                    ),
+                    widget.flag == 1
+                            ? GestureDetector(
+                                onTap: () {
+                                  // 체크박스 토글 로직
+                                  setState(() {
+                                    itemCheckStates[index] =
+                                        !(itemCheckStates[index] ?? false);
+                                  });
+                                },
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                                  child: Icon(itemCheckStates[index] == true
+                                      ? Icons.check_box
+                                      : Icons.check_box_outline_blank),
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  diolock(accessToken, data[index]['clothSeq']);
+                                },
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                                  child: Icon(data[index]['private'] == true
+                                      ? Icons.lock
+                                      : Icons.lock_open),
+                                ),
+                              ),
                   ],
                 ),
                 const Divider(
