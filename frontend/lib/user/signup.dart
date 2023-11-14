@@ -179,45 +179,168 @@ class _SignUpState extends State<SignUp> {
                                       height: 50,
                                       child: OutlinedButton(
                                         onPressed: () async {
-                                                        final checkid =
-                                                              await pageapi.checkid(
-                                                                  controller
-                                                                      .text
-                                                                      .toString());
-                                                          print(checkid);
-                                                          if (checkid
-                                                                  .toString() ==
-                                                              "true") {
-                                                                print(1);
-                                                                showDialog(context: context, builder: (context) {
-                                                                   return Dialog( child: 
-                                                                   Container(
-                                                                    width: 100,
-                                                                    height: 100,
-                                                                    color: Colors.white,
-                                                                    child: Center(child: Text('사용가능한 아이디입니다.')))
-                                                                   );
-                                                                 }
-                                                                );
-                                                            setState(() {
-                                                              idCheck = true;
-                                                            });
-                                                          } else {
-                                                            showDialog(context: context, builder: (context) {
-                                                                   return Dialog( child: 
-                                                                   Container(
-                                                                    width: 100,
-                                                                    height: 100,
-                                                                    color: Colors.white,
-                                                                    child: Center(child: Text('중복된 아이디입니다.')))
-                                                                   );
-                                                                 }
-                                                                );
-                                                            setState(() {
-                                                              idCheck = false;
-                                                            });
-                                                          }
-                                                        },
+                                          final checkid = await pageapi.checkid(
+                                              controller.text.toString());
+                                          print(checkid);
+                                          if (checkid.toString() == "true") {
+                                            print(1);
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return Dialog(
+                                                      child: Container(
+                                                          width: 100,
+                                                          height: 100,
+                                                          color: Colors.white,
+                                                          child: Center(
+                                                              child: Text(
+                                                                  '사용가능한 아이디입니다.'))));
+                                                });
+                                            setState(() {
+                                              idCheck = true;
+                                            });
+                                          } else {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return Dialog(
+                                                      child: Container(
+                                                          width: 100,
+                                                          height: 100,
+                                                          color: Colors.white,
+                                                          child: Center(
+                                                              child: Text(
+                                                                  '중복된 아이디입니다.'))));
+                                                });
+                                            setState(() {
+                                              idCheck = false;
+                                            });
+                                          }
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                5.0), // 각진 정도 조절
+                                          ),
+                                          side: const BorderSide(
+                                            color:
+                                                Color(0xFFF5BEB5), // 외곽선 색상 설정
+                                            width: 1, // 외곽선 두께 설정
+                                          ),
+                                        ),
+                                        child: const Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              0.2, 0.2, 0.2, 0.2),
+                                          child: Text(
+                                            '중복 확인',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color:
+                                                  Color(0xFFF5BEB5), // 글자 색상 설정
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              SizedBox(
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        onChanged: (value) {
+                                          if (!RegExp(r'^[A-Za-z가-힣0-9]{2,10}$')
+                                              .hasMatch(value)) {
+                                            setState(() {
+                                              nickError = nickMessage;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              nickError = null; // 에러 없음
+                                            });
+                                          }
+                                        },
+                                        controller: controller5,
+                                        autofocus: true,
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(
+                                            vertical: 16.0,
+                                            horizontal: 40.0,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              width: 1.5,
+                                              color: Color(0xFFF5BEB5),
+                                            ),
+                                          ),
+                                          prefixIconColor: Color(0xFFF5BEB5),
+                                          prefixIcon: Icon(
+                                            Icons.face_6,
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(),
+                                          ),
+                                          labelText: '닉네임',
+                                          errorText: nickError,
+                                          errorStyle: TextStyle(height: 1),
+                                          focusColor: Color(0xFFF5BEB5),
+                                        ),
+                                        keyboardType: TextInputType.text,
+                                        textAlign: TextAlign.start,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 20, // 중복 확인 버튼과 아이디 입력창 사이의 간격 설정
+                                    ),
+                                    SizedBox(
+                                      width: 90,
+                                      height: 50,
+                                      child: OutlinedButton(
+                                        onPressed: () async {
+                                          final checkNick =
+                                              await pageapi.checkNick(
+                                                  controller5.text.toString());
+                                          print(checkNick);
+                                          if (checkNick.toString() == "true") {
+                                            print(11);
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return Dialog(
+                                                      child: Container(
+                                                          width: 100,
+                                                          height: 100,
+                                                          color: Colors.white,
+                                                          child: Center(
+                                                              child: Text(
+                                                                  '사용가능한 닉네임입니다.'))));
+                                                });
+                                            setState(() {
+                                              nickCheck = true;
+                                            });
+                                          } else {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return Dialog(
+                                                      child: Container(
+                                                          width: 100,
+                                                          height: 100,
+                                                          color: Colors.white,
+                                                          child: Center(
+                                                              child: Text(
+                                                                  '중복된 닉네임입니다.'))));
+                                                });
+                                            setState(() {
+                                              nickCheck = false;
+                                            });
+                                          }
+                                        },
                                         style: OutlinedButton.styleFrom(
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
@@ -310,22 +433,21 @@ class _SignUpState extends State<SignUp> {
                               SizedBox(
                                 height: 80,
                                 child: TextField(
-                                  onChanged: (value){
-                                    if (controller2.text ==
-                                            controller3.text) {
-                                          setState(() {
-                                            samepasswordError = null;
-                                            samepasswordCheck = true;
-                                          });
-                                        } else {
-                                          setState(() {
-                                            samepasswordError = samepasswordMessage;
-                                            samepasswordCheck = false;
-                                          });
-                                          // samepasswordError =
-                                          //     samepasswordMessage;
-                                          // samepasswordCheck = false;
-                                        }
+                                  onChanged: (value) {
+                                    if (controller2.text == controller3.text) {
+                                      setState(() {
+                                        samepasswordError = null;
+                                        samepasswordCheck = true;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        samepasswordError = samepasswordMessage;
+                                        samepasswordCheck = false;
+                                      });
+                                      // samepasswordError =
+                                      //     samepasswordMessage;
+                                      // samepasswordCheck = false;
+                                    }
                                   },
                                   controller: controller3,
                                   decoration: InputDecoration(
@@ -395,165 +517,164 @@ class _SignUpState extends State<SignUp> {
                                             TextInputType.emailAddress,
                                       ),
                                     ),
-                                    const SizedBox(
-                                      width: 10, // 이메일 인풋창과 인증 버튼 사이의 간격 설정
-                                    ),
-                                    SizedBox(
-                                      width: 70,
-                                      height: 48,
-                                      child: OutlinedButton(
-                                        onPressed: () {
-                                          // 중복 확인 작업을 수행하는 코드 추가
-                                        },
-                                        style: OutlinedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                5.0), // 각진 정도 조절
-                                          ),
-                                          side: const BorderSide(
-                                            color:
-                                                Color(0xFFF5BEB5), // 외곽선 색상 설정
-                                            width: 1, // 외곽선 두께 설정
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          '인증',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color:
-                                                Color(0xFFF5BEB5), // 글자 색상 설정
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    // const SizedBox(
+                                    //   width: 10, // 이메일 인풋창과 인증 버튼 사이의 간격 설정
+                                    // ),
+                                    // SizedBox(
+                                    //   width: 70,
+                                    //   height: 48,
+                                    //   child: OutlinedButton(
+                                    //     onPressed: () {
+                                    //       // 중복 확인 작업을 수행하는 코드 추가
+                                    //     },
+                                    //     style: OutlinedButton.styleFrom(
+                                    //       shape: RoundedRectangleBorder(
+                                    //         borderRadius: BorderRadius.circular(
+                                    //             5.0), // 각진 정도 조절
+                                    //       ),
+                                    //       side: const BorderSide(
+                                    //         color:
+                                    //             Color(0xFFF5BEB5), // 외곽선 색상 설정
+                                    //         width: 1, // 외곽선 두께 설정
+                                    //       ),
+                                    //     ),
+                                    //     child: const Text(
+                                    //       '인증',
+                                    //       textAlign: TextAlign.center,
+                                    //       style: TextStyle(
+                                    //         color:
+                                    //             Color(0xFFF5BEB5), // 글자 색상 설정
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
                               const SizedBox(
                                 height: 20,
                               ),
-                              SizedBox(
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextField(
-                                        onChanged: (value) {
-                                          if (!RegExp(
-                                                  r'^[A-Za-z가-힣0-9]{2,10}$')
-                                              .hasMatch(value)) {
-                                            setState(() {
-                                              nickError = nickMessage;
-                                            });
-                                          } else {
-                                            setState(() {
-                                              nickError = null; // 에러 없음
-                                            });
-                                          }
-                                        },
-                                        controller: controller5,
-                                        autofocus: true,
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(
-                                            vertical: 16.0,
-                                            horizontal: 40.0,
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              width: 1.5,
-                                              color: Color(0xFFF5BEB5),
-                                            ),
-                                          ),
-                                          prefixIconColor: Color(0xFFF5BEB5),
-                                          prefixIcon: Icon(
-                                            Icons.face_6,
-                                          ),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide(),
-                                          ),
-                                          labelText: '닉네임',
-                                          errorText: nickError,
-                                          errorStyle: TextStyle(height: 1),
-                                          focusColor: Color(0xFFF5BEB5),
-                                        ),
-                                        keyboardType: TextInputType.text,
-                                        textAlign: TextAlign.start,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 20, // 중복 확인 버튼과 아이디 입력창 사이의 간격 설정
-                                    ),
-                                    SizedBox(
-                                      width: 90,
-                                      height: 50,
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                                        final checkNick =
-                                                              await pageapi.checkNick(
-                                                                  controller5
-                                                                      .text
-                                                                      .toString());
-                                                          print(checkNick);
-                                                          if (checkNick
-                                                                  .toString() ==
-                                                              "true") {
-                                                                print(11);
-                                                            showDialog(context: context, builder: (context) {
-                                                                   return Dialog( child: 
-                                                                   Container(
-                                                                    width: 100,
-                                                                    height: 100,
-                                                                    color: Colors.white,
-                                                                    child: Center(child: Text('사용가능한 닉네임입니다.')))
-                                                                   );
-                                                                 }
-                                                                );    
-                                                            setState(() {
-                                                              nickCheck = true;
-                                                            });
-                                                          } else {
-                                                            showDialog(context: context, builder: (context) {
-                                                                   return Dialog( child: 
-                                                                   Container(
-                                                                    width: 100,
-                                                                    height: 100,
-                                                                    color: Colors.white,
-                                                                    child: Center(child: Text('중복된 닉네임입니다.')))
-                                                                   );
-                                                                 }
-                                                                );
-                                                            setState(() {
-                                                              nickCheck = false;
-                                                            });
-                                                          }
-                                                        },
-                                        style: OutlinedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                5.0), // 각진 정도 조절
-                                          ),
-                                          side: const BorderSide(
-                                            color:
-                                                Color(0xFFF5BEB5), // 외곽선 색상 설정
-                                            width: 1, // 외곽선 두께 설정
-                                          ),
-                                        ),
-                                        child: const Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              0.2, 0.2, 0.2, 0.2),
-                                          child: Text(
-                                            '중복 확인',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color:
-                                                  Color(0xFFF5BEB5), // 글자 색상 설정
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
+                              // SizedBox(
+                              //   child: Row(
+                              //     children: [
+                              //       Expanded(
+                              //         child: TextField(
+                              //           onChanged: (value) {
+                              //             if (!RegExp(r'^[A-Za-z가-힣0-9]{2,10}$')
+                              //                 .hasMatch(value)) {
+                              //               setState(() {
+                              //                 nickError = nickMessage;
+                              //               });
+                              //             } else {
+                              //               setState(() {
+                              //                 nickError = null; // 에러 없음
+                              //               });
+                              //             }
+                              //           },
+                              //           controller: controller5,
+                              //           autofocus: true,
+                              //           decoration: InputDecoration(
+                              //             contentPadding: EdgeInsets.symmetric(
+                              //               vertical: 16.0,
+                              //               horizontal: 40.0,
+                              //             ),
+                              //             focusedBorder: OutlineInputBorder(
+                              //               borderSide: BorderSide(
+                              //                 width: 1.5,
+                              //                 color: Color(0xFFF5BEB5),
+                              //               ),
+                              //             ),
+                              //             prefixIconColor: Color(0xFFF5BEB5),
+                              //             prefixIcon: Icon(
+                              //               Icons.face_6,
+                              //             ),
+                              //             border: OutlineInputBorder(
+                              //               borderSide: BorderSide(),
+                              //             ),
+                              //             labelText: '닉네임',
+                              //             errorText: nickError,
+                              //             errorStyle: TextStyle(height: 1),
+                              //             focusColor: Color(0xFFF5BEB5),
+                              //           ),
+                              //           keyboardType: TextInputType.text,
+                              //           textAlign: TextAlign.start,
+                              //         ),
+                              //       ),
+                              //       const SizedBox(
+                              //         width: 20, // 중복 확인 버튼과 아이디 입력창 사이의 간격 설정
+                              //       ),
+                              //       SizedBox(
+                              //         width: 90,
+                              //         height: 50,
+                              //         child: OutlinedButton(
+                              //           onPressed: () async {
+                              //             final checkNick =
+                              //                 await pageapi.checkNick(
+                              //                     controller5.text.toString());
+                              //             print(checkNick);
+                              //             if (checkNick.toString() == "true") {
+                              //               print(11);
+                              //               showDialog(
+                              //                   context: context,
+                              //                   builder: (context) {
+                              //                     return Dialog(
+                              //                         child: Container(
+                              //                             width: 100,
+                              //                             height: 100,
+                              //                             color: Colors.white,
+                              //                             child: Center(
+                              //                                 child: Text(
+                              //                                     '사용가능한 닉네임입니다.'))));
+                              //                   });
+                              //               setState(() {
+                              //                 nickCheck = true;
+                              //               });
+                              //             } else {
+                              //               showDialog(
+                              //                   context: context,
+                              //                   builder: (context) {
+                              //                     return Dialog(
+                              //                         child: Container(
+                              //                             width: 100,
+                              //                             height: 100,
+                              //                             color: Colors.white,
+                              //                             child: Center(
+                              //                                 child: Text(
+                              //                                     '중복된 닉네임입니다.'))));
+                              //                   });
+                              //               setState(() {
+                              //                 nickCheck = false;
+                              //               });
+                              //             }
+                              //           },
+                              //           style: OutlinedButton.styleFrom(
+                              //             shape: RoundedRectangleBorder(
+                              //               borderRadius: BorderRadius.circular(
+                              //                   5.0), // 각진 정도 조절
+                              //             ),
+                              //             side: const BorderSide(
+                              //               color:
+                              //                   Color(0xFFF5BEB5), // 외곽선 색상 설정
+                              //               width: 1, // 외곽선 두께 설정
+                              //             ),
+                              //           ),
+                              //           child: const Padding(
+                              //             padding: EdgeInsets.fromLTRB(
+                              //                 0.2, 0.2, 0.2, 0.2),
+                              //             child: Text(
+                              //               '중복 확인',
+                              //               textAlign: TextAlign.center,
+                              //               style: TextStyle(
+                              //                 color:
+                              //                     Color(0xFFF5BEB5), // 글자 색상 설정
+                              //               ),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       )
+                              //     ],
+                              //   ),
+                              // ),
                               const SizedBox(
                                 child: Padding(
                                   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -678,71 +799,80 @@ class _SignUpState extends State<SignUp> {
                                       const EdgeInsets.fromLTRB(0, 20, 0, 10),
                                   child: ButtonTheme(
                                       child: TextButton(
-                                          onPressed: idCheck && nickCheck && emailCheck && passwordCheck && samepasswordCheck? 
-                                          () async {
-                                                        final signup =
-                                                              await pageapi.signup(
-                                                                  controller5
-                                                                      .text
-                                                                      .toString(),
-                                                                  controller.text.toString(),
-                                                                  controller2.text,
-                                                                  controller4.text.toString(),
-                                                                  controller6.text,
-                                                                  selectedYear,
-                                                                  _selectedWman
-                                                                  );
-                                                          print(signup);
-                                                          if (signup == 200) {
-                                                          await showDialog(context: context, builder: (context) {
-                                                                   return Dialog( child: 
-                                                                   Container(
-                                                                    width: 100,
-                                                                    height: 100,
-                                                                    color: Colors.white,
-                                                                    child: Center(child: Text('회원가입 성공')))
-                                                                   );
-                                                                 }
-                                                                );
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                              builder: (context) => const LogIn()),
-                                                          );
-                                                          }
-                                                          // if (signup
-                                                          //         .toString() ==
-                                                          //     "true") {
-                                                          //       print(1);
-                                                          //       showDialog(context: context, builder: (context) {
-                                                          //          return Dialog( child: 
-                                                          //          Container(
-                                                          //           width: 100,
-                                                          //           height: 100,
-                                                          //           color: Colors.white,
-                                                          //           child: Center(child: Text('사용가능한 아이디입니다.')))
-                                                          //          );
-                                                          //        }
-                                                          //       );
-                                                          //   setState(() {
-                                                          //     idCheck = true;
-                                                          //   });
-                                                          // } else {
-                                                          //   showDialog(context: context, builder: (context) {
-                                                          //          return Dialog( child: 
-                                                          //          Container(
-                                                          //           width: 100,
-                                                          //           height: 100,
-                                                          //           color: Colors.white,
-                                                          //           child: Center(child: Text('중복된 아이디입니다.')))
-                                                          //          );
-                                                          //        }
-                                                          //       );
-                                                          //   setState(() {
-                                                          //     idCheck = false;
-                                                          //   });
-                                                          // }
-                                                        } : null,
+                                          onPressed: idCheck &&
+                                                  nickCheck &&
+                                                  emailCheck &&
+                                                  passwordCheck &&
+                                                  samepasswordCheck
+                                              ? () async {
+                                                  final signup =
+                                                      await pageapi.signup(
+                                                          controller5.text
+                                                              .toString(),
+                                                          controller.text
+                                                              .toString(),
+                                                          controller2.text,
+                                                          controller4.text
+                                                              .toString(),
+                                                          controller6.text,
+                                                          selectedYear,
+                                                          _selectedWman);
+                                                  print(signup);
+                                                  if (signup == 200) {
+                                                    await showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return Dialog(
+                                                              child: Container(
+                                                                  width: 100,
+                                                                  height: 100,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  child: Center(
+                                                                      child: Text(
+                                                                          '회원가입 성공'))));
+                                                        });
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const LogIn()),
+                                                    );
+                                                  }
+                                                  // if (signup
+                                                  //         .toString() ==
+                                                  //     "true") {
+                                                  //       print(1);
+                                                  //       showDialog(context: context, builder: (context) {
+                                                  //          return Dialog( child:
+                                                  //          Container(
+                                                  //           width: 100,
+                                                  //           height: 100,
+                                                  //           color: Colors.white,
+                                                  //           child: Center(child: Text('사용가능한 아이디입니다.')))
+                                                  //          );
+                                                  //        }
+                                                  //       );
+                                                  //   setState(() {
+                                                  //     idCheck = true;
+                                                  //   });
+                                                  // } else {
+                                                  //   showDialog(context: context, builder: (context) {
+                                                  //          return Dialog( child:
+                                                  //          Container(
+                                                  //           width: 100,
+                                                  //           height: 100,
+                                                  //           color: Colors.white,
+                                                  //           child: Center(child: Text('중복된 아이디입니다.')))
+                                                  //          );
+                                                  //        }
+                                                  //       );
+                                                  //   setState(() {
+                                                  //     idCheck = false;
+                                                  //   });
+                                                  // }
+                                                }
+                                              : null,
                                           style: const ButtonStyle(
                                               backgroundColor:
                                                   MaterialStatePropertyAll(

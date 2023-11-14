@@ -91,7 +91,7 @@ public class SocialController {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "코디 이름 받지 못했습니다.");
         }
         String imgUrl= s3Service.copyTempToFashion(request.getImgName());
-        String fileName=request.getImgName().replace("temp_", "fashion_");
+        String fileName=request.getImgName().replace("temp_", "fashion_") + ".jpg";
 
         return Api.OK(socialService.saveFashion(member, request, imgUrl,fileName ));
     }
