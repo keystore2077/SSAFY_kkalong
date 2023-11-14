@@ -250,7 +250,7 @@ public class ClothController {
 
         String imgUrl="";
         String fileName="";
-        if (file!=null || !file.isEmpty()) {
+        if (file!=null && !file.isEmpty()) {
 
             if ("jpg".equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
                 //1.원본 사진 저장
@@ -307,7 +307,7 @@ public class ClothController {
         }
         ClothSaveRes clothSaveRes = clothService.updateCloth(cloth, clothUpdateReq);
 
-        if(file!=null || !file.isEmpty()){
+        if(file!=null && !file.isEmpty()){
             fastApiCallerService.callU2Net(member, fileName, clothSaveRes.getClothRes().getClothSeq());
         }
 
