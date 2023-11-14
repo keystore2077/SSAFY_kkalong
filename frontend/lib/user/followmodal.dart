@@ -354,6 +354,7 @@ class DialogUI2 extends StatelessWidget {
                         children: followings.map((following) => GestureDetector(
                           onTap: () {
                             // navigateTaglist(context, tag);
+                            Navigator.pop(context);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -409,6 +410,7 @@ class DialogUI2 extends StatelessWidget {
                       child: Column(
                         children: followers.map((follower) => GestureDetector(
                         onTap: () {
+                        Navigator.pop(context);
                         // navigateTaglist(context, tag);
                         Navigator.push(
                               context,
