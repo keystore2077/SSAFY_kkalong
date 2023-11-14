@@ -206,24 +206,24 @@ public class ClothController {
 
     @Operation(summary = "옷 정보수정")
     @PutMapping(value = "" )
-    public Api<Object> updateCloth(@RequestParam(value = "mFile",required = false ) MultipartFile file, @ModelAttribute ClothUpdateReq request) {
+    public Api<Object> updateCloth(@RequestParam(required = false) MultipartFile file, @ModelAttribute ClothUpdateReq clothUpdateReq) {
         System.out.println(file);
-        System.out.println(request.toString());
+        System.out.println(clothUpdateReq.toString());
 
         Member member = memberService.getLoginUserInfo();
         if (member == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
         }
 
-        Cloth cloth =clothService.getCloth(request.getClothSeq());
+        Cloth cloth =clothService.getCloth(clothUpdateReq.getClothSeq());
         if(cloth ==null){
             return Api.ERROR(ErrorCode.BAD_REQUEST, "옷 정보를 찾지 못했습니다.");
         }
 
         //sectionSeq 유효성 검사
         Section section = null;
-        if(request.getSectionSeq()!=0){
-            section = closetService.getSection(request.getSectionSeq());
+        if(clothUpdateReq.getSectionSeq()!=0){
+            section = closetService.getSection(clothUpdateReq.getSectionSeq());
             if (section == null) {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "옷을 저장하려는 구역 정보를 찾지 못했습니다.");
             }
@@ -231,7 +231,7 @@ public class ClothController {
                 return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원은 옷을 저장하려는 구역의 주인이 아닙니다.");
             }
             //Section 변경 사항 저장
-            if (cloth.getSection()==null || cloth.getSection().getSectionSeq() != request.getSectionSeq()) {
+            if (cloth.getSection()==null || cloth.getSection().getSectionSeq() != clothUpdateReq.getSectionSeq()) {
                 cloth.setSection(section);
             }
         }else{
@@ -239,9 +239,9 @@ public class ClothController {
         }
 
         //sortSeq 유효성 검사
-        Sort sort = sortService.getClothSort(request.getSort());
+        Sort sort = sortService.getClothSort(clothUpdateReq.getSort());
         if (sort == null) {
-            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷 종류입니다. Top, Pants, Outer, Skirt, Dress, Etc 중에서 보내주세요.", request.getSort()));
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유호하지 않는 옷 종류입니다. Top, Pants, Outer, Skirt, Dress, Etc 중에서 보내주세요.", clothUpdateReq.getSort()));
         }
         //sort 변경 사항 저장
         if (cloth.getSort().getSortSeq() != sort.getSortSeq()) {
@@ -297,15 +297,15 @@ public class ClothController {
         }
 
         // 옷장 이름 변경 사항 저장
-        if (!cloth.getClothName().equals(request.getClothName())) {
-            cloth.setClothName(request.getClothName());
+        if (!cloth.getClothName().equals(clothUpdateReq.getClothName())) {
+            cloth.setClothName(clothUpdateReq.getClothName());
         }
 
         // 공개 여부 변경 사항 저장
-        if (cloth.isPrivate() != request.isPrivate()) {
-            cloth.setPrivate(request.isPrivate());
+        if (cloth.isPrivate() != clothUpdateReq.isPrivate()) {
+            cloth.setPrivate(clothUpdateReq.isPrivate());
         }
-        ClothSaveRes clothSaveRes = clothService.updateCloth(cloth, request);
+        ClothSaveRes clothSaveRes = clothService.updateCloth(cloth, clothUpdateReq);
 
         if(!file.isEmpty()){
             fastApiCallerService.callU2Net(member, fileName, clothSaveRes.getClothRes().getClothSeq());
