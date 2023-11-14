@@ -11,8 +11,11 @@ import java.time.LocalDateTime;
 @Data
 public class FashionAssessRes {
 
+    @Schema(description = "사용자 닉네임")
+    private String memberNickName;
+
     @Schema(description = "인덱스")
-    int fashionSeq;
+    private int fashionSeq;
 
     @Schema(description = "코디 이름")
     private String fashionName ;
@@ -25,6 +28,7 @@ public class FashionAssessRes {
 
     public static FashionAssessRes toRes(Fashion fashion, String imgUrl, LocalDateTime regDate){
         return FashionAssessRes.builder()
+                .memberNickName(fashion.getMember().getMemberNickname())
                 .fashionSeq(fashion.getFashionSeq())
                 .fashionName(fashion.getFashionName())
                 .regDate(fashion.getFashionRegDate())

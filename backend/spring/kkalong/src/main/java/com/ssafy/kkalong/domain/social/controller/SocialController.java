@@ -76,13 +76,20 @@ public class SocialController {
 
     @Operation(summary = "코디사진 저장")
     @PostMapping(value = "/save" )
-    public Api<Object> saveFashion( @ModelAttribute  FashionSaveReq request) {
+    public Api<Object> saveFashion( @RequestBody  FashionSaveReq request) {
         Member member = memberService.getLoginUserInfo();
 
         if (member == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
         }
+        System.out.println(request.toString());
+        if(request.getImgName()==null || request.getImgName().isEmpty()){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "이미지 이름 받지 못했습니다.");
+        }
 
+        if(request.getFashionName()==null || request.getFashionName().isEmpty()){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "코디 이름 받지 못했습니다.");
+        }
         String imgUrl= s3Service.copyTempToFashion(request.getImgName());
         String fileName=request.getImgName().replace("temp_", "fashion_");
 
