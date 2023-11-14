@@ -59,7 +59,9 @@ public class ClosetService {
 
     public List<Section> createSection(List<SectionCreateRequestItem> requests, Closet newCloset) {
         List<Section> sectionsToSave = new ArrayList<>();
-
+        if (requests == null || requests.isEmpty()){
+            return sectionsToSave;
+        }
 
         for (SectionCreateRequestItem request : requests) {
             Sort sort = sortService.getSort(request.getSort());
@@ -78,6 +80,10 @@ public class ClosetService {
     //섹션 수정
     public List<Section> updateSection(List<SectionUpdateRequest> sectionUpdateRequests,Closet closet){
         List<Section> result = new ArrayList<>();
+        if (sectionUpdateRequests == null || sectionUpdateRequests.isEmpty()){
+            return result;
+        }
+
         for(SectionUpdateRequest sectionUpdateRequest : sectionUpdateRequests){
             Section section = sectionRepository.findBySectionSeqAndIsSectionDeleted(
                             sectionUpdateRequest.getSectionSeq(), false).orElse(null);
@@ -115,7 +121,9 @@ public class ClosetService {
 
 
     public void deleteSection(List<Integer> closetSectionDeleteList,Closet closet,Member member){
-
+        if (closetSectionDeleteList == null || closetSectionDeleteList.isEmpty()){
+            return;
+        }
         for (Integer sectionSeq : closetSectionDeleteList) {
 
             // 기존 섹션을 시퀀스로 찾기
