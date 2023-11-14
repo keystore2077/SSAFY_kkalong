@@ -3,13 +3,15 @@ import 'package:flutter_mycloset/closet/clothdetail.dart';
 import 'package:flutter_mycloset/main.dart';
 import 'package:flutter_mycloset/user/followmodal.dart';
 import 'package:flutter_mycloset/user/login.dart';
+import '../avata/completecody.dart';
 import 'package:flutter_mycloset/user/pageapi.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
+import 'package:dio/dio.dart';
 
 class MyPage extends StatefulWidget {
-  const MyPage({super.key});
+  MyPage({super.key});
 
   // final storage;
 
@@ -23,21 +25,27 @@ class MyPageState extends State<MyPage> {
 
   String nick = '';
   String email = '';
+  int fashionSeq = 1;
+  String memberNickname = '';
+  String fashionName = '';
+  String imgUrl = '';
   List<dynamic> followings = [];
   List<dynamic> followers = [];
-   
-  List<dynamic> savecloItem = [];
-    // "list": [
-    //   {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
-    //   {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
-    //   {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
-    //   {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
-    // ]
-    List<dynamic> saveCloth = [];
-    bool showCody = false;
-    bool showCloth = false;
 
-  
+  List<dynamic> savecloItem = [];
+  // "list": [
+  //   {"image": "Assets/Image/logo.png", "name": "깔쌈한코디1"},
+  //   {"image": "Assets/Image/logo.png", "name": "깔쌈코디2"},
+  //   {"image": "Assets/Image/logo.png", "name": "깔삼코디3"},
+  //   {"image": "Assets/Image/logo.png", "name": "하늘하늘코디3"},
+  // ]
+  List<dynamic> saveCloth = [];
+  bool showCody = false;
+  bool showCloth = false;
+
+  // void updateReversedList() {
+  //   reversedList = List.from(savecloItem.reversed);
+  // }
 
   @override
   void initState() {
@@ -49,68 +57,35 @@ class MyPageState extends State<MyPage> {
       final info = await pageapi.getinfo(accessToken);
       print(info);
 
-      if (info != null){
+      if (info != null) {
         setState(() {
           nick = info['body']['memberNickname'];
         });
         print(nick);
-
       }
 
       final profile = await pageapi.getprofile(accessToken, nick);
-      print(profile); 
-       if (profile != null){
+      print(profile);
+      if (profile != null) {
         setState(() {
           savecloItem = profile['body']['fashionList'];
           saveCloth = profile['body']['clothList'];
+          // updateReversedList();
         });
-          print(savecloItem);
-
-       }
-
+        print(savecloItem);
+        // print(reversedList);
+      }
 
       final followlist = await pageapi.getfollow(accessToken, nick);
-      print(followlist); 
-      if (followlist != null){
+      print(followlist);
+      if (followlist != null) {
         setState(() {
           followings = followlist['body']['followingList'];
           followers = followlist['body']['followerList'];
         });
-
       }
-
-      // if (info != null) {
-      //   await userStore.changeUserInfo(info['userEmail']);
-      //   favoringredient = info['ingredientList'];
-      //   favorrecipe = info['recipeList'];
-      //   selectedVeganNumber = info['veganId'];
-      //   selectedVegan = veganList[selectedVeganNumber];
-
-      //   final resallergyList = (info['allergyList']);
-      //   print(resallergyList);
-      //   print(resallergyList.runtimeType);
-      //   if (resallergyList.isNotEmpty) {
-      //     print(1);
-      //     algdropdown = true;
-      //     havAllergie = '있음';
-      //   }
-      //   for (int i = 0; i < resallergyList.length; i++) {
-      //     selectedAllergieNumber.add(resallergyList[i]['algyId']);
-      //     selectedAllergie.add(resallergyList[i]['algyName']);
-      //   }
-      //   print(selectedAllergieNumber);
-      //   print(selectedAllergie);
-      // }
-      // setState(() {});
-      // 이제 userStore를 사용할 수 있습니다.
-      // ...
     });
-
-    // 초기화 작업 수행
   }
-
-
-// BearList? bearList;
 
   @override
   Widget build(BuildContext context) {
@@ -134,224 +109,7 @@ class MyPageState extends State<MyPage> {
             ),
           ],
         ),
-        body:
-            // Container(
-            //   padding: const EdgeInsets.all(30),
-            //   child: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     children: [
-            //       Container(
-            //         margin: const EdgeInsets.fromLTRB(0, 0, 0, 35),
-            //         child: const Column(
-            //           crossAxisAlignment: CrossAxisAlignment.start,
-            //           children: [
-            //             SizedBox(
-            //               child: Padding(
-            //                 padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-            //                 child: Text(
-            //                   '안녕하세요,',
-            //                   style: TextStyle(
-            //                     fontSize: 20,
-            //                     fontWeight: FontWeight.w600,
-            //                   ),
-            //                 ),
-            //               ),
-            //             ),
-            //             Row(
-            //               children: [
-            //                 Padding(
-            //                   padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-            //                   child: Text(
-            //                     '나는야김싸피',
-            //                     style: TextStyle(
-            //                       fontSize: 20,
-            //                       fontWeight: FontWeight.w600,
-            //                       color: Color(0xFFF5BEB5),
-            //                     ),
-            //                   ),
-            //                 ),
-            //                 Padding(
-            //                   padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-            //                   child: Text(
-            //                     '님',
-            //                     style: TextStyle(
-            //                       fontSize: 20,
-            //                       fontWeight: FontWeight.w600,
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ],
-            //             ),
-            //             Padding(
-            //               padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-            //               child: Text(
-            //                 '오늘도 깔롱쟁이와 멋쟁이 돼보아요!',
-            //                 style: TextStyle(
-            //                   fontSize: 20,
-            //                   fontWeight: FontWeight.w600,
-            //                 ),
-            //               ),
-            //             ),
-            //           ],
-            //         ),
-            //       ),
-            //       Expanded(
-            //         child: Column(
-            //           crossAxisAlignment: CrossAxisAlignment.start,
-            //           children: [
-            //             SizedBox(
-            //               child: Padding(
-            //                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
-            //                 child: Row(
-            //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //                   children: [
-            //                     const Text(
-            //                       'My깔롱',
-            //                       style: TextStyle(
-            //                         fontSize: 22,
-            //                         fontWeight: FontWeight.w700,
-            //                         color: Color(0xFFF5BEB5),
-            //                       ),
-            //                     ),
-            //                     ElevatedButton(
-            //                       onPressed: () {
-            //                         // 버튼 클릭 이벤트
-            //                       },
-            //                       style: ElevatedButton.styleFrom(
-            //                         shape: RoundedRectangleBorder(
-            //                           borderRadius: BorderRadius.circular(
-            //                               5.0), // 원하는 각진 정도로 설정
-            //                         ),
-            //                         // 다른 스타일 속성들
-            //                       ),
-            //                       child: const Text('Follow List'),
-            //                     ),
-            //                   ],
-            //                 ),
-            //               ),
-            //             ),
-            //             // Expanded(
-            //             //   child:
-            //             Column(
-            //               children: [
-            //                 SizedBox(
-            //                   child: Padding(
-            //                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
-            //                     child: Row(
-            //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //                       crossAxisAlignment: CrossAxisAlignment.end,
-            //                       children: [
-            //                         const Row(
-            //                           children: [
-            //                             Text(
-            //                               '저장한 코디 ',
-            //                               style: TextStyle(
-            //                                 fontSize: 17,
-            //                                 fontWeight: FontWeight.w600,
-            //                               ),
-            //                             ),
-            //                             Text(
-            //                               '(3건)',
-            //                               style: TextStyle(
-            //                                 fontSize: 12,
-            //                                 fontWeight: FontWeight.w600,
-            //                               ),
-            //                             ),
-            //                           ],
-            //                         ),
-            //                         GestureDetector(
-            //                           onTap: () {
-            //                             // 이동 로직을 추가하세요.
-            //                           },
-            //                           child: const Text('더보기'),
-            //                         ),
-            //                       ],
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ],
-            //             ),
-            //             // ),
-            //             Expanded(
-            //               child: GridView.builder(
-            //                 gridDelegate:
-            //                     const SliverGridDelegateWithFixedCrossAxisCount(
-            //                   crossAxisCount: 2, // Number of columns in the grid
-            //                   crossAxisSpacing: 5.0, // Spacing between columns
-            //                   mainAxisSpacing: 5.0, // Spacing between rows
-            //                 ),
-            //                 itemCount: savecloItem['list']?.length ?? 0,
-            //                 itemBuilder: (BuildContext context, int index) {
-            //                   final item = savecloItem['list']?[index];
-            //                   if (item == null) {
-            //                     return const SizedBox(); // 빈 위젯 반환
-            //                   }
-            //                   return GestureDetector(
-            //                     onTap: () {
-            //                       // 클릭이벤트
-            //                     },
-            //                     child: Card(
-            //                       child: Column(
-            //                         mainAxisAlignment: MainAxisAlignment.center,
-            //                         children: <Widget>[
-            //                           Image.asset(
-            //                               item["image"] ?? "Assets/Image/logo.png",
-            //                               height: 100,
-            //                               width: 100),
-            //                           Text(
-            //                             item["name"] ?? "Unknown",
-            //                             style: const TextStyle(
-            //                               fontSize: 16,
-            //                               fontWeight: FontWeight.w600,
-            //                             ),
-            //                           ),
-            //                         ],
-            //                       ),
-            //                     ),
-            //                   );
-            //                 },
-            //               ),
-            //             )
-            //           ],
-            //         ),
-            //       ),
-            //       ListTileTheme(
-            //         selectedColor: Colors.blue,
-            //         child: ListTile(
-            //           title: const Text('로그아웃'),
-            //           trailing: const Icon(Icons.chevron_right),
-            //           onTap: () async {
-            //             await storage.delete(key: "login");
-            //             await pageapi.logout(context.read<UserStore>().accessToken);
-            //             await context.read<UserStore>().changeAccessToken('');
-
-            //             Navigator.pushAndRemoveUntil(
-            //                 context,
-            //                 MaterialPageRoute(
-            //                     builder: (BuildContext context) => LogIn()),
-            //                 (route) => false);
-            //           },
-            //         ),
-            //       ),
-            //       ListTileTheme(
-            //         selectedColor: Colors.blue,
-            //         child: ListTile(
-            //           title: const Text('정보수정'),
-            //           trailing: const Icon(Icons.chevron_right),
-            //           onTap: () {
-            //             showDialog(
-            //                 context: context,
-            //                 builder: (context) {
-            //                   return DialogUI(nick: nick);
-            //                 });
-            //           },
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // )
-
-            CustomScrollView(
+        body: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
               child: Container(
@@ -440,39 +198,44 @@ class MyPageState extends State<MyPage> {
                           ElevatedButton(
                             onPressed: () {
                               Future.delayed(Duration.zero, () async {
-      final userStore = Provider.of<UserStore>(context, listen: false);
-      final accessToken = userStore.accessToken;
-      print(accessToken);
-      final info = await pageapi.getinfo(accessToken);
-      print(info);
+                                final userStore = Provider.of<UserStore>(
+                                    context,
+                                    listen: false);
+                                final accessToken = userStore.accessToken;
+                                print(accessToken);
+                                final info = await pageapi.getinfo(accessToken);
+                                print(info);
 
-      if (info != null){
-        setState(() {
-          nick = info['body']['memberNickname'];
-        });
-        print(nick);
+                                if (info != null) {
+                                  setState(() {
+                                    nick = info['body']['memberNickname'];
+                                  });
+                                  print(nick);
+                                }
 
-      }
+                                final followlist =
+                                    await pageapi.getfollow(accessToken, nick);
+                                print(followlist);
+                                if (followlist != null) {
+                                  setState(() {
+                                    followings =
+                                        followlist['body']['followingList'];
+                                    followers =
+                                        followlist['body']['followerList'];
+                                  });
+                                }
 
-
-      final followlist = await pageapi.getfollow(accessToken, nick);
-      print(followlist); 
-      if (followlist != null){
-        setState(() {
-          followings = followlist['body']['followingList'];
-          followers = followlist['body']['followerList'];
-        });
-
-      }
-
-      showDialog(context: context, builder: (context) {
-                                  return DialogUI2(followings: followings, followers: followers, nick:nick);
-                                });
-     
-    });
-                                // 버튼 클릭 이벤트
-                                
-                              },
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return DialogUI2(
+                                          followings: followings,
+                                          followers: followers,
+                                          nick: nick);
+                                    });
+                              });
+                              // 버튼 클릭 이벤트
+                            },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                 borderRadius:
@@ -522,7 +285,7 @@ class MyPageState extends State<MyPage> {
                                     showCody = !showCody;
                                   });
                                 },
-                                child: showCody? Text('간략히') : Text('더보기'),
+                                child: showCody ? Text('간략히') : Text('더보기'),
                               ),
                             ],
                           ),
@@ -544,13 +307,55 @@ class MyPageState extends State<MyPage> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    if (savecloItem == null || index >= savecloItem.length || (!showCody && index >= 4)) {
-                  return const SizedBox(); // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
-                }
-                final item = savecloItem[index];
+                    if (index >= savecloItem.length ||
+                        (!showCody && index >= 4)) {
+                      return null; // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
+                    }
+                    final item = savecloItem[index];
                     return GestureDetector(
-                      onTap: () {
-                        // 클릭 이벤트
+                      onTap: () async {
+                        print(item['seq']);
+                        setState(() {
+                          fashionSeq = item['seq'];
+                        });
+                        Dio dio = Dio();
+                        const serverURL = 'http://k9c105.p.ssafy.io:8761';
+
+                        try {
+                          Map<String, dynamic> headers = {};
+                          var accessToken =
+                              context.read<UserStore>().accessToken;
+
+                          if (accessToken.isNotEmpty) {
+                            headers['Authorization'] = 'Bearer $accessToken';
+                          }
+
+                          final response = await dio.get(
+                            '$serverURL/api/social/fashion/$fashionSeq',
+                            options: Options(headers: headers),
+                          );
+
+                          setState(() {
+                            memberNickname =
+                                response.data['body']['memberNickname'];
+                            fashionName = response.data['body']['fashionName'];
+                            imgUrl = response.data['body']['imgUrl'];
+                          });
+
+                          print('리스판스데이타출력++++++++++++++');
+                          print(response.data);
+
+                          Navigator.of(context)
+                              .pushReplacement(MaterialPageRoute(
+                            builder: (_) => Completecody(
+                                memberNickname: memberNickname,
+                                fashionName: fashionName,
+                                imgUrl: imgUrl),
+                          ));
+                          return response.data;
+                        } catch (e) {
+                          print('에러: $e');
+                        }
                       },
                       child: Card(
                         child: Stack(
@@ -561,9 +366,9 @@ class MyPageState extends State<MyPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Image.network(
-                                    item["imgUrl"] ?? null,
-                                    height: 100,
-                                    width: 100,
+                                    item["imgUrl"],
+                                    height: 110,
+                                    width: 150,
                                   ),
                                   Text(
                                     item["name"] ?? "Unknown",
@@ -580,19 +385,24 @@ class MyPageState extends State<MyPage> {
                               right: 8.0,
                               child: IconButton(
                                 icon: Icon(Icons.lock),
-                                color: item['isPrivate']? Colors.yellow: Colors.black,
+                                color: item['isPrivate']
+                                    ? Color.fromARGB(255, 219, 201, 248)
+                                    : Color.fromARGB(255, 121, 120, 121),
                                 onPressed: () {
                                   Future.delayed(Duration.zero, () async {
-                                    final userStore = Provider.of<UserStore>(context, listen: false);
+                                    final userStore = Provider.of<UserStore>(
+                                        context,
+                                        listen: false);
                                     final accessToken = userStore.accessToken;
                                     print(accessToken);
-                                    final lock = await pageapi.lockfashion(accessToken, item['seq']);
-                                    if (lock != null){
+                                    final lock = await pageapi.lockfashion(
+                                        accessToken, item['seq']);
+                                    if (lock != null) {
                                       setState(() {
                                         item['isPrivate'] = !item['isPrivate'];
                                       });
                                     }
-                                    });
+                                  });
                                   // 자물쇠 버튼 클릭 이벤트
                                 },
                               ),
@@ -602,7 +412,7 @@ class MyPageState extends State<MyPage> {
                       ),
                     );
                   },
-                  childCount: showCody? (savecloItem?.length ?? 0) : 4,
+                  childCount: showCody ? (savecloItem.length ?? 0) : 4,
                 ),
               ),
             ),
@@ -646,7 +456,7 @@ class MyPageState extends State<MyPage> {
                                     showCloth = !showCloth;
                                   });
                                 },
-                                child: showCloth? Text('간략히') : Text('더보기'),
+                                child: showCloth ? Text('간략히') : Text('더보기'),
                               ),
                             ],
                           ),
@@ -668,8 +478,9 @@ class MyPageState extends State<MyPage> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                     if (saveCloth == null || index >= saveCloth.length || (!showCloth && index >= 4)) {
-                     return const SizedBox(); // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
+                    if (index >= saveCloth.length ||
+                        (!showCloth && index >= 4)) {
+                      return null; // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
                     }
                     final item = saveCloth[index];
                     return GestureDetector(
@@ -687,7 +498,7 @@ class MyPageState extends State<MyPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Image.network(
-                              item["imgUrl"] ?? null,
+                              item["imgUrl"],
                               height: 100,
                               width: 100,
                             ),
@@ -703,7 +514,7 @@ class MyPageState extends State<MyPage> {
                       ),
                     );
                   },
-                  childCount: showCloth? (saveCloth?.length ?? 0) : 4,
+                  childCount: showCloth ? (saveCloth.length ?? 0) : 4,
                 ),
               ),
             ),
@@ -718,16 +529,17 @@ class MyPageState extends State<MyPage> {
                       title: const Text('로그아웃'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () async {
-                    await storage.delete(key: "login");
-                    await pageapi.logout(context.read<UserStore>().accessToken);
-                    await context.read<UserStore>().changeAccessToken('');
+                        await storage.delete(key: "login");
+                        await pageapi
+                            .logout(context.read<UserStore>().accessToken);
+                        await context.read<UserStore>().changeAccessToken('');
 
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) => LogIn()),
-                        (route) => false);
-                     },
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => LogIn()),
+                            (route) => false);
+                      },
                     ),
                   ),
                   ListTileTheme(
@@ -736,10 +548,12 @@ class MyPageState extends State<MyPage> {
                       title: const Text('정보수정'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
-                    showDialog(context: context, builder: (context) {
-                      return DialogUI(nick:nick);
-                    });
-                  },
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return DialogUI(nick: nick);
+                            });
+                      },
                     ),
                   ),
                 ],
@@ -1182,4 +996,3 @@ class _DialogUIState extends State<DialogUI> {
     );
   }
 }
-

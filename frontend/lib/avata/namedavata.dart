@@ -357,6 +357,7 @@ import 'package:flutter_mycloset/avata/choicecloth.dart';
 import '../avata/completecody.dart';
 import 'package:http_parser/http_parser.dart';
 import '../user/mypage.dart';
+import './choicepicture.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
@@ -1011,7 +1012,43 @@ class NamedAvataState extends State<NamedAvata> {
                                     },
                                   );
                                 } else {
-                                  print('코디저장에 실패했습니다.');
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text(
+                                          ' 저장실패 ',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        content: Text(
+                                          '코디저장에 실패했습니다!',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        actions: <Widget>[
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment
+                                                .center, // 중앙 정렬 설정
+                                            children: [
+                                              TextButton(
+                                                child: Text('확인'),
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(); // 대화 상자 닫기
+                                                  Navigator.of(context)
+                                                      .pushReplacement(
+                                                    MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          ChoicePicture(),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
                                 }
                                 return response.data;
                               } catch (e) {

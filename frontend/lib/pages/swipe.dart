@@ -124,19 +124,48 @@ class SwipeState extends State<Swipe> {
     }
   }
 
+  // void _showErrorDialog(String message) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (ctx) => AlertDialog(
+  //       title: Text('오류 발생!'),
+  //       content: Text(message),
+  //       actions: <Widget>[
+  //         TextButton(
+  //           child: Text('확인'),
+  //           onPressed: () {
+  //             Navigator.of(ctx).pop();
+  //           },
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
+
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('오류 발생!'),
-        content: Text(message),
+        title: Text(
+          '오류 발생!',
+          textAlign: TextAlign.center, // 타이틀 중간 정렬
+        ),
+        content: Text(
+          message,
+          textAlign: TextAlign.center, // 내용 중간 정렬
+        ),
         actions: <Widget>[
-          TextButton(
-            child: Text('확인'),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-          )
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center, // 버튼 중앙 정렬
+            children: [
+              TextButton(
+                child: Text('확인'),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -168,23 +197,24 @@ class SwipeState extends State<Swipe> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => NamPage2(nick:nickName)),
-                    );
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                    child: Text(
-                      nickName,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFFF5BEB5),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NamPage2(nick: nickName)),
+                      );
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      child: Text(
+                        nickName,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFF5BEB5),
+                        ),
                       ),
                     ),
-                  ),
                   ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
@@ -209,7 +239,7 @@ class SwipeState extends State<Swipe> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
+                        SizedBox(
                           height: 300,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
