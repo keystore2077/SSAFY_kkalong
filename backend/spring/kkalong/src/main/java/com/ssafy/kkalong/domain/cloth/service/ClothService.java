@@ -274,13 +274,12 @@ public class ClothService {
     }
 
     public ClothGetRes lockCloth(Cloth cloth){
-        cloth.setPrivate(!cloth.isPrivate());
+        boolean isPrivate = !cloth.isPrivate();
+        cloth.setPrivate(isPrivate);
 
-        String filePathNobg = "cloth/no_bg/" + cloth.getClothImgName() + ".png";
+        String filePathNobg = "cloth/no_bg/" + clothRepository.save(cloth).getClothImgName() + ".png";
         String imgUrl = s3Service.generatePresignedUrl(filePathNobg);
 
         return ClothGetRes.toRes(cloth,imgUrl);
     }
-
-
 }
