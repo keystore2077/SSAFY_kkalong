@@ -239,6 +239,54 @@ class WearClothState extends State<WearCloth> {
                       })),
                     ),
                   )
+                  // Padding(
+                  //   padding: const EdgeInsets.fromLTRB(
+                  //       0, 0, 5, 0), // 원하는 패딩 값을 설정하세요
+                  //   child: SizedBox(
+                  //     width: double.infinity,
+                  //     // width: 500,
+                  //     height: 150,
+                  //     child: Row(
+                  //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //       children: List<Widget>.from(
+                  //         (clomenue["list"] ?? []).map<Widget>((item) {
+                  //           return GestureDetector(
+                  //             onTap: () {
+                  //               String sortName = item["name"] ?? 'Unknown';
+                  //               Navigator.push(
+                  //                 context,
+                  //                 MaterialPageRoute(
+                  //                   builder: (context) {
+                  //                     if (imageUrl != null) {
+                  //                       return ChoiceCloth(
+                  //                         photoSeq: widget.photoSeq,
+                  //                         imageUrl: imageUrl!,
+                  //                         sortName: sortName,
+                  //                       );
+                  //                     } else {
+                  //                       return Container(); // 빈 컨테이너를 반환
+                  //                     }
+                  //                   },
+                  //                 ),
+                  //               );
+                  //             },
+                  //             child: Column(
+                  //               children: <Widget>[
+                  //                 Image.asset(
+                  //                   item["image"] ?? 'Assets/Image/logo.png',
+                  //                   width: 60,
+                  //                   height: 100,
+                  //                 ),
+                  //                 const SizedBox(height: 5),
+                  //                 Text(item["name"] ?? 'Unknown'),
+                  //               ],
+                  //             ),
+                  //           );
+                  //         }),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // )
                 ],
               ),
             ),

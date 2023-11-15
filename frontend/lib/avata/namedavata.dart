@@ -825,10 +825,10 @@ class NamedAvataState extends State<NamedAvata> {
                             style: TextButton.styleFrom(
                               foregroundColor: isSelectedYes
                                   ? Color.fromARGB(255, 254, 253, 253)
-                                  : Color.fromARGB(255, 250, 246, 246),
+                                  : Color.fromARGB(255, 252, 247, 247),
                               backgroundColor: isSelectedYes
                                   ? Color.fromARGB(255, 251, 173, 161)
-                                  : Color.fromARGB(255, 250, 220, 220),
+                                  : Color.fromARGB(255, 247, 203, 203),
                               side: const BorderSide(
                                   color: Color.fromARGB(255, 247, 203, 203),
                                   width: 1.0),
