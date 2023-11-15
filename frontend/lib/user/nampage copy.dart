@@ -754,63 +754,63 @@ class NamPage2State extends State<NamPage2> {
                   }
                   final item = savecloItem[index];
                   return GestureDetector(
-                    onTap: () {},
-                    // onTap: () async {
-                    //   if (item['seq'] != null) {
-                    //     setState(() {
-                    //       print(item['seq']);
-                    //       fashionSeq = item['seq'];
-                    //     });
-                    //     print('이건패션시큐___');
-                    //     print(fashionSeq);
-                    //     // 나머지 코드 작성
-                    //   } else {
-                    //     print('아이템시큐값이널___');
-                    //   }
+                    // onTap: () {},
+                    onTap: () async {
+                      if (item['seq'] != null) {
+                        setState(() {
+                          print(item['seq']);
+                          fashionSeq = item['seq'];
+                        });
+                        print('이건패션시큐___');
+                        print(fashionSeq);
+                        // 나머지 코드 작성
+                      } else {
+                        print('아이템시큐값이널___');
+                      }
 
-                    //   Dio dio = Dio();
-                    //   const serverURL = 'http://k9c105.p.ssafy.io:8761';
+                      Dio dio = Dio();
+                      const serverURL = 'http://k9c105.p.ssafy.io:8761';
 
-                    //   try {
-                    //     Map<String, dynamic> headers = {};
-                    //     var accessToken = context.read<UserStore>().accessToken;
+                      try {
+                        Map<String, dynamic> headers = {};
+                        var accessToken = context.read<UserStore>().accessToken;
 
-                    //     if (accessToken.isNotEmpty) {
-                    //       headers['Authorization'] = 'Bearer $accessToken';
-                    //     }
+                        if (accessToken.isNotEmpty) {
+                          headers['Authorization'] = 'Bearer $accessToken';
+                        }
 
-                    //     final response = await dio.get(
-                    //       '$serverURL/api/social/fashion/$fashionSeq',
-                    //       options: Options(headers: headers),
-                    //     );
-                    //     print('요청보냄');
+                        final response = await dio.get(
+                          '$serverURL/api/social/fashion/$fashionSeq',
+                          options: Options(headers: headers),
+                        );
+                        print('요청보냄');
 
-                    //     setState(() {
-                    //       codyinfo = response.data['body'];
-                    //       memberNickname =
-                    //           response.data['body']['memberNickname'];
-                    //       fashionName = response.data['body']['fashionName'];
-                    //       imgUrl = response.data['body']['imgUrl'];
-                    //     });
+                        setState(() {
+                          codyinfo = response.data['body'];
+                          memberNickname =
+                              response.data['body']['memberNickname'];
+                          fashionName = response.data['body']['fashionName'];
+                          imgUrl = response.data['body']['imgUrl'];
+                        });
 
-                    //     print('코디인포출력');
-                    //     print(codyinfo);
+                        print('코디인포출력');
+                        print(codyinfo);
 
-                    //     print('리스판스데이타출력++++++++++++++');
-                    //     print(response.data);
+                        print('리스판스데이타출력++++++++++++++');
+                        print(response.data);
 
-                    //     Navigator.of(context).push(MaterialPageRoute(
-                    //       builder: (_) => Completecody(
-                    //           memberNickname: memberNickname,
-                    //           fashionName: fashionName,
-                    //           imgUrl: imgUrl,
-                    //           codyinfo: codyinfo),
-                    //     ));
-                    //     return response.data;
-                    //   } catch (e) {
-                    //     print('에러: $e');
-                    //   }
-                    // },
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => Completecody(
+                              memberNickname: memberNickname,
+                              fashionName: fashionName,
+                              imgUrl: imgUrl,
+                              codyinfo: codyinfo),
+                        ));
+                        return response.data;
+                      } catch (e) {
+                        print('에러: $e');
+                      }
+                    },
                     child: Card(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
