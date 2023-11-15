@@ -73,14 +73,7 @@ class ClothChangeState extends State<ClothChange> {
   ];
   String? selectedCloset;
 
-  List<String> sections = [
-    '행거1',
-    '행거2',
-    '수납장1',
-    '선반1',
-    '선반2',
-    '박스1',
-  ];
+  List<String> sections = [];
   String? selectedSection;
 
   final List<String> clothes = [
@@ -145,6 +138,7 @@ class ClothChangeState extends State<ClothChange> {
         tags2 = result['tagList'];
         selectedSection = result['clothRes']['sectionSeq'].toString();
         // print(result['clothRes']['clothName']);
+        selectedCloth = result['clothRes']['sort'];
         clothName = result['clothRes']['clothName'];
         inputController = TextEditingController(text: clothName);
         imgUrl = result['clothRes']['imgUrl'];
@@ -567,8 +561,8 @@ class ClothChangeState extends State<ClothChange> {
                             '옷장 세부구역',
                             style: TextStyle(fontSize: 14),
                           ),
-                          items: sections
-                              .map((item) => DropdownMenuItem<String>(
+                          items: selectedCloset != null
+                          ? sections.map((item) => DropdownMenuItem<String>(
                                     value: item,
                                     child: Text(
                                       item,
@@ -576,8 +570,8 @@ class ClothChangeState extends State<ClothChange> {
                                         fontSize: 14,
                                       ),
                                     ),
-                                  ))
-                              .toList(),
+                                  )).toList()
+                              : [],
                           validator: (value) {
                             if (value == null) {
                               return '세부구역을 선택해주세요.';
@@ -586,13 +580,17 @@ class ClothChangeState extends State<ClothChange> {
                           },
                           onChanged: (value) {
                             //Do something when selected item is changed.
-                            var matchingItem = data2.firstWhere(
-                              (item) => item['name'] == value,
-                              orElse: () => null, // 일치하는 요소가 없는 경우 null을 반환합니다.
-                            );
-                            setState(() {
-                              selectedSection = matchingItem['seq'].toString();
-                            });
+                            if (value != null && selectedCloset != null) {
+                              var matchingItem = data2.firstWhere(
+                                (item) => item['name'] == value,
+                                orElse: () => null,
+                              );
+                              if (matchingItem != null) {
+                                setState(() {
+                                  selectedSection = matchingItem['seq'].toString();
+                                });
+                              }
+                            }
                           },
                           onSaved: (value) {
                             // selectedSection = value.toString();
