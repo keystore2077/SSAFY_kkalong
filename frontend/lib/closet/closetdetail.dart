@@ -67,14 +67,15 @@ class _ClosetDetailState extends State<ClosetDetail> {
         closetName = result['closetName'];
       });
       // print(result);
+      print(sections);
       return response.data;
     } catch (e) {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog('오류 발생 diodata: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! diodata');
       }
     }
   }
@@ -118,9 +119,9 @@ class _ClosetDetailState extends State<ClosetDetail> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog('오류 발생 delete closet: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! delete cleset');
       }
     }
   }
@@ -146,9 +147,9 @@ class _ClosetDetailState extends State<ClosetDetail> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog('오류 발생 cleancloset: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! cleancloset');
       }
     }
   }

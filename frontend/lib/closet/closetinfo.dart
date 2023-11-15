@@ -7,6 +7,7 @@ import '../store/userstore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:convert';
+
 class ClosetInfo extends StatefulWidget {
   const ClosetInfo({
     super.key,
@@ -95,8 +96,10 @@ class ClosetInfoState extends State<ClosetInfo> {
     for (var entry in sectionItems.entries) {
       for (var i = 0; i < entry.value.length; i++) {
         var itemName = entry.value[i];
-        closetSectionListEntries.add(MapEntry('closetSectionList[$i].sort', entry.key));
-        closetSectionListEntries.add(MapEntry('closetSectionList[$i].sectionName', itemName));
+        closetSectionListEntries
+            .add(MapEntry('closetSectionList[$i].sort', entry.key));
+        closetSectionListEntries
+            .add(MapEntry('closetSectionList[$i].sectionName', itemName));
       }
     }
 
@@ -111,7 +114,7 @@ class ClosetInfoState extends State<ClosetInfo> {
     FormData formData = FormData();
     // 파일 추가
     formData.files.add(MapEntry('file', file));
-    
+
     formData.fields.add(MapEntry('closetName', inputController.text));
     formData.fields.addAll(closetSectionListEntries);
 
@@ -140,11 +143,11 @@ class ClosetInfoState extends State<ClosetInfo> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog('오류 발생 senddata: ${e.response?.statusCode}');
         print(formData.fields);
         // print(closetSectionListJson);
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! senddata');
       }
     }
   }
