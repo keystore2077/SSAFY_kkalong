@@ -29,6 +29,7 @@ class MyPageState extends State<MyPage> {
   String memberNickname = '';
   String fashionName = '';
   String imgUrl = '';
+  Map<String, dynamic> codyinfo = {};
   List<dynamic> followings = [];
   List<dynamic> followers = [];
 
@@ -336,21 +337,25 @@ class MyPageState extends State<MyPage> {
                           );
 
                           setState(() {
+                            codyinfo = response.data['body'];
                             memberNickname =
                                 response.data['body']['memberNickname'];
                             fashionName = response.data['body']['fashionName'];
                             imgUrl = response.data['body']['imgUrl'];
                           });
 
+                          print('코디인포출력');
+                          print(codyinfo);
+
                           print('리스판스데이타출력++++++++++++++');
                           print(response.data);
 
-                          Navigator.of(context)
-                              .pushReplacement(MaterialPageRoute(
+                          Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => Completecody(
                                 memberNickname: memberNickname,
                                 fashionName: fashionName,
-                                imgUrl: imgUrl),
+                                imgUrl: imgUrl,
+                                codyinfo: codyinfo),
                           ));
                           return response.data;
                         } catch (e) {

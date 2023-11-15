@@ -442,9 +442,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mycloset/closet/clothdetail.dart';
+import '../avata/completecody.dart';
 import 'package:flutter_mycloset/user/pageapi.dart';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
+import 'package:dio/dio.dart';
 
 class NamPage2 extends StatefulWidget {
   const NamPage2({super.key, this.storage, this.nick});
@@ -464,6 +466,13 @@ class NamPage2State extends State<NamPage2> {
   List<dynamic> savecloItem = [];
   List<dynamic> opencloItem = [];
   bool isfollowing = false;
+
+  //추가중
+  int fashionSeq = 1;
+  String memberNickname = '';
+  String fashionName = '';
+  String imgUrl = '';
+  Map<String, dynamic> codyinfo = {};
 
   bool showCody = false;
   bool showCloth = false;
@@ -728,47 +737,6 @@ class NamPage2State extends State<NamPage2> {
               ],
             ),
           ),
-          // Flexible(
-          //   flex: 3,
-          //   child: GridView.builder(
-          //     gridDelegate:
-          //         const SliverGridDelegateWithFixedCrossAxisCount(
-          //       crossAxisCount: 2, // Number of columns in the grid
-          //       crossAxisSpacing: 5.0, // Spacing between columns
-          //       mainAxisSpacing: 5.0, // Spacing between rows
-          //     ),
-          //     itemCount: savecloItem['list']?.length ?? 0,
-          //     itemBuilder: (BuildContext context, int index) {
-          //       final item = savecloItem['list']?[index];
-          //       if (item == null) {
-          //         return const SizedBox(); // 빈 위젯 반환
-          //       }
-          //       return GestureDetector(
-          //         onTap: () {
-          //           // 클릭이벤트
-          //         },
-          //         child: Card(
-          //           child: Column(
-          //             mainAxisAlignment: MainAxisAlignment.center,
-          //             children: <Widget>[
-          //               Image.asset(
-          //                   item["image"] ?? "Assets/Image/logo.png",
-          //                   height: 100,
-          //                   width: 100),
-          //               Text(
-          //                 item["name"] ?? "Unknown",
-          //                 style: const TextStyle(
-          //                   fontSize: 16,
-          //                   fontWeight: FontWeight.w600,
-          //                 ),
-          //               ),
-          //             ],
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //   ),
-          // ),
           SliverPadding(
             padding: const EdgeInsets.all(
                 20), // Use your desired padding value here.
@@ -782,13 +750,67 @@ class NamPage2State extends State<NamPage2> {
                 (BuildContext context, int index) {
                   if (index >= savecloItem.length ||
                       (!showCody && index >= 4)) {
-                    return null; // 아이템이 null이거나 표시되지 않는 경우 빈 컨테이너를 반환합니다.
+                    return null;
                   }
                   final item = savecloItem[index];
                   return GestureDetector(
-                    onTap: () {
-                      // 클릭 이벤트
-                    },
+                    onTap: () {},
+                    // onTap: () async {
+                    //   if (item['seq'] != null) {
+                    //     setState(() {
+                    //       print(item['seq']);
+                    //       fashionSeq = item['seq'];
+                    //     });
+                    //     print('이건패션시큐___');
+                    //     print(fashionSeq);
+                    //     // 나머지 코드 작성
+                    //   } else {
+                    //     print('아이템시큐값이널___');
+                    //   }
+
+                    //   Dio dio = Dio();
+                    //   const serverURL = 'http://k9c105.p.ssafy.io:8761';
+
+                    //   try {
+                    //     Map<String, dynamic> headers = {};
+                    //     var accessToken = context.read<UserStore>().accessToken;
+
+                    //     if (accessToken.isNotEmpty) {
+                    //       headers['Authorization'] = 'Bearer $accessToken';
+                    //     }
+
+                    //     final response = await dio.get(
+                    //       '$serverURL/api/social/fashion/$fashionSeq',
+                    //       options: Options(headers: headers),
+                    //     );
+                    //     print('요청보냄');
+
+                    //     setState(() {
+                    //       codyinfo = response.data['body'];
+                    //       memberNickname =
+                    //           response.data['body']['memberNickname'];
+                    //       fashionName = response.data['body']['fashionName'];
+                    //       imgUrl = response.data['body']['imgUrl'];
+                    //     });
+
+                    //     print('코디인포출력');
+                    //     print(codyinfo);
+
+                    //     print('리스판스데이타출력++++++++++++++');
+                    //     print(response.data);
+
+                    //     Navigator.of(context).push(MaterialPageRoute(
+                    //       builder: (_) => Completecody(
+                    //           memberNickname: memberNickname,
+                    //           fashionName: fashionName,
+                    //           imgUrl: imgUrl,
+                    //           codyinfo: codyinfo),
+                    //     ));
+                    //     return response.data;
+                    //   } catch (e) {
+                    //     print('에러: $e');
+                    //   }
+                    // },
                     child: Card(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -814,88 +836,6 @@ class NamPage2State extends State<NamPage2> {
               ),
             ),
           ),
-          // Container(
-          //   margin: const EdgeInsets.only(top: 5),
-          //   child: Column(
-          //     children: [
-          //       SizedBox(
-          //         child: Padding(
-          //           padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
-          //           child: Row(
-          //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //             crossAxisAlignment: CrossAxisAlignment.end,
-          //             children: [
-          //               const Row(
-          //                 children: [
-          //                   Text(
-          //                     '공개한 코디 ',
-          //                     style: TextStyle(
-          //                       fontSize: 17,
-          //                       fontWeight: FontWeight.w600,
-          //                     ),
-          //                   ),
-          //                   Text(
-          //                     '(5건)',
-          //                     style: TextStyle(
-          //                       fontSize: 12,
-          //                       fontWeight: FontWeight.w600,
-          //                     ),
-          //                   ),
-          //                 ],
-          //               ),
-          //               GestureDetector(
-          //                 onTap: () {
-          //                   // 이동 로직을 추가하세요.
-          //                 },
-          //                 child: const Text('더보기'),
-          //               ),
-          //             ],
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // Expanded(
-          //   child: GridView.builder(
-          //     gridDelegate:
-          //         const SliverGridDelegateWithFixedCrossAxisCount(
-          //       crossAxisCount: 2, // Number of columns in the grid
-          //       crossAxisSpacing: 5.0, // Spacing between columns
-          //       mainAxisSpacing: 5.0, // Spacing between rows
-          //     ),
-          //     itemCount: opencloItem['list']?.length ?? 0,
-          //     itemBuilder: (BuildContext context, int index) {
-          //       final item = opencloItem['list']?[index];
-          //       if (item == null) {
-          //         return const SizedBox(); // 빈 위젯 반환
-          //       }
-          //       return GestureDetector(
-          //         onTap: () {
-          //           // 클릭이벤트
-          //         },
-          //         child: Card(
-          //           child: Column(
-          //             mainAxisAlignment: MainAxisAlignment.center,
-          //             children: <Widget>[
-          //               Image.asset(
-          //                   item["image"] ?? "Assets/Image/logo.png",
-          //                   height: 100,
-          //                   width: 100),
-          //               Text(
-          //                 item["name"] ?? "Unknown",
-          //                 style: const TextStyle(
-          //                   fontSize: 16,
-          //                   fontWeight: FontWeight.w600,
-          //                 ),
-          //               ),
-          //             ],
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //   ),
-          // ),
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
