@@ -7,6 +7,7 @@ import '../store/userstore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:convert';
+
 class ClosetInfo extends StatefulWidget {
   const ClosetInfo({
     super.key,
@@ -66,6 +67,11 @@ class ClosetInfoState extends State<ClosetInfo> {
   Future<dynamic> sendData(token) async {
     Response response;
 
+    dio.interceptors.add(LogInterceptor(
+      requestBody: true,
+      responseBody: true,
+    ));
+
     // List<Map<String, dynamic>> sectionList = sectionItems.entries.map((entry) {
     //   // 각 섹션명과 그에 해당하는 아이템 목록을 사용해 리스트를 생성
     //   return {
@@ -91,14 +97,34 @@ class ClosetInfoState extends State<ClosetInfo> {
     // }).toList();
 
     // 기존의 sectionItems에서 FormData에 추가할 각 항목을 생성
+    // List<MapEntry<String, String>> closetSectionListEntries = [];
+    // for (var entry in sectionItems.entries) {
+    //   for (var i = 0; i < entry.value.length; i++) {
+    //     var itemName = entry.value[i];
+    //     closetSectionListEntries
+    //         .add(MapEntry('closetSectionList[$i].sort', entry.key));
+    //       print(entry.key);
+    //     closetSectionListEntries
+    //         .add(MapEntry('closetSectionList[$i].sectionName', itemName));
+    //   }
+    // }
+
     List<MapEntry<String, String>> closetSectionListEntries = [];
+    int globalIndex = 0;  // 전체 인덱스 관리를 위한 변수
+
     for (var entry in sectionItems.entries) {
       for (var i = 0; i < entry.value.length; i++) {
         var itemName = entry.value[i];
-        closetSectionListEntries.add(MapEntry('closetSectionList[$i].sort', entry.key));
-        closetSectionListEntries.add(MapEntry('closetSectionList[$i].sectionName', itemName));
+        closetSectionListEntries
+            .add(MapEntry('closetSectionList[$globalIndex].sort', entry.key));
+        closetSectionListEntries
+            .add(MapEntry('closetSectionList[$globalIndex].sectionName', itemName));
+
+        globalIndex++;  // 각 아이템을 추가할 때마다 전체 인덱스 증가
       }
     }
+
+    print(closetSectionListEntries);
 
     // closetSectionList를 JSON 문자열로 변환
     // String closetSectionListJson = jsonEncode(sectionList);
@@ -111,7 +137,7 @@ class ClosetInfoState extends State<ClosetInfo> {
     FormData formData = FormData();
     // 파일 추가
     formData.files.add(MapEntry('file', file));
-    
+
     formData.fields.add(MapEntry('closetName', inputController.text));
     formData.fields.addAll(closetSectionListEntries);
 
@@ -140,11 +166,11 @@ class ClosetInfoState extends State<ClosetInfo> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog('오류 발생 senddata: ${e.response?.statusCode}');
         print(formData.fields);
         // print(closetSectionListJson);
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! senddata');
       }
     }
   }

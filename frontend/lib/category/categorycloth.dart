@@ -6,11 +6,17 @@ import 'package:provider/provider.dart';
 import '../store/userstore.dart';
 
 class CategoryClothList extends StatefulWidget {
-  const CategoryClothList({super.key, this.storage, required this.category, required this.flag});
+  const CategoryClothList(
+      {super.key,
+      this.storage,
+      required this.category,
+      required this.flag,
+      required this.callbackFunction});
 
   final storage;
   final int category;
   final int flag;
+  final Function(Future<dynamic> Function()) callbackFunction;
 
   @override
   State<CategoryClothList> createState() => _CategoryClothListState();
@@ -26,6 +32,9 @@ class _CategoryClothListState extends State<CategoryClothList> {
     final userStore = Provider.of<UserStore>(context, listen: false);
     accessToken = userStore.accessToken;
     dioData(accessToken);
+
+    // 부모 위젯으로부터 받은 콜백 함수를 사용하여 자식의 함수를 연결
+    widget.callbackFunction(() => clothesmove(accessToken));
   }
 
   final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
@@ -41,6 +50,13 @@ class _CategoryClothListState extends State<CategoryClothList> {
 
   // 각 아이템의 체크 상태를 저장하는 맵
   Map<int, bool> itemCheckStates = {};
+
+  // void _handleCheckStateChange(int key, bool value) {
+  //   setState(() {
+  //     itemCheckStates[key] = value;
+  //   });
+  //   widget.onStateChanged(itemCheckStates);
+  // }
 
   Future<dynamic> dioData(token) async {
     try {
@@ -62,9 +78,10 @@ class _CategoryClothListState extends State<CategoryClothList> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog(
+            '오류 발생 dio data categorycloth: ${e.response?.statusCode}');
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! diodata categorycloth');
       }
     }
   }
@@ -108,6 +125,41 @@ class _CategoryClothListState extends State<CategoryClothList> {
       return response.data;
     } catch (e) {
       print(e.toString());
+    }
+  }
+
+  Future<dynamic> clothesmove(token) async {
+    var movelist = [];
+    itemCheckStates.forEach((key, value) {
+      // 여기서 key와 value를 사용할 수 있습니다.
+      if (value == true) {
+        movelist.add(data[key]['clothSeq']);
+      }
+    });
+
+    print(movelist);
+    try {
+      final response = await dio.put('$serverURL/api/cloth/input/section',
+          data: {
+            "sectionSeq": 32,
+            "clothSeqList": movelist,
+          },
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      print('유저 정보 수정 ${response.data}');
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생 clothes move: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생! clothes move');
+      }
     }
   }
 
@@ -161,34 +213,34 @@ class _CategoryClothListState extends State<CategoryClothList> {
                       ),
                     ),
                     widget.flag == 1
-                            ? GestureDetector(
-                                onTap: () {
-                                  // 체크박스 토글 로직
-                                  setState(() {
-                                    itemCheckStates[index] =
-                                        !(itemCheckStates[index] ?? false);
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                                  child: Icon(itemCheckStates[index] == true
-                                      ? Icons.check_box
-                                      : Icons.check_box_outline_blank),
-                                ),
-                              )
-                            : GestureDetector(
-                                onTap: () {
-                                  diolock(accessToken, data[index]['clothSeq']);
-                                },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                                  child: Icon(data[index]['private'] == true
-                                      ? Icons.lock
-                                      : Icons.lock_open),
-                                ),
-                              ),
+                        ? GestureDetector(
+                            onTap: () {
+                              // 체크박스 토글 로직을 _handleCheckStateChange 함수로 이동
+                              // _handleCheckStateChange(
+                              //     index, !(itemCheckStates[index] ?? false));
+                              setState(() {
+                                itemCheckStates[index] =
+                                    !(itemCheckStates[index] ?? false);
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                              child: Icon(itemCheckStates[index] == true
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank),
+                            ),
+                          )
+                        : GestureDetector(
+                            onTap: () {
+                              diolock(accessToken, data[index]['clothSeq']);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                              child: Icon(data[index]['private'] == true
+                                  ? Icons.lock
+                                  : Icons.lock_open),
+                            ),
+                          ),
                   ],
                 ),
                 const Divider(

@@ -45,15 +45,13 @@ class ClosetChangeState extends State<ClosetChange> {
       final userStore = Provider.of<UserStore>(context, listen: false);
       accessToken = userStore.accessToken;
       dioData(accessToken).then((_) {
-      // dioData가 완료된 후에 inputController를 초기화
-      setState(() {
-        inputController = TextEditingController(text: closetName);
+        // dioData가 완료된 후에 inputController를 초기화
+        setState(() {
+          inputController = TextEditingController(text: closetName);
+        });
       });
     });
-    });
-
   }
-
 
   final List<String> sections = ['행거', '수납장', '선반', '박스'];
   String? selectedSection;
@@ -142,7 +140,7 @@ class ClosetChangeState extends State<ClosetChange> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog('오류 발생 diodata: ${e.response?.statusCode}');
       } else {
         _showErrorDialog('오류발생! diodata');
       }
@@ -164,7 +162,7 @@ class ClosetChangeState extends State<ClosetChange> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog('오류 발생 getdata: ${e.response?.statusCode}');
       } else {
         _showErrorDialog('오류발생! img');
         // print(imgUrl);
@@ -248,11 +246,11 @@ class ClosetChangeState extends State<ClosetChange> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+        _showErrorDialog('오류 발생 senddata: ${e.response?.statusCode}');
         print(formData.fields);
         // print(closetSectionListJson);
       } else {
-        _showErrorDialog('오류발생!');
+        _showErrorDialog('오류발생! senddata');
       }
     }
   }
