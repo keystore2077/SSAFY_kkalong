@@ -13,18 +13,22 @@ from glob import glob
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-from utils import *
+from .utils import *
 
 
 def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = "4,5"
 
     N_CLASSES = 20
-    DATA_DIR = './datasets/images'
-    NUM_STEPS = len(os.listdir(DATA_DIR))
+    DATA_DIR = './CIHP/datasets/images'
+    image_extensions = [".jpg"]
+    NUM_STEPS = 0
+    for file in os.listdir(DATA_DIR):
+        if any(file.endswith(ext) for ext in image_extensions):
+            NUM_STEPS += 1
     print(f"total test images: {NUM_STEPS}")
     # RESTORE_FROM = './checkpoint/CIHP_pgn'
-    RESTORE_FROM = './checkpoint'
+    RESTORE_FROM = './CIHP/checkpoint'
 
     """Create the model and start the evaluation process."""
     # Create queue coordinator.
@@ -157,10 +161,10 @@ def main():
     threads = tf.train.start_queue_runners(coord=coord, sess=sess)
 
     # evaluate prosessing
-    parsing_dir = './output/cihp_parsing_maps'
+    parsing_dir = './CIHP/output/cihp_parsing_maps'
     if not os.path.exists(parsing_dir):
         os.makedirs(parsing_dir)
-    edge_dir = './output/cihp_edge_maps'
+    edge_dir = './CIHP/output/cihp_edge_maps'
     if not os.path.exists(edge_dir):
         os.makedirs(edge_dir)
     # Iterate over training steps.
