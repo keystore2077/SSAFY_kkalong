@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Document(collection = "chat")
 public class Chat {
     @Id
-    @Field("id")
     private String id; // MongoDB에서 사용하는 고유한 ID
 
     @Indexed

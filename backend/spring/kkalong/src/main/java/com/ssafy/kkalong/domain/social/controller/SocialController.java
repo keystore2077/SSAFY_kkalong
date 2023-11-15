@@ -194,7 +194,7 @@ public class SocialController {
         if (loginMember == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
         }
-        Fashion fashion = socialService.getFashion(fashionSeq,loginMember.getMemberSeq());
+        Fashion fashion = socialService.getFashionBySeq(fashionSeq);
         if (fashion==null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST,"코디 사진 정보를 찾을 수 없습니다.");
         }
