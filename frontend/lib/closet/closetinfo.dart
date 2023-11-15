@@ -67,6 +67,11 @@ class ClosetInfoState extends State<ClosetInfo> {
   Future<dynamic> sendData(token) async {
     Response response;
 
+    dio.interceptors.add(LogInterceptor(
+      requestBody: true,
+      responseBody: true,
+    ));
+
     // List<Map<String, dynamic>> sectionList = sectionItems.entries.map((entry) {
     //   // 각 섹션명과 그에 해당하는 아이템 목록을 사용해 리스트를 생성
     //   return {
@@ -92,16 +97,34 @@ class ClosetInfoState extends State<ClosetInfo> {
     // }).toList();
 
     // 기존의 sectionItems에서 FormData에 추가할 각 항목을 생성
+    // List<MapEntry<String, String>> closetSectionListEntries = [];
+    // for (var entry in sectionItems.entries) {
+    //   for (var i = 0; i < entry.value.length; i++) {
+    //     var itemName = entry.value[i];
+    //     closetSectionListEntries
+    //         .add(MapEntry('closetSectionList[$i].sort', entry.key));
+    //       print(entry.key);
+    //     closetSectionListEntries
+    //         .add(MapEntry('closetSectionList[$i].sectionName', itemName));
+    //   }
+    // }
+
     List<MapEntry<String, String>> closetSectionListEntries = [];
+    int globalIndex = 0;  // 전체 인덱스 관리를 위한 변수
+
     for (var entry in sectionItems.entries) {
       for (var i = 0; i < entry.value.length; i++) {
         var itemName = entry.value[i];
         closetSectionListEntries
-            .add(MapEntry('closetSectionList[$i].sort', entry.key));
+            .add(MapEntry('closetSectionList[$globalIndex].sort', entry.key));
         closetSectionListEntries
-            .add(MapEntry('closetSectionList[$i].sectionName', itemName));
+            .add(MapEntry('closetSectionList[$globalIndex].sectionName', itemName));
+
+        globalIndex++;  // 각 아이템을 추가할 때마다 전체 인덱스 증가
       }
     }
+
+    print(closetSectionListEntries);
 
     // closetSectionList를 JSON 문자열로 변환
     // String closetSectionListJson = jsonEncode(sectionList);
