@@ -346,7 +346,8 @@ class ChoiceClothState extends State<ChoiceCloth> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 0),
                         child: Image.asset(
-                          'Assets/Image/TShirt.png',
+                          'Assets/Image/cate/${widget.sortName}.png',
+                          // "Assets/Image/TShirt.png",
                           width: 70.0,
                           height: 70.0,
                         ),

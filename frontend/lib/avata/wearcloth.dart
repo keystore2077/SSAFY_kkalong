@@ -176,7 +176,7 @@ class WearClothState extends State<WearCloth> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(30, 2, 10, 2),
+              padding: const EdgeInsets.fromLTRB(20, 2, 10, 2),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -190,6 +190,7 @@ class WearClothState extends State<WearCloth> {
                   const SizedBox(height: 10),
                   SizedBox(
                     width: double.infinity,
+                    // width: 500,
                     height: 150,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -217,8 +218,6 @@ class WearClothState extends State<WearCloth> {
                                       sortName: sortName,
                                     );
                                   } else {
-                                    // imageUrl이 null인 경우에 대한 대체 처리를 여기에 추가
-                                    // 예를 들어 placeholder 이미지를 사용하거나 에러 메시지를 표시할 수 있습니다.
                                     return Container(); // 빈 컨테이너를 반환
                                   }
                                 },
