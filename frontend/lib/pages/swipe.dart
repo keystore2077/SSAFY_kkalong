@@ -147,7 +147,7 @@ class SwipeState extends State<Swipe> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(
-          '오류 발생!',
+          '평가 완료 ✨',
           textAlign: TextAlign.center, // 타이틀 중간 정렬
         ),
         content: Text(

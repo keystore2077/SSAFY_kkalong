@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class CategorySelect extends StatefulWidget {
   const CategorySelect({super.key, required this.category});
@@ -36,7 +37,17 @@ class _CategorySelectState extends State<CategorySelect> {
 
   var flag = 0;
   var data = [];
+  var data2 = [];
   var movelist = [];
+
+  List<String> closets = [
+    '듀마옷장',
+    '공주옷장',
+  ];
+  String? selectedCloset;
+
+  List<String> sections = [];
+  String? selectedSection;
 
   // Map<int, bool> itemCheckStates = {};
 
@@ -70,6 +81,65 @@ class _CategorySelectState extends State<CategorySelect> {
         _showErrorDialog('오류 발생 diodata select: ${e.response?.statusCode}');
       } else {
         _showErrorDialog('오류발생! diodata select');
+      }
+    }
+  }
+
+  Future<dynamic> closetData(token) async {
+    try {
+      final response = await dio.get('$serverURL/api/closet/list',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      var result = response.data['body'];
+      var namesList = result.map((item) => item['name']).toList();
+      List<String> strclosets = List<String>.from(namesList);
+      setState(() {
+        closets = strclosets;
+        data = result;
+      });
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
+      }
+    }
+  }
+
+  Future<dynamic> sectionData(token, closetSeq) async {
+    try {
+      final response = await dio.get('$serverURL/api/closet/list/$closetSeq',
+          // queryParameters: {'userEmail': id}
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token', // 토큰을 'Bearer' 스타일로 포함
+              // 다른 헤더도 필요한 경우 여기에 추가할 수 있습니다.
+            },
+          ));
+      var result = response.data['body'];
+      print(result);
+      var namesList = result.map((item) => item['name']).toList();
+      List<String> strsections = List<String>.from(namesList);
+      setState(() {
+        data2 = result;
+        sections = strsections;
+      });
+      return response.data;
+    } catch (e) {
+      print(e);
+      if (e is DioError) {
+        // DioError를 확인
+        _showErrorDialog('오류 발생: ${e.response?.statusCode}');
+      } else {
+        _showErrorDialog('오류발생!');
       }
     }
   }
@@ -224,17 +294,183 @@ class _CategorySelectState extends State<CategorySelect> {
               )
             : ElevatedButton(
                 onPressed: () async {
-                  // 옮기기 로직
-                  // clothesmove(accessToken);
-                  // itemCheckStates.forEach((key, value) {
-                  //   // 여기서 key와 value를 사용할 수 있습니다.
-                  //   if (value == true) {
-                  //     setState(() {
-                  //       // movelist.add(data[key]['clothSeq']);
-                  //     });
-                  //   }
-                  //   print(data[key]);
-                  // });
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Dialog(
+                        child: Container(
+                          width: 300,
+                          height: 300,
+                          color: Colors.white,
+                          child: Column(children: [
+                            Row(
+                    children: [
+                      Flexible(
+                        fit: FlexFit.tight,
+                        flex: 8,
+                        child: DropdownButtonFormField2<String>(
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            // Add Horizontal padding using menuItemStyleData.padding so it matches
+                            // the menu padding when button's width is not specified.
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 16),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color(
+                                      0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
+                            ),
+                            // Add more decoration..
+                          ),
+                          hint: const Text(
+                            '옷장',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          items: closets
+                              .map((item) => DropdownMenuItem<String>(
+                                    value: item,
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ))
+                              .toList(),
+                          validator: (value) {
+                            if (value == null) {
+                              return '옷장을 선택해주세요.';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) {
+                            var matchingItem = data.firstWhere(
+                              (item) => item['name'] == value,
+                              orElse: () => null, // 일치하는 요소가 없는 경우 null을 반환합니다.
+                            );
+                            setState(() {
+                              selectedCloset = matchingItem['seq'].toString();
+                            });
+                            sectionData(accessToken, selectedCloset);
+                            print(selectedSection);
+                            //Do something when selected item is changed.
+                          },
+                          onSaved: (value) {
+                            setState(() {
+                              // selectedCloset = value.toString();
+                            });
+                          },
+                          buttonStyleData: const ButtonStyleData(
+                            padding: EdgeInsets.only(right: 8),
+                          ),
+                          iconStyleData: const IconStyleData(
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.black45,
+                            ),
+                            iconSize: 24,
+                          ),
+                          dropdownStyleData: DropdownStyleData(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            maxHeight: 200,
+                          ),
+                          menuItemStyleData: const MenuItemStyleData(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                        ),
+                      ),
+                      Flexible(fit: FlexFit.tight, flex: 1, child: SizedBox()),
+                      Flexible(
+                        fit: FlexFit.tight,
+                        flex: 12,
+                        child: DropdownButtonFormField2<String>(
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            // Add Horizontal padding using menuItemStyleData.padding so it matches
+                            // the menu padding when button's width is not specified.
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 16),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color(
+                                      0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
+                            ),
+                            // Add more decoration..
+                          ),
+                          hint: const Text(
+                            '옷장 세부구역',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          items: selectedCloset != null
+                          ? sections.map((item) => DropdownMenuItem<String>(
+                                    value: item,
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  )).toList()
+                              : [],
+                          validator: (value) {
+                            if (value == null) {
+                              return '세부구역을 선택해주세요.';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) {
+                            //Do something when selected item is changed.
+                            if (value != null && selectedCloset != null) {
+                              var matchingItem = data2.firstWhere(
+                                (item) => item['name'] == value,
+                                orElse: () => null,
+                              );
+                              if (matchingItem != null) {
+                                setState(() {
+                                  selectedSection = matchingItem['seq'].toString();
+                                });
+                              }
+                            }
+                          },
+                          onSaved: (value) {
+                            // selectedSection = value.toString();
+                          },
+                          buttonStyleData: const ButtonStyleData(
+                            padding: EdgeInsets.only(right: 8),
+                          ),
+                          iconStyleData: const IconStyleData(
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.black45,
+                            ),
+                            iconSize: 24,
+                          ),
+                          dropdownStyleData: DropdownStyleData(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            maxHeight: 200,
+                          ),
+                          menuItemStyleData: const MenuItemStyleData(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                          ]),
+                        )
+                      );
+                    },
+                  );
                   var result2 = await childFunction();
                 },
                 style: ElevatedButton.styleFrom(
@@ -246,23 +482,6 @@ class _CategorySelectState extends State<CategorySelect> {
                 ),
                 child: const Text('옮기기'),
               ),
-        // floatingActionButton: ElevatedButton(
-        //   onPressed: () {
-        //     print('여기까지 잘왔니??????');
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(builder: (context) => const ClothCamera()),
-        //     );
-        //   },
-        //   style: ElevatedButton.styleFrom(
-        //     backgroundColor: Colors.grey[50],
-        //     shape: RoundedRectangleBorder(
-        //       borderRadius: BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
-        //     ),
-        //     // 다른 스타일 속성들
-        //   ),
-        //   child: const Text(' + 옷등록'),
-        // ),
       ),
     );
   }
