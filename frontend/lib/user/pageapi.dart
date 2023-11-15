@@ -21,9 +21,10 @@ class PageApi {
 
   Future<dynamic> checkid(id) async {
     try {
-      final response = await dio.get('$serverURL/api/member/id/$id',
-          // queryParameters: {'userEmail': id}
-          );
+      final response = await dio.get(
+        '$serverURL/api/member/id/$id',
+        // queryParameters: {'userEmail': id}
+      );
       print(response.data['body']);
       return response.data['body'];
     } catch (e) {
@@ -31,18 +32,18 @@ class PageApi {
     }
   }
 
-    Future<dynamic> checkNick(nick) async {
+  Future<dynamic> checkNick(nick) async {
     try {
-      final response = await dio.get('$serverURL/api/member/nickname/$nick',
-          // queryParameters: {'userEmail': id}
-          );
+      final response = await dio.get(
+        '$serverURL/api/member/nickname/$nick',
+        // queryParameters: {'userEmail': id}
+      );
       print(response.data['body']);
       return response.data['body'];
     } catch (e) {
       print(e);
     }
   }
-
 
   // Future<dynamic> sendEmail(id) async {
   //   try {
@@ -66,8 +67,7 @@ class PageApi {
   //   }
   // }
 
-  Future<dynamic> signup(
-      nick, id, pw, email, phone, gender, birth) async {
+  Future<dynamic> signup(nick, id, pw, email, phone, gender, birth) async {
     try {
       final response = await dio.post('$serverURL/api/member/sign-up', data: {
         'memberNickname': nick,
@@ -103,14 +103,13 @@ class PageApi {
     }
   }
 
-  Future<dynamic> updateuserinfo(
-      token, nick, pw, pwc) async {
+  Future<dynamic> updateuserinfo(token, nick, pw, pwc) async {
     try {
       final response = await dio.put('$serverURL/api/member',
           data: {
-            'memberNickname':nick,
-            'newPassword':pw,
-            'newPasswordCheck':pwc
+            'memberNickname': nick,
+            'newPassword': pw,
+            'newPasswordCheck': pwc
           },
           options: Options(
             headers: {
@@ -200,9 +199,7 @@ class PageApi {
     }
   }
 
-
-
-Future<dynamic> getprofile(token, nick) async {
+  Future<dynamic> getprofile(token, nick) async {
     print(token);
     print(token.runtimeType);
     try {
@@ -220,7 +217,7 @@ Future<dynamic> getprofile(token, nick) async {
     }
   }
 
- Future<dynamic> getfollow(token, nick) async {
+  Future<dynamic> getfollow(token, nick) async {
     print(token);
     print(token.runtimeType);
     try {
@@ -236,7 +233,7 @@ Future<dynamic> getprofile(token, nick) async {
     } catch (e) {
       print(e.toString());
     }
-  } 
+  }
 
   Future<dynamic> checkfollow(token, nick) async {
     try {
@@ -252,7 +249,7 @@ Future<dynamic> getprofile(token, nick) async {
     } catch (e) {
       print(e.toString());
     }
-  } 
+  }
 
   Future<dynamic> follow(token, nick) async {
     try {
@@ -268,9 +265,9 @@ Future<dynamic> getprofile(token, nick) async {
     } catch (e) {
       print(e.toString());
     }
-  } 
+  }
 
-    Future<dynamic> unfollow(token, nick) async {
+  Future<dynamic> unfollow(token, nick) async {
     try {
       final response = await dio.put('$serverURL/api/social/follow/$nick',
           options: Options(
@@ -284,7 +281,7 @@ Future<dynamic> getprofile(token, nick) async {
     } catch (e) {
       print(e.toString());
     }
-  } 
+  }
 
   Future<dynamic> lockfashion(token, seq) async {
     try {
@@ -300,8 +297,5 @@ Future<dynamic> getprofile(token, nick) async {
     } catch (e) {
       print(e.toString());
     }
-  } 
-
-
-
+  }
 }
