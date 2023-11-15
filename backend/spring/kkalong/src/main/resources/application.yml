@@ -28,7 +28,7 @@ spring:
       password: ${SECURITY_PASSWORD}
   servlet:
     multipart:
-      max-file-size: 2MB
+      max-file-size: 6MB
       max-request-size: 10MB
       file-size-threshold: 0
 
@@ -53,10 +53,10 @@ logging.level:
       SQL: debug
       type: trace
     springframework:
-                data:
-                    mongodb:
-                        core:
-                            MongoTemplate: DEBUG
+      data:
+        mongodb:
+          core:
+            MongoTemplate: DEBUG
 
 server:
   port: 8761

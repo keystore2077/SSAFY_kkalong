@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ChatService {
@@ -74,8 +75,10 @@ public class ChatService {
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
-    public Mono<Chat> setMsg(Chat chat) {
+    public Chat setMsg(Chat chat) {
         chat.setDatetime(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
-        return mongoRepository.save(chat);
+        chat.setId(null);
+        return  mongoRepository.save(chat).block();
+
     }
 }

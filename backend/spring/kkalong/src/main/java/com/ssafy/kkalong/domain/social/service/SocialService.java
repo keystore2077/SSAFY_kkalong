@@ -248,6 +248,11 @@ public class SocialService {
         return fashionRepository.findByFashionSeqAndMemberMemberSeqAndIsFashionDeleted(fashionSeq, memberSeq,false).orElse(null);
     }
 
+    public Fashion getFashionBySeq (int fashionSeq){
+        return fashionRepository.findByFashionSeqAndIsFashionDeleted(fashionSeq,false).orElse(null);
+    }
+
+
     public FashionInfoRes getFashionInfo (Fashion fashion){
         String imgUrl = s3Service.generatePresignedUrl("fashion/" + fashion.getFashionImgName());
         int cntLike = assessRepository.findByFashionFashionSeqAndIsLike(fashion.getFashionSeq(),true).size();

@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface FashionRepository extends JpaRepository<Fashion,Integer> {
+
+    Optional<Fashion> findByFashionSeqAndIsFashionDeleted(int fashionSeq,boolean isDeleted);
     Optional<Fashion> findByFashionSeqAndMemberMemberSeqAndIsFashionDeleted(int fashionSeq,int memberSeq,boolean isDeleted);
     List<Fashion> findAllByMemberMemberSeqAndIsFashionDeleted(int memberSeq,boolean isDeleted);
 
