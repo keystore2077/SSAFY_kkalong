@@ -54,14 +54,7 @@ class ClothInfoState extends State<ClothInfo> {
   ];
   String? selectedCloset;
 
-  List<String> sections = [
-    '행거1',
-    '행거2',
-    '수납장1',
-    '선반1',
-    '선반2',
-    '박스1',
-  ];
+  List<String> sections = [];
   String? selectedSection;
 
   final List<String> clothes = [
@@ -421,8 +414,8 @@ class ClothInfoState extends State<ClothInfo> {
                             '옷장 세부구역',
                             style: TextStyle(fontSize: 14),
                           ),
-                          items: sections
-                              .map((item) => DropdownMenuItem<String>(
+                          items: selectedCloset != null
+                          ? sections.map((item) => DropdownMenuItem<String>(
                                     value: item,
                                     child: Text(
                                       item,
@@ -430,8 +423,8 @@ class ClothInfoState extends State<ClothInfo> {
                                         fontSize: 14,
                                       ),
                                     ),
-                                  ))
-                              .toList(),
+                                  )).toList()
+                              : [],
                           validator: (value) {
                             if (value == null) {
                               return '세부구역을 선택해주세요.';
@@ -440,13 +433,17 @@ class ClothInfoState extends State<ClothInfo> {
                           },
                           onChanged: (value) {
                             //Do something when selected item is changed.
-                            var matchingItem = data2.firstWhere(
-                              (item) => item['name'] == value,
-                              orElse: () => null, // 일치하는 요소가 없는 경우 null을 반환합니다.
-                            );
-                            setState(() {
-                              selectedSection = matchingItem['seq'].toString();
-                            });
+                            if (value != null && selectedCloset != null) {
+                              var matchingItem = data2.firstWhere(
+                                (item) => item['name'] == value,
+                                orElse: () => null,
+                              );
+                              if (matchingItem != null) {
+                                setState(() {
+                                  selectedSection = matchingItem['seq'].toString();
+                                });
+                              }
+                            }
                           },
                           onSaved: (value) {
                             // selectedSection = value.toString();
@@ -628,12 +625,32 @@ class ClothInfoState extends State<ClothInfo> {
                       child: ButtonTheme(
                           child: TextButton(
                               onPressed: () async {
-                                sendData(accessToken);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Main()),
-                                );
+                                if (selectedSection == null || selectedSection!.isEmpty) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('경고'),
+                                        content: const Text('옷장 세부구역을 선택해주세요.'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: const Text('확인'),
+                                            onPressed: () {
+                                              Navigator.of(context).pop(); // 다이얼로그 닫기
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                } else {
+                                  // 'selectedSection'이 존재하면 sendData 함수 호출
+                                  sendData(accessToken);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => Main()),
+                                  );
+                                }
                               },
                               style: OutlinedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
