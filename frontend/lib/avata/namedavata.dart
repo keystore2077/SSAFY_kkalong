@@ -714,6 +714,9 @@ class NamedAvataState extends State<NamedAvata> {
 
   @override
   Widget build(BuildContext context) {
+    //추가한부분
+    bool isButtonEnabled =
+        (isSelectedYes || isSelectedNo) && controller.text.trim().isNotEmpty;
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
       body: CustomScrollView(
@@ -904,194 +907,338 @@ class NamedAvataState extends State<NamedAvata> {
                       ),
                     ),
                   ),
+                  // SizedBox(
+                  //   height: 80,
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.fromLTRB(0, 15, 0, 10),
+                  //     child: ButtonTheme(
+                  //         child: TextButton(
+                  //       onPressed: () async {
+                  //         if (isSelectedYes || isSelectedNo) {
+                  //           final String codiName =
+                  //               controller.text.trim(); // 코디 이름 가져오기
+                  //           if (codiName.isNotEmpty) {
+                  //             var accessToken =
+                  //                 context.read<UserStore>().accessToken;
+
+                  //             print('____코디네임: $codiName');
+                  //             print('____선택했니?: $isSelectedYes');
+                  //             print('파일네임');
+                  //             print(widget.fileName);
+                  //             try {
+                  //               Map<String, dynamic> headers = {};
+                  //               if (accessToken.isNotEmpty) {
+                  //                 headers['Authorization'] =
+                  //                     'Bearer $accessToken';
+                  //                 // headers['Content-Type'] =
+                  //                 //     'multipart/form-data';
+                  //               }
+                  //               print('___________토큰: $accessToken');
+
+                  //               // 코디 정보를 서버에 보내는 API 요청
+                  //               final response = await widget.dio.post(
+                  //                 '${widget.serverURL}/api/social/save',
+                  //                 data: {
+                  //                   "fashionName": codiName,
+                  //                   "ai": true,
+                  //                   "fashionPrivate": isSelectedYes,
+                  //                   "imgName": widget.fileName,
+                  //                 },
+                  //                 options: Options(headers: headers),
+                  //               );
+                  //               print('요청보냄');
+                  //               print(response.data);
+
+                  //               if (response.data['result']['resultCode'] ==
+                  //                   200) {
+                  //                 showDialog(
+                  //                   context: context,
+                  //                   builder: (BuildContext context) {
+                  //                     return AlertDialog(
+                  //                       title: Text(
+                  //                         ' 🎉 저장 성공 🎉 ',
+                  //                         textAlign: TextAlign.center,
+                  //                       ),
+                  //                       content: Text(
+                  //                         '완성된 코디는 내프로필에 저장됩니다!',
+                  //                         textAlign: TextAlign.center,
+                  //                       ),
+                  //                       actions: <Widget>[
+                  //                         Row(
+                  //                           mainAxisAlignment: MainAxisAlignment
+                  //                               .center, // 중앙 정렬 설정
+                  //                           children: [
+                  //                             TextButton(
+                  //                               child: Text('확인'),
+                  //                               onPressed: () {
+                  //                                 Navigator.of(context)
+                  //                                     .pop(); // 대화 상자 닫기
+                  //                                 // Navigator.of(context).push(
+                  //                                 //   MaterialPageRoute(
+                  //                                 //     builder: (_) => MyPage(),
+                  //                                 //   ),
+                  //                                 // );
+                  //                                 //수정한부분
+                  //                                 Navigator.of(context)
+                  //                                     .pushReplacement(
+                  //                                   MaterialPageRoute(
+                  //                                     builder: (_) => Main(),
+                  //                                   ),
+                  //                                 );
+                  //                               },
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                       ],
+                  //                     );
+                  //                   },
+                  //                 );
+                  //               } else {
+                  //                 showDialog(
+                  //                   context: context,
+                  //                   builder: (BuildContext context) {
+                  //                     return AlertDialog(
+                  //                       title: Text(
+                  //                         ' 저장실패 ',
+                  //                         textAlign: TextAlign.center,
+                  //                       ),
+                  //                       content: Text(
+                  //                         '코디저장에 실패했습니다!',
+                  //                         textAlign: TextAlign.center,
+                  //                       ),
+                  //                       actions: <Widget>[
+                  //                         Row(
+                  //                           mainAxisAlignment: MainAxisAlignment
+                  //                               .center, // 중앙 정렬 설정
+                  //                           children: [
+                  //                             TextButton(
+                  //                               child: Text('확인'),
+                  //                               onPressed: () {
+                  //                                 Navigator.of(context)
+                  //                                     .pop(); // 대화 상자 닫기
+                  //                                 // Navigator.of(context).push(
+                  //                                 //   MaterialPageRoute(
+                  //                                 //     builder: (_) =>
+                  //                                 //         ChoicePicture(),
+                  //                                 //   ),
+                  //                                 // );
+                  //                                 //수정한부분
+                  //                                 Navigator.of(context)
+                  //                                     .popUntil((route) =>
+                  //                                         route.isFirst);
+                  //                               },
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                       ],
+                  //                     );
+                  //                   },
+                  //                 );
+                  //               }
+                  //               return response.data;
+                  //             } catch (e) {
+                  //               print('에러: $e');
+                  //             }
+                  //           }
+                  //         }
+                  //       },
+                  //       style: TextButton.styleFrom(
+                  //         shape: RoundedRectangleBorder(
+                  //           borderRadius:
+                  //               BorderRadius.circular(4.0), // 원하는 각진 정도로 설정
+                  //         ),
+                  //         backgroundColor: const Color(0xFFF5BEB5),
+                  //       ),
+                  //       child: SizedBox(
+                  //         height: 35,
+                  //         child: Row(
+                  //           mainAxisAlignment: MainAxisAlignment.center,
+                  //           children: const [
+                  //             Text(
+                  //               '저장하기',
+                  //               style: TextStyle(
+                  //                 fontWeight: FontWeight.w700,
+                  //                 color: Colors.white,
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     )),
+                  //   ),
+                  // )
+
                   SizedBox(
                     height: 80,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(0, 15, 0, 10),
                       child: ButtonTheme(
-                          child: TextButton(
-                        onPressed: () async {
-                          if (isSelectedYes || isSelectedNo) {
-                            final String codiName =
-                                controller.text.trim(); // 코디 이름 가져오기
-                            if (codiName.isNotEmpty) {
-                              var accessToken =
-                                  context.read<UserStore>().accessToken;
+                        child: TextButton(
+                          onPressed: isButtonEnabled
+                              ? () async {
+                                  if (isSelectedYes || isSelectedNo) {
+                                    final String codiName =
+                                        controller.text.trim(); // 코디 이름 가져오기
+                                    if (codiName.isNotEmpty) {
+                                      var accessToken =
+                                          context.read<UserStore>().accessToken;
 
-                              print('____코디네임: $codiName');
-                              print('____선택했니?: $isSelectedYes');
-                              print('파일네임');
-                              print(widget.fileName);
-                              try {
-                                Map<String, dynamic> headers = {};
-                                if (accessToken.isNotEmpty) {
-                                  headers['Authorization'] =
-                                      'Bearer $accessToken';
-                                  // headers['Content-Type'] =
-                                  //     'multipart/form-data';
+                                      print('____코디네임: $codiName');
+                                      print('____선택했니?: $isSelectedYes');
+                                      print('파일네임');
+                                      print(widget.fileName);
+                                      try {
+                                        Map<String, dynamic> headers = {};
+                                        if (accessToken.isNotEmpty) {
+                                          headers['Authorization'] =
+                                              'Bearer $accessToken';
+                                          // headers['Content-Type'] =
+                                          //     'multipart/form-data';
+                                        }
+                                        print('___________토큰: $accessToken');
+
+                                        // 코디 정보를 서버에 보내는 API 요청
+                                        final response = await widget.dio.post(
+                                          '${widget.serverURL}/api/social/save',
+                                          data: {
+                                            "fashionName": codiName,
+                                            "ai": true,
+                                            "fashionPrivate": isSelectedYes,
+                                            "imgName": widget.fileName,
+                                          },
+                                          options: Options(headers: headers),
+                                        );
+                                        print('요청보냄');
+                                        print(response.data);
+
+                                        if (response.data['result']
+                                                ['resultCode'] ==
+                                            200) {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                  ' 🎉 저장 성공 🎉 ',
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                content: Text(
+                                                  '완성된 코디는 내프로필에 저장됩니다!',
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                actions: <Widget>[
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center, // 중앙 정렬 설정
+                                                    children: [
+                                                      TextButton(
+                                                        child: Text('확인'),
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop(); // 대화 상자 닫기
+                                                          // Navigator.of(context).push(
+                                                          //   MaterialPageRoute(
+                                                          //     builder: (_) => MyPage(),
+                                                          //   ),
+                                                          // );
+                                                          //수정한부분
+                                                          Navigator.of(context)
+                                                              .pushReplacement(
+                                                            MaterialPageRoute(
+                                                              builder: (_) =>
+                                                                  Main(),
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        } else {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                  ' 저장실패 ',
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                content: Text(
+                                                  '코디저장에 실패했습니다!',
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                actions: <Widget>[
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center, // 중앙 정렬 설정
+                                                    children: [
+                                                      TextButton(
+                                                        child: Text('확인'),
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop(); // 대화 상자 닫기
+                                                          // Navigator.of(context).push(
+                                                          //   MaterialPageRoute(
+                                                          //     builder: (_) =>
+                                                          //         ChoicePicture(),
+                                                          //   ),
+                                                          // );
+                                                          //수정한부분
+                                                          Navigator.of(context)
+                                                              .popUntil((route) =>
+                                                                  route
+                                                                      .isFirst);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        }
+                                        return response.data;
+                                      } catch (e) {
+                                        print('에러: $e');
+                                      }
+                                    }
+                                  }
                                 }
-                                print('___________토큰: $accessToken');
-
-                                // 코디 정보를 서버에 보내는 API 요청
-                                final response = await widget.dio.post(
-                                  '${widget.serverURL}/api/social/save',
-                                  data: {
-                                    "fashionName": codiName,
-                                    "ai": true,
-                                    "fashionPrivate": isSelectedYes,
-                                    "imgName": widget.fileName,
-                                  },
-                                  options: Options(headers: headers),
-                                );
-                                print('요청보냄');
-                                print(response.data);
-
-                                if (response.data['result']['resultCode'] ==
-                                    200) {
-                                  // showDialog(
-                                  //   context: context,
-                                  //   builder: (BuildContext context) {
-                                  //     return AlertDialog(
-                                  //       title: Text(
-                                  //         ' 🎉 저장 성공 🎉 ',
-                                  //         textAlign: TextAlign.center, // 여기에 추가
-                                  //       ),
-                                  //       content: Text(
-                                  //         '완성된 코디는 내프로필에 저장됩니다!',
-                                  //         textAlign: TextAlign.center, // 여기에 추가
-                                  //       ),
-                                  //       actions: <Widget>[
-                                  //         TextButton(
-                                  //           child: Text('확인'),
-                                  //           onPressed: () {
-                                  //             Navigator.of(context).pop();
-                                  //             Navigator.of(context)
-                                  //                 .pushReplacement(
-                                  //                     MaterialPageRoute(
-                                  //               builder: (_) => MyPage(),
-                                  //             ));
-                                  //           },
-                                  //         ),
-                                  //       ],
-                                  //     );
-                                  //   },
-                                  // );
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text(
-                                          ' 🎉 저장 성공 🎉 ',
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        content: Text(
-                                          '완성된 코디는 내프로필에 저장됩니다!',
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        actions: <Widget>[
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment
-                                                .center, // 중앙 정렬 설정
-                                            children: [
-                                              TextButton(
-                                                child: Text('확인'),
-                                                onPressed: () {
-                                                  Navigator.of(context)
-                                                      .pop(); // 대화 상자 닫기
-                                                  // Navigator.of(context).push(
-                                                  //   MaterialPageRoute(
-                                                  //     builder: (_) => MyPage(),
-                                                  //   ),
-                                                  // );
-                                                  //수정한부분
-                                                  Navigator.of(context)
-                                                      .pushReplacement(
-                                                    MaterialPageRoute(
-                                                      builder: (_) => Main(),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text(
-                                          ' 저장실패 ',
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        content: Text(
-                                          '코디저장에 실패했습니다!',
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        actions: <Widget>[
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment
-                                                .center, // 중앙 정렬 설정
-                                            children: [
-                                              TextButton(
-                                                child: Text('확인'),
-                                                onPressed: () {
-                                                  Navigator.of(context)
-                                                      .pop(); // 대화 상자 닫기
-                                                  // Navigator.of(context).push(
-                                                  //   MaterialPageRoute(
-                                                  //     builder: (_) =>
-                                                  //         ChoicePicture(),
-                                                  //   ),
-                                                  // );
-                                                  //수정한부분
-                                                  Navigator.of(context)
-                                                      .popUntil((route) =>
-                                                          route.isFirst);
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                }
-                                return response.data;
-                              } catch (e) {
-                                print('에러: $e');
-                              }
-                            }
-                          }
-                        },
-                        style: TextButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(4.0), // 원하는 각진 정도로 설정
+                              : null, // 조건이 충족되지 않으면 null을 할당하여 비활성화
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(4.0), // 원하는 각진 정도로 설정
+                            ),
+                            backgroundColor: isButtonEnabled
+                                ? const Color(0xFFF5BEB5)
+                                : const Color.fromARGB(
+                                    255, 196, 195, 195), // 조건에 따라 색상 변경
                           ),
-                          backgroundColor: const Color(0xFFF5BEB5),
-                        ),
-                        child: SizedBox(
-                          height: 35,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Text(
-                                '저장하기',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
+                          child: SizedBox(
+                            height: 35,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  '저장하기',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      )),
+                      ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
