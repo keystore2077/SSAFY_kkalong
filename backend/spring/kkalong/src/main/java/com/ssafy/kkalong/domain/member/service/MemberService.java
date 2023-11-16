@@ -119,6 +119,7 @@ public class MemberService {
     }
 
     public void deleteMember(Member member){
+        member.setMemberNickname("_");
         member.setMemberDeleted(true);
         member.setMemberWithdrawnDate(LocalDateTime.now());
         memberRepository.save(member);
