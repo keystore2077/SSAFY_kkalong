@@ -71,7 +71,7 @@ public class MemberService {
     }
 
     public Member checkId(String memberId){
-        return memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false).orElse(null);
+        return memberRepository.findByMemberId(memberId).orElse(null);
     }
 
     public Member checkNickName(String nickName){

@@ -105,6 +105,10 @@ public class MemberController {
     @Operation(summary = "아이디 중복확인 : 중복이면 false")
     @GetMapping("/id/{memberId}")
     public Api<Object> checkId(@PathVariable String memberId){
+        String idRegex = "^(?=.*[a-zA-Z])[a-zA-Z0-9]{5,20}$";
+        if(!memberId.matches(idRegex)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 않는 아이디입니다. 영어와, 숫자만 가능하고 최소 5자에서 20자 이내로 작성해주세요. 최소 1개의 영어가 포함되어야 합니다.", memberId));
+        }
 
         return Api.OK(memberService.checkId(memberId)==null);
     }

@@ -11,11 +11,13 @@ class CategoryClothList extends StatefulWidget {
       this.storage,
       required this.category,
       required this.flag,
+      required this.selectedSection,
       required this.callbackFunction});
 
   final storage;
   final int category;
   final int flag;
+  final selectedSection;
   final Function(Future<dynamic> Function()) callbackFunction;
 
   @override
@@ -34,7 +36,7 @@ class _CategoryClothListState extends State<CategoryClothList> {
     dioData(accessToken);
 
     // 부모 위젯으로부터 받은 콜백 함수를 사용하여 자식의 함수를 연결
-    widget.callbackFunction(() => clothesmove(accessToken));
+    widget.callbackFunction(() => clothesmove(accessToken, widget.selectedSection));
   }
 
   final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
@@ -128,7 +130,7 @@ class _CategoryClothListState extends State<CategoryClothList> {
     }
   }
 
-  Future<dynamic> clothesmove(token) async {
+  Future<dynamic> clothesmove(token, selectedSection) async {
     var movelist = [];
     itemCheckStates.forEach((key, value) {
       // 여기서 key와 value를 사용할 수 있습니다.
@@ -141,7 +143,7 @@ class _CategoryClothListState extends State<CategoryClothList> {
     try {
       final response = await dio.put('$serverURL/api/cloth/input/section',
           data: {
-            "sectionSeq": 32,
+            "sectionSeq": selectedSection,
             "clothSeqList": movelist,
           },
           options: Options(

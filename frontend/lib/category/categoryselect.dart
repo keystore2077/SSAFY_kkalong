@@ -29,6 +29,7 @@ class _CategorySelectState extends State<CategorySelect> {
     final userStore = Provider.of<UserStore>(context, listen: false);
     accessToken = userStore.accessToken;
     dioData(accessToken);
+    closetData(accessToken);
   }
 
   final Dio dio = Dio(); // Dio HTTP 클라이언트 초기화
@@ -38,12 +39,10 @@ class _CategorySelectState extends State<CategorySelect> {
   var flag = 0;
   var data = [];
   var data2 = [];
+  var data3 = [];
   var movelist = [];
 
-  List<String> closets = [
-    '듀마옷장',
-    '공주옷장',
-  ];
+  List<String> closets = [];
   String? selectedCloset;
 
   List<String> sections = [];
@@ -100,8 +99,9 @@ class _CategorySelectState extends State<CategorySelect> {
       List<String> strclosets = List<String>.from(namesList);
       setState(() {
         closets = strclosets;
-        data = result;
+        data2 = result;
       });
+      print(data2);
       return response.data;
     } catch (e) {
       print(e);
@@ -128,10 +128,12 @@ class _CategorySelectState extends State<CategorySelect> {
       print(result);
       var namesList = result.map((item) => item['name']).toList();
       List<String> strsections = List<String>.from(namesList);
+      print(strsections);
       setState(() {
-        data2 = result;
+        data3 = result;
         sections = strsections;
       });
+      print(sections);
       return response.data;
     } catch (e) {
       print(e);
@@ -231,6 +233,7 @@ class _CategorySelectState extends State<CategorySelect> {
               CategoryClothList(
                 category: 0,
                 flag: flag,
+                selectedSection: selectedSection,
                 callbackFunction: (Future<dynamic> Function() callback) {
                   childFunction = callback;
                 },
@@ -238,6 +241,7 @@ class _CategorySelectState extends State<CategorySelect> {
               CategoryClothList(
                 category: 1,
                 flag: flag,
+                selectedSection: selectedSection,
                 callbackFunction: (Future<dynamic> Function() callback) {
                   childFunction = callback;
                 },
@@ -245,6 +249,7 @@ class _CategorySelectState extends State<CategorySelect> {
               CategoryClothList(
                 category: 2,
                 flag: flag,
+                selectedSection: selectedSection,
                 callbackFunction: (Future<dynamic> Function() callback) {
                   childFunction = callback;
                 },
@@ -252,6 +257,7 @@ class _CategorySelectState extends State<CategorySelect> {
               CategoryClothList(
                 category: 3,
                 flag: flag,
+                selectedSection: selectedSection,
                 callbackFunction: (Future<dynamic> Function() callback) {
                   childFunction = callback;
                 },
@@ -259,6 +265,7 @@ class _CategorySelectState extends State<CategorySelect> {
               CategoryClothList(
                 category: 4,
                 flag: flag,
+                selectedSection: selectedSection,
                 callbackFunction: (Future<dynamic> Function() callback) {
                   childFunction = callback;
                 },
@@ -266,6 +273,7 @@ class _CategorySelectState extends State<CategorySelect> {
               CategoryClothList(
                 category: 5,
                 flag: flag,
+                selectedSection: selectedSection,
                 callbackFunction: (Future<dynamic> Function() callback) {
                   childFunction = callback;
                 },
@@ -298,180 +306,302 @@ class _CategorySelectState extends State<CategorySelect> {
                     context: context,
                     builder: (BuildContext context) {
                       return Dialog(
-                        child: Container(
-                          width: 300,
-                          height: 300,
-                          color: Colors.white,
-                          child: Column(children: [
-                            Row(
-                    children: [
-                      Flexible(
-                        fit: FlexFit.tight,
-                        flex: 8,
-                        child: DropdownButtonFormField2<String>(
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            // Add Horizontal padding using menuItemStyleData.padding so it matches
-                            // the menu padding when button's width is not specified.
-                            contentPadding:
-                                const EdgeInsets.symmetric(vertical: 16),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Color(
-                                      0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
-                            ),
-                            // Add more decoration..
-                          ),
-                          hint: const Text(
-                            '옷장',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          items: closets
-                              .map((item) => DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Text(
-                                      item,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                      ),
+                          child: Container(
+                            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                            width: 300,
+                            height: 300,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center, // 이 부분이 중요합니다
+                                children: [
+                                  Text(
+                                    '옮길 구역을 선택하세요',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w800,
                                     ),
-                                  ))
-                              .toList(),
-                          validator: (value) {
-                            if (value == null) {
-                              return '옷장을 선택해주세요.';
-                            }
-                            return null;
-                          },
-                          onChanged: (value) {
-                            var matchingItem = data.firstWhere(
-                              (item) => item['name'] == value,
-                              orElse: () => null, // 일치하는 요소가 없는 경우 null을 반환합니다.
-                            );
-                            setState(() {
-                              selectedCloset = matchingItem['seq'].toString();
-                            });
-                            sectionData(accessToken, selectedCloset);
-                            print(selectedSection);
-                            //Do something when selected item is changed.
-                          },
-                          onSaved: (value) {
-                            setState(() {
-                              // selectedCloset = value.toString();
-                            });
-                          },
-                          buttonStyleData: const ButtonStyleData(
-                            padding: EdgeInsets.only(right: 8),
-                          ),
-                          iconStyleData: const IconStyleData(
-                            icon: Icon(
-                              Icons.arrow_drop_down,
-                              color: Colors.black45,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Row(
+                                            children: [
+                        Flexible(
+                          fit: FlexFit.tight,
+                          flex: 8,
+                          child: DropdownButtonFormField2<String>(
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              // Add Horizontal padding using menuItemStyleData.padding so it matches
+                              // the menu padding when button's width is not specified.
+                              contentPadding:
+                                  const EdgeInsets.symmetric(vertical: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color(
+                                        0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
+                              ),
+                              // Add more decoration..
                             ),
-                            iconSize: 24,
-                          ),
-                          dropdownStyleData: DropdownStyleData(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
+                            hint: const Text(
+                              '옷장',
+                              style: TextStyle(fontSize: 14),
                             ),
-                            maxHeight: 200,
-                          ),
-                          menuItemStyleData: const MenuItemStyleData(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                        ),
-                      ),
-                      Flexible(fit: FlexFit.tight, flex: 1, child: SizedBox()),
-                      Flexible(
-                        fit: FlexFit.tight,
-                        flex: 12,
-                        child: DropdownButtonFormField2<String>(
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            // Add Horizontal padding using menuItemStyleData.padding so it matches
-                            // the menu padding when button's width is not specified.
-                            contentPadding:
-                                const EdgeInsets.symmetric(vertical: 16),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Color(
-                                      0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
-                            ),
-                            // Add more decoration..
-                          ),
-                          hint: const Text(
-                            '옷장 세부구역',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          items: selectedCloset != null
-                          ? sections.map((item) => DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Text(
-                                      item,
-                                      style: const TextStyle(
-                                        fontSize: 14,
+                            items: closets
+                                .map((item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(
+                                        item,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                        ),
                                       ),
-                                    ),
-                                  )).toList()
-                              : [],
-                          validator: (value) {
-                            if (value == null) {
-                              return '세부구역을 선택해주세요.';
-                            }
-                            return null;
-                          },
-                          onChanged: (value) {
-                            //Do something when selected item is changed.
-                            if (value != null && selectedCloset != null) {
+                                    ))
+                                .toList(),
+                            validator: (value) {
+                              if (value == null) {
+                                return '옷장을 선택해주세요.';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
                               var matchingItem = data2.firstWhere(
                                 (item) => item['name'] == value,
-                                orElse: () => null,
+                                orElse: () => null, // 일치하는 요소가 없는 경우 null을 반환합니다.
                               );
-                              if (matchingItem != null) {
-                                setState(() {
-                                  selectedSection = matchingItem['seq'].toString();
-                                });
-                              }
-                            }
-                          },
-                          onSaved: (value) {
-                            // selectedSection = value.toString();
-                          },
-                          buttonStyleData: const ButtonStyleData(
-                            padding: EdgeInsets.only(right: 8),
-                          ),
-                          iconStyleData: const IconStyleData(
-                            icon: Icon(
-                              Icons.arrow_drop_down,
-                              color: Colors.black45,
+                              print(value);
+                              print(matchingItem);
+                              setState(() {
+                                selectedCloset = matchingItem['seq'].toString();
+                                selectedSection = '';
+                                sectionData(accessToken, selectedCloset);
+                                flag = 0;
+                              });
+                              //Do something when selected item is changed.
+                            },
+                            onSaved: (value) {
+                              setState(() {
+                                sectionData(accessToken, selectedCloset);
+                              });
+                            },
+                            buttonStyleData: const ButtonStyleData(
+                              padding: EdgeInsets.only(right: 8),
                             ),
-                            iconSize: 24,
-                          ),
-                          dropdownStyleData: DropdownStyleData(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
+                            iconStyleData: const IconStyleData(
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.black45,
+                              ),
+                              iconSize: 24,
                             ),
-                            maxHeight: 200,
-                          ),
-                          menuItemStyleData: const MenuItemStyleData(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            dropdownStyleData: DropdownStyleData(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              maxHeight: 200,
+                            ),
+                            menuItemStyleData: const MenuItemStyleData(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                          ]),
-                        )
-                      );
-                    },
+                        Flexible(fit: FlexFit.tight, flex: 1, child: SizedBox()),
+                        Flexible(
+                          fit: FlexFit.tight,
+                          flex: 12,
+                          child: DropdownButtonFormField2<String>(
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              // Add Horizontal padding using menuItemStyleData.padding so it matches
+                              // the menu padding when button's width is not specified.
+                              contentPadding:
+                                  const EdgeInsets.symmetric(vertical: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color(
+                                        0xFFF5BEB5)), // 포커스가 있을 때의 테두리 색상을 보라색으로 설정
+                              ),
+                              // Add more decoration.. 
+                            ),
+                            hint: const Text(
+                              '옷장 세부구역',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            items: selectedCloset != null
+                            ? sections.map((item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(
+                                        item,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    )).toList()
+                                : [],
+                            validator: (value) {
+                              if (value == null) {
+                                return '세부구역을 선택해주세요.';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              //Do something when selected item is changed.
+                              if (value != null && selectedCloset != null) {
+                                var matchingItem = data3.firstWhere(
+                                  (item) => item['name'] == value,
+                                  orElse: () => null,
+                                );
+                                if (matchingItem != null) {
+                                  setState(() {
+                                    selectedSection = matchingItem['seq'].toString();
+                                  });
+                                }
+                              }
+                            },
+                            onSaved: (value) {
+                              // selectedSection = value.toString();
+                            },
+                            buttonStyleData: const ButtonStyleData(
+                              padding: EdgeInsets.only(right: 8),
+                            ),
+                            iconStyleData: const IconStyleData(
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.black45,
+                              ),
+                              iconSize: 24,
+                            ),
+                            dropdownStyleData: DropdownStyleData(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              maxHeight: 200,
+                            ),
+                            menuItemStyleData: const MenuItemStyleData(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                            ),
+                          ),
+                        ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                height: 15,
+                              ),
+                                          SizedBox(
+                                      height: 40,
+                                      width: 250,
+                                      child: Row(
+                                        children: [
+                                          ButtonTheme(
+                        child: TextButton(
+                            onPressed: () async {
+                              var result2 = await childFunction();
+                              Navigator.pop(context);
+                              showDialog(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: Text('이동 완료'),
+                                      content: Text('옷 이동이 완료되었습니다!'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: Text('확인'),
+                                          onPressed: () {
+                                            Navigator.of(ctx).pop();
+                                          },
+                                        )
+                                      ],
+                                    ),
+                                  );
+                            },
+                            style:
+                            // const ButtonStyle(
+                            //     backgroundColor:
+                            //         MaterialStatePropertyAll(
+                            //             Color(0xFFF5BEB5))),
+                            OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(
+                                    5.0), // 원하는 각진 정도로 설정
+                              ),
+                              backgroundColor:
+                              const Color(0xFFF5BEB5),
+                            ),
+                            child: const SizedBox(
+                              height: 40,
+                              width: 95,
+                              child: Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '확인',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ))),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          ButtonTheme(
+                        child: TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            style:
+                            // const ButtonStyle(
+                            //     backgroundColor:
+                            //         MaterialStatePropertyAll(
+                            //             Color(0xFFF5BEB5))),
+                            OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(
+                                    5.0), // 원하는 각진 정도로 설정
+                              ),
+                              backgroundColor:
+                              const Color(0xFFF5BEB5),
+                            ),
+                            child: const SizedBox(
+                              height: 40,
+                              width: 95,
+                              child: Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '취소',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ))),
+                                        ],
+                                      ),
+                                    ),
+                            ]),
+                          )
+                        );}
                   );
-                  var result2 = await childFunction();
+                  // var result2 = await childFunction();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[50],
