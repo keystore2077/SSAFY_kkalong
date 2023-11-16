@@ -997,7 +997,14 @@ class NamedAvataState extends State<NamedAvata> {
                                                 onPressed: () {
                                                   Navigator.of(context)
                                                       .pop(); // 대화 상자 닫기
-                                                  Navigator.of(context).push(
+                                                  // Navigator.of(context).push(
+                                                  //   MaterialPageRoute(
+                                                  //     builder: (_) => MyPage(),
+                                                  //   ),
+                                                  // );
+                                                  //수정한부분
+                                                  Navigator.of(context)
+                                                      .pushReplacement(
                                                     MaterialPageRoute(
                                                       builder: (_) => MyPage(),
                                                     ),
@@ -1040,14 +1047,9 @@ class NamedAvataState extends State<NamedAvata> {
                                                   //   ),
                                                   // );
                                                   //수정한부분
-                                                  Navigator.pushAndRemoveUntil(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ChoicePicture()),
-                                                    (Route<dynamic> route) =>
-                                                        false,
-                                                  );
+                                                  Navigator.of(context)
+                                                      .popUntil((route) =>
+                                                          route.isFirst);
                                                 },
                                               ),
                                             ],
