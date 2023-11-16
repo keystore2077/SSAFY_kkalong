@@ -35,7 +35,10 @@ class _SignUpState extends State<SignUp> {
   TextEditingController controller4 = TextEditingController();
   TextEditingController controller5 = TextEditingController();
   TextEditingController controller6 = TextEditingController();
-  final _wman = ['남자', '여자']; // 성별선택 드롭다운 리스트
+  final _wman = {
+  '여성': 'F',
+  '남성': 'M',
+  }; // 성별선택 드롭다운 리스트
   String? _selectedWman;
 
   bool idCheck = false;
@@ -774,10 +777,10 @@ class _SignUpState extends State<SignUp> {
                                           ),
                                           DropdownButton<String>(
                                             value: _selectedWman,
-                                            items: _wman.map((e) {
+                                            items: _wman.keys.map((String key) {
                                               return DropdownMenuItem<String>(
-                                                value: e,
-                                                child: Text(e),
+                                                value: _wman[key],
+                                                child: Text(key),
                                               );
                                             }).toList(),
                                             onChanged: (value) {
@@ -815,8 +818,8 @@ class _SignUpState extends State<SignUp> {
                                                           controller4.text
                                                               .toString(),
                                                           controller6.text,
-                                                          selectedYear,
-                                                          _selectedWman);
+                                                          _selectedWman,
+                                                          selectedYear);
                                                   print(signup);
                                                   if (signup == 200) {
                                                     await showDialog(

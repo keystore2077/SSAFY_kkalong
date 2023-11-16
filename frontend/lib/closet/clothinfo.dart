@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_mycloset/closet/closetdetail.dart';
 import 'package:flutter_mycloset/main.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
@@ -646,9 +647,9 @@ class ClothInfoState extends State<ClothInfo> {
                                 } else {
                                   // 'selectedSection'이 존재하면 sendData 함수 호출
                                   sendData(accessToken);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => Main()),
+                                  Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => Main()),
                                   );
                                 }
                               },
