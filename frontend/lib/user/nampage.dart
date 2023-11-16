@@ -461,7 +461,6 @@ class NamPageState extends State<NamPage> {
   int followerCount = 0;
   int follwingCount = 0;
 
-
   @override
   void initState() {
     super.initState();
@@ -472,18 +471,16 @@ class NamPageState extends State<NamPage> {
       print(accessToken);
 
       final profile = await pageapi.getprofile(accessToken, widget.nick);
-      print(profile); 
-       if (profile != null){
+      print(profile);
+      if (profile != null) {
         setState(() {
           followerCount = profile['body']['followerCount'];
           follwingCount = profile['body']['followingCount'];
           // savecloItem = profile['body']['fashionList'];
           // saveCloth = profile['body']['clothList'];
         });
-          print(savecloItem);
-
-       }
-
+        print(savecloItem);
+      }
     });
     // 초기화 작업 수행
   }
@@ -570,14 +567,14 @@ class NamPageState extends State<NamPage> {
                     child: Row(
                       children: [
                         Text(
-                          'Follower:'+ followerCount.toString(),
+                          'Follower:$followerCount',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
                         Text(
-                          ' | Following:' + follwingCount.toString(),
+                          ' | Following:$follwingCount',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w400,
@@ -735,7 +732,7 @@ class NamPageState extends State<NamPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Image.asset(
-                                    item["image"] ?? "Assets/Image/logo.png",
+                                    item["image"] ?? "Assets/Image/logol.png",
                                     height: 100,
                                     width: 100),
                                 Text(

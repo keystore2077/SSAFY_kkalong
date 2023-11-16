@@ -146,12 +146,12 @@ class WearClothState extends State<WearCloth> {
                       //   ),
                       // );
                       Image.network(
-                    imageUrl ?? "Assets/Image/logo.png",
+                    imageUrl ?? "Assets/Image/logol.png",
                     height: 125,
                     width: 180,
                     errorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        "Assets/Image/logo.png",
+                        "Assets/Image/logol.png",
                         height: 125,
                         width: 180,
                       );
@@ -227,7 +227,7 @@ class WearClothState extends State<WearCloth> {
                           child: Column(
                             children: <Widget>[
                               Image.asset(
-                                item["image"] ?? 'Assets/Image/logo.png',
+                                item["image"] ?? 'Assets/Image/logol.png',
                                 width: 60,
                                 height: 100,
                               ),

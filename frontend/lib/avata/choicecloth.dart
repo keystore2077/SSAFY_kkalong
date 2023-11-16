@@ -237,12 +237,14 @@ import 'package:dio/dio.dart';
 
 class ChoiceCloth extends StatefulWidget {
   final int photoSeq;
-  String imageUrl;
+  String imageUrl =
+      'https://kkalong.s3.ap-northeast-2.amazonaws.com/logol.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20231116T062506Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=AKIA5RRQZSI64T25QVH5%2F20231116%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Signature=d19ada1250a2e03d0eecddfee57db8ebff5e84c7eba3354f779f918bc8428540",';
   String fileName = '';
   final String sortName;
   int? selectedIndex;
   int? selectedClothSeq;
   List<dynamic> cloList = [];
+
   // bool isLoading = true;
 
   ChoiceCloth({
@@ -321,6 +323,8 @@ class ChoiceClothState extends State<ChoiceCloth> {
 
   @override
   Widget build(BuildContext context) {
+    bool mixok = false;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 254),
       body: CustomScrollView(
@@ -385,12 +389,13 @@ class ChoiceClothState extends State<ChoiceCloth> {
                     return const SizedBox(); // 빈 위젯 반환
                   }
                   return Image.network(
-                    widget.imageUrl ?? "Assets/Image/logo.png",
+                    widget.imageUrl ??
+                        "https://kkalong.s3.ap-northeast-2.amazonaws.com/logol.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20231116T062506Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=AKIA5RRQZSI64T25QVH5%2F20231116%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Signature=d19ada1250a2e03d0eecddfee57db8ebff5e84c7eba3354f779f918bc8428540",
                     height: 125,
                     width: 180,
                     errorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        "Assets/Image/logo.png",
+                        "Assets/Image/logol.png",
                         height: 125,
                         width: 180,
                       );
@@ -431,32 +436,34 @@ class ChoiceClothState extends State<ChoiceCloth> {
                     ),
                   ),
                   const Spacer(),
-                  Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 1, 10, 10),
-                      child: OutlinedButton(
-                        onPressed: () {},
-                        style: OutlinedButton.styleFrom(
-                          // backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-                          foregroundColor:
-                              const Color.fromARGB(255, 232, 170, 170),
-                          side: const BorderSide(
-                              color: Color.fromARGB(255, 232, 170, 170),
-                              width:
-                                  1.0), // Adjusting border color and thickness
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
-                          ),
-                          // 다른 스타일 속성들
-                        ),
-                        child: const Text(
-                          '+ 다른 옷',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      )),
+                  // Padding(
+                  //     padding: const EdgeInsets.fromLTRB(30, 1, 10, 10),
+                  //     child:
+                  //     OutlinedButton(
+                  //       onPressed: () {},
+                  //       style: OutlinedButton.styleFrom(
+                  //         // backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+                  //         foregroundColor:
+                  //             const Color.fromARGB(255, 232, 170, 170),
+                  //         side: const BorderSide(
+                  //             color: Color.fromARGB(255, 232, 170, 170),
+                  //             width:
+                  //                 1.0), // Adjusting border color and thickness
+                  //         shape: RoundedRectangleBorder(
+                  //           borderRadius:
+                  //               BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+                  //         ),
+                  //         // 다른 스타일 속성들
+                  //       ),
+                  //       child: const Text(
+                  //         '+ 다른 옷',
+                  //         style: TextStyle(
+                  //           fontSize: 12,
+                  //           fontWeight: FontWeight.w600,
+                  //         ),
+                  //       ),
+                  //     )
+                  //     ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(2, 1, 20, 10),
                     child: OutlinedButton(
@@ -489,6 +496,42 @@ class ChoiceClothState extends State<ChoiceCloth> {
                       ),
                     ),
                   )
+                  //수정중
+                  // Padding(
+                  //   padding: const EdgeInsets.fromLTRB(2, 1, 20, 10),
+                  //   child: OutlinedButton(
+                  //     onPressed: mixok
+                  //         ? () {
+                  //             Navigator.push(
+                  //               context,
+                  //               MaterialPageRoute(
+                  //                   builder: (context) => NamedAvata(
+                  //                       imageUrl: widget.imageUrl,
+                  //                       fileName: widget.fileName)),
+                  //             );
+                  //           }
+                  //         : null, // mixok가 false일 경우, 버튼 비활성화
+                  //     style: OutlinedButton.styleFrom(
+                  //       backgroundColor: Color.fromARGB(255, 255, 220, 215),
+                  //       foregroundColor: Colors.white,
+                  //       side: const BorderSide(
+                  //           color: Color.fromARGB(255, 255, 218, 212),
+                  //           width: 1.0),
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius:
+                  //             BorderRadius.circular(20.0), // 원하는 각진 정도로 설정
+                  //       ),
+                  //       // 다른 스타일 속성들
+                  //     ),
+                  //     child: const Text(
+                  //       ' 저장 ',
+                  //       style: TextStyle(
+                  //         fontSize: 12,
+                  //         fontWeight: FontWeight.w600,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // )
                 ],
               ),
             ),
@@ -517,6 +560,9 @@ class ChoiceClothState extends State<ChoiceCloth> {
                                 onTap: () async {
                                   setState(() {
                                     widget.selectedIndex = i;
+                                    mixok = false;
+                                    widget.imageUrl =
+                                        'https://kkalong.s3.ap-northeast-2.amazonaws.com/logol.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20231116T062506Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=AKIA5RRQZSI64T25QVH5%2F20231116%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Signature=d19ada1250a2e03d0eecddfee57db8ebff5e84c7eba3354f779f918bc8428540';
                                   });
                                   if (widget.cloList[i]
                                       .containsKey('clothSeq')) {
@@ -573,6 +619,9 @@ class ChoiceClothState extends State<ChoiceCloth> {
                                   } finally {}
 
                                   print('사진합성완료---------------------');
+                                  setState(() {
+                                    mixok = true;
+                                  });
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -587,7 +636,7 @@ class ChoiceClothState extends State<ChoiceCloth> {
                                     borderRadius: BorderRadius.circular(5),
                                     child: Image.network(
                                       widget.cloList[i]['imgUrl'] ??
-                                          'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
+                                          'https://kkalong.s3.ap-northeast-2.amazonaws.com/logol.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20231116T062506Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=AKIA5RRQZSI64T25QVH5%2F20231116%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Signature=d19ada1250a2e03d0eecddfee57db8ebff5e84c7eba3354f779f918bc8428540',
                                       width: 100,
                                       height: 120,
                                       fit: BoxFit.cover,
