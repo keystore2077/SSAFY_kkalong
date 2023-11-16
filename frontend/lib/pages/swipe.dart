@@ -27,6 +27,28 @@ class SwipeState extends State<Swipe> {
     final userStore = Provider.of<UserStore>(context, listen: false);
     accessToken = userStore.accessToken;
     dioData(accessToken);
+
+    // 5초 후에 투명도를 0으로 변경
+    // Future.delayed(Duration(seconds: 5), () {
+    //   setState(() {
+    //     opacity = 0.0;
+    //   });
+    // });
+
+    // 5초 후에 이미지를 숨기고 카드 크기 변경
+    Future.delayed(Duration(seconds: 3), () {
+      setState(() {
+        imageOpacity = 0.0;
+      });
+    });
+
+    Future.delayed(Duration(seconds: 4), () {
+      setState(() {
+        showImage = false;  // 이미지 숨기기
+        cardWidth = 300;    // 카드 너비 증가
+        cardHeight = 400;   // 카드 높이 증가
+      });
+    });
   }
 
   final TextEditingController inputController = TextEditingController();
@@ -35,10 +57,16 @@ class SwipeState extends State<Swipe> {
 
   var data = [];
   var imgUrl =
-      'https://mblogthumb-phinf.pstatic.net/MjAxODEyMTlfMTcz/MDAxNTQ1MjA0MTk4NDQy.-lCTSpFhyK1yb6_e8FaFoZwZmMb_-rRZ04AnFmNijB4g.ID8x5cmkX8obTOxG8yoq39JRURXvKBPjbxY_z5M90bkg.JPEG.cine_play/707211_1532672215.jpg?type=w800';
+      'https://media.istockphoto.com/id/1330667863/ko/%EB%B2%A1%ED%84%B0/%EA%B0%90%EC%82%AC%ED%95%A9%EB%8B%88%EB%8B%A4-%EC%9D%8C%EC%84%B1-%EA%B1%B0%ED%92%88-%EA%B7%B8%EB%A6%BC.jpg?s=612x612&w=0&k=20&c=bK1rF2rhz15ccP3yDVQFRIBxQFJjbLGx-5i-ur6kWNQ=';
   var fashionSeq = 0;
   var fashionName = '';
-  var nickName = '';
+  var nickName = '아무개';
+
+  // double opacity = 1.0; // 초기 투명도는 1.0 (완전 불투명)
+  double imageOpacity = 1.0;
+  bool showImage = true;
+  double cardWidth = 200;
+  double cardHeight = 300;
 
   Future<dynamic> dioData(token) async {
     try {
@@ -63,7 +91,7 @@ class SwipeState extends State<Swipe> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
+        // _showErrorDialog('오류 발생: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
       } else {
         _showErrorDialog('더이상 평가할 사진이 없습니다!');
       }
@@ -90,7 +118,7 @@ class SwipeState extends State<Swipe> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
+        // _showErrorDialog('오류 발생: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
       } else {
         _showErrorDialog('더이상 평가할 사진이 없습니다!');
       }
@@ -117,30 +145,12 @@ class SwipeState extends State<Swipe> {
       print(e);
       if (e is DioError) {
         // DioError를 확인
-        _showErrorDialog('오류 발생: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
+        // _showErrorDialog('오류 발생: ${e.response?.statusCode}\n더이상 평가할 사진이 없습니다!');
       } else {
         _showErrorDialog('더이상 평가할 사진이 없습니다!');
       }
     }
   }
-
-  // void _showErrorDialog(String message) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (ctx) => AlertDialog(
-  //       title: Text('오류 발생!'),
-  //       content: Text(message),
-  //       actions: <Widget>[
-  //         TextButton(
-  //           child: Text('확인'),
-  //           onPressed: () {
-  //             Navigator.of(ctx).pop();
-  //           },
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -239,62 +249,51 @@ class SwipeState extends State<Swipe> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          height: 300,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Icon(
-                                Icons.chevron_left,
-                                size: 40,
-                                color: Color(0xFF54545b),
-                              ),
-                              Expanded(
-                                child: Center(
-                                  child: Dismissible(
-                                    key: Key(imgUrl),
-                                    onDismissed: (direction) {
-                                      final previousImgUrl = imgUrl;
-
-                                      // 오른쪽에서 왼쪽으로 스와이프한 경우 싫어요
-                                      if (direction ==
-                                          DismissDirection.endToStart) {
-                                        hateData(accessToken);
-                                      }
-                                      // 왼쪽에서 오른쪽으로 스와이프한 경우 좋아요
-                                      else if (direction ==
-                                          DismissDirection.startToEnd) {
-                                        likeData(accessToken);
-                                      }
-                                      dioData(accessToken);
-                                    },
-                                    child: Card(
-                                      child: Container(
-                                        height: 300,
-                                        width: 200,
-                                        alignment: Alignment.center,
-                                        child: Image.network(
-                                          imgUrl,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
+                        Center(
+                          child: AnimatedContainer(
+                            duration: Duration(seconds: 1),
+                            width: cardWidth,
+                            height: cardHeight,
+                            child: Center(
+                              child: Dismissible(
+                                key: Key(imgUrl),
+                                onDismissed: (direction) {
+                                  final previousImgUrl = imgUrl;
+                                  // 오른쪽에서 왼쪽으로 스와이프한 경우 싫어요
+                                  if (direction ==
+                                      DismissDirection.endToStart) {
+                                    hateData(accessToken);
+                                  }
+                                  // 왼쪽에서 오른쪽으로 스와이프한 경우 좋아요
+                                  else if (direction ==
+                                      DismissDirection.startToEnd) {
+                                    likeData(accessToken);
+                                  }
+                                  dioData(accessToken);
+                                },
+                                child: Card(
+                                  child: Container(
+                                    // height: 300,
+                                    // width: 200,
+                                    alignment: Alignment.center,
+                                    child: Image.network(
+                                      imgUrl,
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
                               ),
-                              Icon(
-                                Icons.chevron_right,
-                                size: 40,
-                                color: Color(0xFF54545b),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                         SizedBox(
                           height: 20,
                         ),
-                        Center(
-                          child: Image.asset('Assets/Image/swipe.png'),
+                        if (showImage) // 이미지가 표시되어야 하는 경우에만 표시
+                        AnimatedOpacity(
+                          opacity: imageOpacity,
+                          duration: Duration(seconds: 1),
+                          child: Center(child: Image.asset('Assets/Image/swipe.png')),
                         ),
                       ],
                     )),
