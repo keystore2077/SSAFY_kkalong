@@ -7,6 +7,7 @@ import com.ssafy.kkalong.domain.assess.service.AssessService;
 import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
+import com.ssafy.kkalong.domain.social.entity.Fashion;
 import com.ssafy.kkalong.domain.social.service.SocialService;
 import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class AssessContorller {
     private final MemberService memberService;
     private final AssessService assessService;
+    private final SocialService socialService;
 
     @Operation(summary = "공개된 사진 랜덤 조회")
     @GetMapping("")
@@ -41,6 +43,10 @@ public class AssessContorller {
         Member member = memberService.getLoginUserInfo();
         if (member == null) {
             return Api.ERROR(ErrorCode.BAD_REQUEST, "로그인된 회원 정보를 찾지 못했습니다.");
+        }
+        Fashion fashion  = socialService.getFashionBySeq(request.getFashionSeq());
+        if(fashion==null){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, "저장하려는 코디 정보를 찾지 못했습니다..");
         }
 
         return Api.OK(assessService.likeFashion(member, request));
