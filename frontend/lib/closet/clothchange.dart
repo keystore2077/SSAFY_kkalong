@@ -800,7 +800,7 @@ class ClothChangeState extends State<ClothChange> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      '등록하기',
+                                      '수정하기',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,
