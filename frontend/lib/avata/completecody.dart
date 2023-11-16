@@ -292,9 +292,9 @@ class CompletecodyState extends State<Completecody> {
           SliverToBoxAdapter(
             child: Padding(
               padding:
-                  const EdgeInsets.fromLTRB(0, 0, 0, 10), // 원하는 패딩 값으로 수정하세요
+                  const EdgeInsets.fromLTRB(0, 0, 0, 0), // 원하는 패딩 값으로 수정하세요
               child: Container(
-                height: 640,
+                height: 600,
                 color: const Color.fromARGB(255, 251, 235, 233),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
