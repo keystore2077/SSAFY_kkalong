@@ -362,6 +362,7 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import '../store/userstore.dart';
 import 'package:dio/dio.dart';
+import '../main.dart';
 
 class NamedAvata extends StatefulWidget {
   Dio dio = Dio();
@@ -1006,7 +1007,7 @@ class NamedAvataState extends State<NamedAvata> {
                                                   Navigator.of(context)
                                                       .pushReplacement(
                                                     MaterialPageRoute(
-                                                      builder: (_) => MyPage(),
+                                                      builder: (_) => Main(),
                                                     ),
                                                   );
                                                 },
