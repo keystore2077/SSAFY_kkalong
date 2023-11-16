@@ -112,6 +112,12 @@ public class MemberController {
     @Operation(summary = "닉네임 중복확인 : 중복이면 false")
     @GetMapping("/nickname/{nickName}")
     public Api<Object> checkNickName(@PathVariable String nickName){
+
+        String nickNameRegex = "^[a-zA-Z가-힣0-9]{2,10}$";
+        if(!nickName.matches(nickNameRegex)){
+            return Api.ERROR(ErrorCode.BAD_REQUEST, String.format("[%s]은/는 유효하지 않는 닉네임입니다. 영어와 한글, 숫자만 가능하고 최소 2자에서 10자이내로 작성해주세요", nickName));
+        }
+
         return Api.OK(memberService.checkNickNameEvenIfDeleted(nickName)==null);
     }
 
