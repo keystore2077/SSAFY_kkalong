@@ -182,6 +182,31 @@ class _SignUpState extends State<SignUp> {
                                       height: 50,
                                       child: OutlinedButton(
                                         onPressed: () async {
+                                          if (controller.text.isEmpty) {
+                                          // 아이디 입력란이 비어있을 때
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return Dialog(
+                                                child: Container(
+                                                  width: 200,
+                                                  height: 100,
+                                                  color: Colors.white,
+                                                  child: Center(
+                                                    child: Text(
+                                                      '아이디를 입력해주세요',
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                          return;
+                                        }
+
                                           final checkid = await pageapi.checkid(
                                               controller.text.toString());
                                           print(checkid);
@@ -213,7 +238,7 @@ class _SignUpState extends State<SignUp> {
                                                           color: Colors.white,
                                                           child: Center(
                                                               child: Text(
-                                                                  '중복된 아이디입니다.'))));
+                                                                  '사용불가한 아이디입니다.'))));
                                                 });
                                             setState(() {
                                               idCheck = false;
@@ -305,6 +330,31 @@ class _SignUpState extends State<SignUp> {
                                       height: 50,
                                       child: OutlinedButton(
                                         onPressed: () async {
+                                          if (controller5.text.isEmpty) {
+                                          // 아이디 입력란이 비어있을 때
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return Dialog(
+                                                child: Container(
+                                                  width: 200,
+                                                  height: 100,
+                                                  color: Colors.white,
+                                                  child: Center(
+                                                    child: Text(
+                                                      '닉네임을 입력해주세요',
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                          return;
+                                        }
+
                                           final checkNick =
                                               await pageapi.checkNick(
                                                   controller5.text.toString());
@@ -337,7 +387,7 @@ class _SignUpState extends State<SignUp> {
                                                           color: Colors.white,
                                                           child: Center(
                                                               child: Text(
-                                                                  '중복된 닉네임입니다.'))));
+                                                                  '사용불가한 닉네임입니다.'))));
                                                 });
                                             setState(() {
                                               nickCheck = false;
@@ -711,7 +761,7 @@ class _SignUpState extends State<SignUp> {
                                       prefixIconColor: Color(0xFFF5BEB5),
                                       prefixIcon: Icon(Icons.call),
                                       border: OutlineInputBorder(),
-                                      labelText: '전화번호',
+                                      labelText: '전화번호(번호만 입력해주세요)',
                                       focusColor: Color(0xFFF5BEB5)),
                                   keyboardType: TextInputType.phone,
                                 ),
@@ -875,7 +925,23 @@ class _SignUpState extends State<SignUp> {
                                                   //   });
                                                   // }
                                                 }
-                                              : null,
+                                              : 
+                                              (){
+                                                showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return Dialog(
+                                                              child: Container(
+                                                                  width: 100,
+                                                                  height: 100,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  child: Center(
+                                                                      child: Text(
+                                                                          '입력란을 확인해주세요'))));
+                                                        });
+                                              }
+                                              ,
                                           style: const ButtonStyle(
                                               backgroundColor:
                                                   MaterialStatePropertyAll(
