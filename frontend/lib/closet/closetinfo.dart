@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_mycloset/closet/mycloset.dart';
 import 'package:flutter_mycloset/main.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
@@ -72,43 +73,6 @@ class ClosetInfoState extends State<ClosetInfo> {
       responseBody: true,
     ));
 
-    // List<Map<String, dynamic>> sectionList = sectionItems.entries.map((entry) {
-    //   // 각 섹션명과 그에 해당하는 아이템 목록을 사용해 리스트를 생성
-    //   return {
-    //     'sectionName': entry.key,
-    //     'sort': entry.value.map((itemName) {
-    //       return {
-    //         'sortSeq': entry.value.indexOf(itemName), // 아이템의 인덱스를 sortSeq로 사용
-    //         'sort': itemName,
-    //         'sortGroup': {'sortGroupSeq': 2, 'groupName': 'section'}
-    //       };
-    //     }).toList()
-    //   };
-    // }).toList();
-
-    // List<Map<String, dynamic>> sectionList =
-    //     sectionItems.entries.expand((entry) {
-    //   return entry.value.map((itemName) {
-    //     return {
-    //       "sectionName": itemName,
-    //       "sort": entry.key,
-    //     };
-    //   });
-    // }).toList();
-
-    // 기존의 sectionItems에서 FormData에 추가할 각 항목을 생성
-    // List<MapEntry<String, String>> closetSectionListEntries = [];
-    // for (var entry in sectionItems.entries) {
-    //   for (var i = 0; i < entry.value.length; i++) {
-    //     var itemName = entry.value[i];
-    //     closetSectionListEntries
-    //         .add(MapEntry('closetSectionList[$i].sort', entry.key));
-    //       print(entry.key);
-    //     closetSectionListEntries
-    //         .add(MapEntry('closetSectionList[$i].sectionName', itemName));
-    //   }
-    // }
-
     List<MapEntry<String, String>> closetSectionListEntries = [];
     int globalIndex = 0;  // 전체 인덱스 관리를 위한 변수
 
@@ -140,12 +104,6 @@ class ClosetInfoState extends State<ClosetInfo> {
 
     formData.fields.add(MapEntry('closetName', inputController.text));
     formData.fields.addAll(closetSectionListEntries);
-
-    // FormData formData = FormData.fromMap({
-    //   "file": file,
-    //   "closetName": inputController.text,
-    //   "closetSectionList": closetSectionListEntries,
-    // }, ListFormat.multiCompatible);
 
     try {
       // final deviceToken = getMyDeviceToken();
@@ -311,11 +269,32 @@ class ClosetInfoState extends State<ClosetInfo> {
                   child: ButtonTheme(
                       child: TextButton(
                           onPressed: () async {
-                            sendData(accessToken);
-                            Navigator.push(
+                            bool areAllSectionsEmpty = sectionItems.values.every((list) => list.isEmpty);
+                            if (areAllSectionsEmpty) {
+                              // 모든 섹션이 비어 있을 때 수행할 작업
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text('저런!'),
+                                  content: Text('옷장의 구역을 하나라도 골라주세요!'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text('확인'),
+                                      onPressed: () {
+                                        Navigator.of(ctx).pop();
+                                      },
+                                    )
+                                  ],
+                                ),
+                              );
+                            } else {
+                              // 하나 이상의 섹션이 데이터를 포함할 때 수행할 작업
+                              await sendData(accessToken);
+                              Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (context) => Main()),
-                            );
+                              );
+                            }
                           },
                           style: OutlinedButton.styleFrom(
                             shape: RoundedRectangleBorder(

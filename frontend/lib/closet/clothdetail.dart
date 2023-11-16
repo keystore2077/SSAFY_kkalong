@@ -223,14 +223,7 @@ class ClothDetailState extends State<ClothDetail> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(
-                        '${data['clothRes']['closetName']} ${data['clothRes']['sectionName']}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 17,
-                          color: Color(0xFF54545b),
-                        ),
-                      ),
+                      buildTextWidget(data as Map<String, dynamic>),
                     ],
                   ),
                   const SizedBox(
@@ -309,5 +302,29 @@ class ClothDetailState extends State<ClothDetail> {
         child: CircularProgressIndicator(),
       );
     }
+  }
+}
+
+Widget buildTextWidget(Map<String, dynamic> data) {
+  bool hasValidData = data['clothRes']['closetName'] != null && data['clothRes']['sectionName'] != null;
+
+  if (hasValidData) {
+    return Text(
+      '${data['clothRes']['closetName']} ${data['clothRes']['sectionName']}',
+      style: TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 17,
+        color: Color(0xFF54545b),
+      ),
+    );
+  } else {
+    return Text(
+      '소속 구역이 없습니다.',
+      style: TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 17,
+        color: Color(0xFF54545b),
+      ),
+    );
   }
 }
