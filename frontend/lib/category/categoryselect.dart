@@ -200,10 +200,10 @@ class _CategorySelectState extends State<CategorySelect> {
                         }
                       },
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_forever_outlined),
-                      onPressed: () {},
-                    ),
+                    // IconButton(
+                    //   icon: const Icon(Icons.delete_forever_outlined),
+                    //   onPressed: () {},
+                    // ),
                   ],
                 ),
                 SliverPersistentHeader(

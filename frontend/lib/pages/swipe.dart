@@ -39,12 +39,14 @@ class SwipeState extends State<Swipe> {
     Future.delayed(Duration(seconds: 3), () {
       setState(() {
         imageOpacity = 0.0;
+        textOpacity = 1.0;
       });
     });
 
     Future.delayed(Duration(seconds: 4), () {
       setState(() {
         showImage = false;  // 이미지 숨기기
+        showText = true;
         cardWidth = 300;    // 카드 너비 증가
         cardHeight = 400;   // 카드 높이 증가
       });
@@ -64,7 +66,9 @@ class SwipeState extends State<Swipe> {
 
   // double opacity = 1.0; // 초기 투명도는 1.0 (완전 불투명)
   double imageOpacity = 1.0;
+  double textOpacity = 0.0;
   bool showImage = true;
+  bool showText = false;
   double cardWidth = 200;
   double cardHeight = 300;
 
@@ -294,6 +298,19 @@ class SwipeState extends State<Swipe> {
                           opacity: imageOpacity,
                           duration: Duration(seconds: 1),
                           child: Center(child: Image.asset('Assets/Image/swipe.png')),
+                        ),
+                        if (showText)
+                        AnimatedOpacity(
+                          opacity: textOpacity,
+                          duration: Duration(seconds: 1),
+                          child: Center(child: Text(
+                        '스와이프하여 평가해주세요!',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFF5BEB5),
+                        ),
+                      )),
                         ),
                       ],
                     )),
