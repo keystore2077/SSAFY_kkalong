@@ -41,11 +41,12 @@ public class PhotoService {
         return false;
     }
 
-    @Transactional
+
     public Photo savePhoto(Photo photo) {
         return photoRepository.save(photo);
     }
 
+    @Transactional
     public void updatePhotoImgMasking(int photoSeq) {
         // 엔티티를 조회
         Photo photo = entityManager.find(Photo.class, photoSeq);
