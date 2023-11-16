@@ -260,11 +260,22 @@ public class PhotoController {
                 .downloadFile("photo/openpose/img/" + photo.getPhotoImgName() + "_rendered.png");
         byte[] photoOpenposeJson = s3Service
                 .downloadFile("photo/openpose/json/" + photo.getPhotoImgName() + "_keypoints.json");
+
         if (clothImg == null || clothMaskingImg == null || photoImg == null || photoParsingImg == null
                 || photoOpenposeImg == null || photoOpenposeJson == null) {
-            System.out.println("하나 이상의 이미지 다운로드에 실패했습니다.");
-            return Api.ERROR(ErrorCode.SERVER_ERROR, "하나 이상의 이미지 다운로드에 실패했습니다.");
+            List<String> nullImages = new ArrayList<>();
+            if (clothImg == null) nullImages.add("clothImg");
+            if (clothMaskingImg == null) nullImages.add("clothMaskingImg");
+            if (photoImg == null) nullImages.add("photoImg");
+            if (photoParsingImg == null) nullImages.add("photoParsingImg");
+            if (photoOpenposeImg == null) nullImages.add("photoOpenposeImg");
+            if (photoOpenposeJson == null) nullImages.add("photoOpenposeJson");
+
+            String nullImageString = String.join(", ", nullImages);
+            System.out.println("다음 이미지 다운로드에 실패했습니다: " + nullImageString);
+            return Api.ERROR(ErrorCode.SERVER_ERROR, "다음 이미지 다운로드에 실패했습니다: " + nullImageString);
         }
+
         System.out.println("모든 전처리 이미지 다운로드 완료");
 
         Api<Object> vitonResult = fastApiService.requestViton(member, cloth.getClothImgName(), clothImg,
