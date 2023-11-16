@@ -1,21 +1,31 @@
-
+import argparse
+import os
 from fastapi import FastAPI
+import torch
+from torch import nn
+from torch.nn import functional as F
+import torchgeometry as tgm
+
+from datasets import VITONDataset, VITONDataLoader
+from networks import SegGenerator, GMM, ALIASGenerator
+from utils import gen_noise, load_checkpoint, save_images
+
 import base64
 import os
 import json
-import tempfile
-from test import main as viton
+import uvicorn
 
-app = FastAPI()
+
+app = FastAPI()  # FastAPI 애플리케이션을 생성합니다.
 
 
 @app.get("/")
-def welcome():
-    print("welcome called")
-    return "welcome to server for viton"
+async def read_root():
+    # 이 부분은 FastAPI 서버의 루트 엔드포인트입니다.
+    # 필요한 로직을 추가하세요.
+    return "Welcome to the FastAPI server!"
 
-
-@app.post("/")
+@app.post("/viton")
 async def run_viton_hd(file: dict):
     print("run_viton_hd called")
     # 1. 바이트 코드를 임시 저장한다.
@@ -74,105 +84,174 @@ async def run_viton_hd(file: dict):
 
     # 1.7. test_pairs.txt를 수정한다.
     with open(r"./datasets/test_pairs.txt", 'w') as file:
-        file.write(f"{cloth_name} {image_name}")
+        file.write(f"{image_name}.jpg {cloth_name}.jpg")
     print("test_pairs 수정 완료")
 
     # 2. 해당 파일에 대해 CIHP를 돌린다.
-    viton()
+    main()
     print("viton 처리 완료")
 
     # 3. Json으로 변환하여 반환한다.
     result_file = ""
-    temp_path = "./results/test/" + cloth_name + "_" + image_name + ".jpg"
+    temp_path = "./results/test/" + image_name + "_" + cloth_name + ".jpg"
     try:
         if os.path.exists(temp_path):
             with open(temp_path, "rb") as file:
                 result_file = base64.b64encode(file.read()).decode('utf-8')
         return json.dumps({"result": "성공", "viton": result_file})
     finally:
-        # 4. 파일을 삭제한다.
-        os.remove(temp_path)
-        os.remove(cloth_path)
-        os.remove(cloth_mask_path)
-        os.remove(image_path)
-        os.remove(image_parse_path)
-        os.remove(openpose_img_path)
-        os.remove(openpose_json_path)
+        print("!!!")
+#         # 4. 파일을 삭제한다.
+#         os.remove(temp_path)
+#         os.remove(cloth_path)
+#         os.remove(cloth_mask_path)
+#         os.remove(image_path)
+#         os.remove(image_parse_path)
+#         os.remove(openpose_img_path)
+#         os.remove(openpose_json_path)
+
+def get_opt():
+    parser = argparse.ArgumentParser()
+    # parser.add_argument('--name', type=str, required=True)
+    parser.add_argument('--name', type=str, default='test')
+
+    parser.add_argument('-b', '--batch_size', type=int, default=1)
+    parser.add_argument('-j', '--workers', type=int, default=1)
+    parser.add_argument('--load_height', type=int, default=1024)
+    parser.add_argument('--load_width', type=int, default=768)
+    parser.add_argument('--shuffle', action='store_true')
+
+    parser.add_argument('--dataset_dir', type=str, default='./datasets/')
+    parser.add_argument('--dataset_mode', type=str, default='test')
+    parser.add_argument('--dataset_list', type=str, default='test_pairs.txt')
+    parser.add_argument('--checkpoint_dir', type=str, default='./checkpoints/')
+    parser.add_argument('--save_dir', type=str, default='./results/')
+
+    parser.add_argument('--display_freq', type=int, default=1)
+
+    parser.add_argument('--seg_checkpoint', type=str, default='seg_final.pth')
+    parser.add_argument('--gmm_checkpoint', type=str, default='gmm_final.pth')
+    parser.add_argument('--alias_checkpoint', type=str, default='alias_final.pth')
+
+    # common
+    parser.add_argument('--semantic_nc', type=int, default=13, help='# of human-parsing map classes')
+    parser.add_argument('--init_type', choices=['normal', 'xavier', 'xavier_uniform', 'kaiming', 'orthogonal', 'none'], default='xavier')
+    parser.add_argument('--init_variance', type=float, default=0.02, help='variance of the initialization distribution')
+
+    # for GMM
+    parser.add_argument('--grid_size', type=int, default=5)
+
+    # for ALIASGenerator
+    parser.add_argument('--norm_G', type=str, default='spectralaliasinstance')
+    parser.add_argument('--ngf', type=int, default=64, help='# of generator filters in the first conv layer')
+    parser.add_argument('--num_upsampling_layers', choices=['normal', 'more', 'most'], default='most',
+                        help='If \'more\', add upsampling layer between the two middle resnet blocks. '
+                             'If \'most\', also add one more (upsampling + resnet) layer at the end of the generator.')
+
+    opt = parser.parse_args()
+    return opt
+
+def test(opt, seg, gmm, alias):
+    up = nn.Upsample(size=(opt.load_height, opt.load_width), mode='bilinear')
+    gauss = tgm.image.GaussianBlur((15, 15), (3, 3))
+    gauss.cuda()
+
+    test_dataset = VITONDataset(opt)
+    test_loader = VITONDataLoader(opt, test_dataset)
+
+    with torch.no_grad():
+        for i, inputs in enumerate(test_loader.data_loader):
+            img_names = inputs['img_name']
+            c_names = inputs['c_name']['unpaired']
+
+            img_agnostic = inputs['img_agnostic'].cuda()
+            parse_agnostic = inputs['parse_agnostic'].cuda()
+            pose = inputs['pose'].cuda()
+            c = inputs['cloth']['unpaired'].cuda()
+            cm = inputs['cloth_mask']['unpaired'].cuda()
+            if cm.dim() > 4:
+                cm = cm[:, :, :, :, 1]
+
+            # Part 1. Segmentation generation
+            parse_agnostic_down = F.interpolate(parse_agnostic, size=(256, 192), mode='bilinear')
+            pose_down = F.interpolate(pose, size=(256, 192), mode='bilinear')
+            c_masked_down = F.interpolate(c * cm, size=(256, 192), mode='bilinear')
+            cm_down = F.interpolate(cm, size=(256, 192), mode='bilinear')
+            seg_input = torch.cat((cm_down, c_masked_down, parse_agnostic_down, pose_down, gen_noise(cm_down.size()).cuda()), dim=1)
+
+            parse_pred_down = seg(seg_input)
+            parse_pred = gauss(up(parse_pred_down))
+            parse_pred = parse_pred.argmax(dim=1)[:, None]
+
+            parse_old = torch.zeros(parse_pred.size(0), 13, opt.load_height, opt.load_width, dtype=torch.float).cuda()
+            parse_old.scatter_(1, parse_pred, 1.0)
+
+            labels = {
+                0:  ['background',  [0]],
+                1:  ['paste',       [2, 4, 7, 8, 9, 10, 11]],
+                2:  ['upper',       [3]],
+                3:  ['hair',        [1]],
+                4:  ['left_arm',    [5]],
+                5:  ['right_arm',   [6]],
+                6:  ['noise',       [12]]
+            }
+            parse = torch.zeros(parse_pred.size(0), 7, opt.load_height, opt.load_width, dtype=torch.float).cuda()
+            for j in range(len(labels)):
+                for label in labels[j][1]:
+                    parse[:, j] += parse_old[:, label]
+
+            # Part 2. Clothes Deformation
+            agnostic_gmm = F.interpolate(img_agnostic, size=(256, 192), mode='nearest')
+            parse_cloth_gmm = F.interpolate(parse[:, 2:3], size=(256, 192), mode='nearest')
+            pose_gmm = F.interpolate(pose, size=(256, 192), mode='nearest')
+            c_gmm = F.interpolate(c, size=(256, 192), mode='nearest')
+            gmm_input = torch.cat((parse_cloth_gmm, pose_gmm, agnostic_gmm), dim=1)
+
+            _, warped_grid = gmm(gmm_input, c_gmm)
+            warped_c = F.grid_sample(c, warped_grid, padding_mode='border')
+            warped_cm = F.grid_sample(cm, warped_grid, padding_mode='border')
+
+            # Part 3. Try-on synthesis
+            misalign_mask = parse[:, 2:3] - warped_cm
+            misalign_mask[misalign_mask < 0.0] = 0.0
+            parse_div = torch.cat((parse, misalign_mask), dim=1)
+            parse_div[:, 2:3] -= misalign_mask
+
+            output = alias(torch.cat((img_agnostic, pose, warped_c), dim=1), parse, parse_div, misalign_mask)
+
+            unpaired_names = []
+            for img_name, c_name in zip(img_names, c_names):
+                unpaired_names.append('{}_{}'.format(img_name.split('.')[0], c_name))
+            print("==============================================================")
+            print(unpaired_names)
+
+            save_images(output, unpaired_names, os.path.join(opt.save_dir, opt.name))
+
+            if (i + 1) % opt.display_freq == 0:
+                print("step: {}".format(i + 1))
 
 
+def main():
+    opt = get_opt()
+    print(opt)
 
+    if not os.path.exists(os.path.join(opt.save_dir, opt.name)):
+        os.makedirs(os.path.join(opt.save_dir, opt.name))
 
-    # # 1. DB에 모든 전처리가 되어 있는지 확인한다.
-    # sql_photo = ("select member_seq, cloth_img_yes_bg, cloth_img_masking"
-    #              "from member join photo using member_seq"
-    #              "where member_id = %s and photo_img_name = %s")
-    # cursor.execute(sql_photo, (body.member_id, body.photo_img_name))
-    # result_photo = cursor.fetchall()
-    #
-    # sql_cloth = ("select member_seq, cloth_img_yes_bg, cloth_img_masking"
-    #              "from member join cloth using member_seq"
-    #              "where member_id = %s and cloth_img_name = %s")
-    # cursor.execute(sql_cloth, (body.member_id, body.cloth_img_name))
-    # result_cloth = cursor.fetchall()
-    #
-    # # 1.1. 전처리가 하나라도 안되어 있으면 종료한다
-    # if len(result_cloth) == 0 or len(result_photo) == 0:
-    #     return "전처리 안되어 있음"
-    #
-    # # 2. S3서버에서 전처리 파일들을 전부 받아온다
-    # input_path_prefix = r"./datasets/test/"
-    # try:
-    #     # 옷 사진
-    #     s3.download_file(bucket_name, r"cloth/yes_bg/" + rb.cloth_img_name + ".jpg",
-    #                      input_path_prefix + r"cloth/" + rb.cloth_img_name + ".jpg")
-    #     # 옷 마스킹 사진
-    #     s3.download_file(bucket_name, r"cloth/masking/" + rb.cloth_img_name + ".jpg",
-    #                      input_path_prefix + r"cloth-mask/" + rb.cloth_img_name + ".jpg")
-    #     # 사람 사진
-    #     s3.download_file(bucket_name, r"photo/yes_bg/" + rb.photo_img_name + ".jpg",
-    #                      input_path_prefix + r"image/" + rb.photo_img_name + ".jpg")
-    #     # 사람 사진 파싱
-    #     s3.download_file(bucket_name, r"photo/masking/" + rb.photo_img_name + ".png",
-    #                      input_path_prefix + r"image-parse/" + rb.photo_img_name + ".png")
-    #     # 사람 사진 openpose 이미지
-    #     s3.download_file(bucket_name, r"photo/openpose/img/" + rb.photo_img_name + ".png",
-    #                      input_path_prefix + r"openpose-img/" + rb.photo_img_name + "_rendered.png")
-    #     # 사람 사진 openpose json
-    #     s3.download_file(bucket_name, r"photo/openpose/json/" + rb.photo_img_name + ".json",
-    #                      input_path_prefix + r"openpose-json/" + rb.photo_img_name + "_keypoints.json")
-    # except boto3.exceptions.NoCredentialsError:
-    #     return "AWS 자격 증명을 찾을 수 없습니다. 자격 증명을 설정하세요."
-    # except boto3.exceptions.EndpointConnectionError:
-    #     return "S3 엔드포인트에 연결할 수 없습니다. 리전을 확인하세요."
-    #
-    # # 2.1. 서버 소통 실패하면 다운 받은 파일 지우고 종료
-    #
-    # # 3. test_pairs.txt를 수정하고 viton을 돌린다
-    # with open(input_path_prefix + "test_pairs.txt", "w") as file:
-    #     file.write(f"{rb.photo_img_name} {rb.cloth_img_name}\n")
-    # viton()
-    #
-    # # 4. 임시용 S3서버에 저장한다.
-    # try:
-    #     # 현재 시간을 YYMMDD_HHMMSS 형식으로 가져오기
-    #     current_time = datetime.now().strftime("%y%m%d_%H%M%S")
-    #
-    #     # 6자리의 무작위 난수 생성
-    #     random_number = str(random.randint(0, 999999)).zfill(6)
-    #
-    #     temp_file_name = f"fashion_{body.member_id}_{current_time}_{random_number}.jpg"
-    #
-    #     s3.upload_file(r"./results/test/" + f"{rb.photo_img_name}_{rb.cloth_img_name}.jpg", bucket_name,
-    #                    f"fashion_temp/{temp_file_name}")
-    # except boto3.exceptions.NoCredentialsError:
-    #     return "AWS 자격 증명을 찾을 수 없습니다. 자격 증명을 설정하세요."
-    # except boto3.exceptions.EndpointConnectionError:
-    #     return "S3 엔드포인트에 연결할 수 없습니다. 리전을 확인하세요."
-    #
-    # # 5. 사용자에게 성공을 반환 한다.
-    # url = s3.generate_presigned_url(
-    #     ClientMethod='get_object',
-    #     Params={'Bucket': bucket_name, 'Key': r"fashion_temp/" + temp_file_name},
-    #     ExpiresIn=3600
-    # )
-    # return {"message": "success", "url": url}
+    seg = SegGenerator(opt, input_nc=opt.semantic_nc + 8, output_nc=opt.semantic_nc)
+    gmm = GMM(opt, inputA_nc=7, inputB_nc=3)
+    opt.semantic_nc = 7
+    alias = ALIASGenerator(opt, input_nc=9)
+    opt.semantic_nc = 13
+
+    load_checkpoint(seg, os.path.join(opt.checkpoint_dir, opt.seg_checkpoint))
+    load_checkpoint(gmm, os.path.join(opt.checkpoint_dir, opt.gmm_checkpoint))
+    load_checkpoint(alias, os.path.join(opt.checkpoint_dir, opt.alias_checkpoint))
+
+    seg.cuda().eval()
+    gmm.cuda().eval()
+    alias.cuda().eval()
+    test(opt, seg, gmm, alias)
+
+if __name__ == '__main__':
+    uvicorn.run(app, host="0.0.0.0", port=4051)

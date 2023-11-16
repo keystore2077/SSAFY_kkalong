@@ -45,7 +45,9 @@ class Network(object):
         self.use_dropout = tf.placeholder_with_default(tf.constant(1.0),
                                                        shape=[],
                                                        name='use_dropout')
-        self.setup(is_training, n_classes, keep_prob)
+#         self.setup(is_training, n_classes, keep_prob)
+        with tf.variable_scope(tf.get_variable_scope(), reuse=tf.AUTO_REUSE):
+            self.setup(is_training, n_classes, keep_prob)
 
     def setup(self, is_training, n_classes, keep_prob):
         '''Construct the network. '''

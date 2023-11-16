@@ -38,8 +38,16 @@ def read_image_list(data_dir):
     """
     
     images = []
-    for img_name in os.listdir(data_dir):
-        images.append(data_dir + '/' + img_name)
+    # 이미지 파일의 확장자 목록
+    image_extensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp"]
+    
+    for file_name in os.listdir(data_dir):
+        file_path = os.path.join(data_dir, file_name)
+        
+        # 파일의 확장자를 확인하여 이미지 파일인 경우에만 추가
+        if any(file_path.endswith(ext) for ext in image_extensions):
+            images.append(file_path)
+    
     return images
 
 class TestImageReader(object):

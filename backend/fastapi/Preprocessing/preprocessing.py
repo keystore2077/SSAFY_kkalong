@@ -9,6 +9,7 @@ import os
 import tempfile
 from pydantic import BaseModel
 import json
+import datetime
 
 
 class Req(BaseModel):
@@ -17,33 +18,60 @@ class Req(BaseModel):
     path: str
 
 
+print("FastAPI Server booting....")
 app = FastAPI()
 print("FastAPI Server started")
 
+def delete_file(path):
+    if os.path.exists(path):
+        os.remove(path)
+    else:
+        print(f"{path} 파일이 존재하지 않습니다.")
+        
+# 폴더 내의 모든 파일을 삭제
+def clear_folder(folder_path):
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+#                 print(f"파일 삭제: {file_path}")
+        except Exception as e:
+            print(f"파일 삭제 실패: {file_path}, 오류: {str(e)}")
 
 @app.get("/")
 def welcome():
+    print("welcome called")
     return "welcome"
 
 
 @app.post("/cihp")  #사람부위별 마스킹 # 미완성
 def run_cihp(file: dict):
-    print("run_cihp called")
+    print(f"run_cihp called at {datetime.datetime.now()}")
+    # 0. 폴더를 비운다
+    temp_file_path = "./CIHP/datasets/images/"
+    clear_folder(temp_file_path)
 
     # 1. 바이트 코드를 임시 저장한다.
-    temp_file_path = ".\\CIHP\\datasets\\images\\"
     file_name = "temp"
     with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False, dir=temp_file_path) as temp_file:
         temp_file.write(base64.b64decode(file["file"]))
-        temp_file_path = temp_file.name
+        file_name, file_extension = os.path.splitext(os.path.basename(temp_file.name))
 
     # 2. 해당 파일에 대해 CIHP를 돌린다.
-    cihp.main()
+    try:
+        cihp.main()
+    except tensorflow.python.framework.errors_impl.NotFoundError as e:
+        print(f"An NotFoundError occurred: {e}")
+        return json.dumps({"result": "실패", "cihp": None})
+    except Exception as e:
+        print(f"An unidentified error occurred: {e}")
+        return json.dumps({"result": "실패", "cihp": None})
 
     # 3. Json으로 변환하여 반환한다.
     try:
         cihpFile = ""
-        temp_path = ".\\CIHP\\output\\cihp_parsing_maps\\" + file_name + "png"
+        temp_path = "./CIHP/output/cihp_parsing_maps/" + file_name + ".png"
         if os.path.exists(temp_path):
             with open(temp_path, "rb") as file:
                 cihpFile = base64.b64encode(file.read()).decode('utf-8')
@@ -51,43 +79,53 @@ def run_cihp(file: dict):
         return json.dumps({"result": "성공", "cihp": cihpFile})
     finally:
         # 4. 파일을 삭제한다.
-        os.remove(temp_file_path)
-        os.remove(r"./CIHP/output/cihp_edge_maps/" + file_name + ".png")
-        os.remove(r"./CIHP/output/cihp_parsing_maps/" + file_name + "_vis.png")
-        os.remove(r"./CIHP/output/cihp_parsing_maps/" + file_name + ".png")
+        delete_file(temp_file_path + file_name + ".jpg")
+        delete_file(r"./CIHP/output/cihp_edge_maps/" + file_name + ".png")
+        delete_file(r"./CIHP/output/cihp_parsing_maps/" + file_name + "_vis.png")
+        delete_file(r"./CIHP/output/cihp_parsing_maps/" + file_name + ".png")
 
 
 @app.post("/u2net")
 def run_u2net(file: dict):
-    print("run_u2net called")
+    print(f"run_u2net called at {datetime.datetime.now()}")
+    # 0. 폴더를 비운다
+    temp_file_path = r"./U2Net/test_data/test_images/"
+    clear_folder(temp_file_path)
+    
     # 1. 바이트 코드를 임시 저장한다.
-    temp_file_path = ".\\U2Net\\test_data\\test_images\\"
     file_name = "temp"
     with tempfile.NamedTemporaryFile(suffix=".png", delete=False, dir=temp_file_path) as temp_file:
         temp_file.write(base64.b64decode(file["file"]))
-        temp_file_path = temp_file.name
+        file_name, file_extension = os.path.splitext(os.path.basename(temp_file.name))
 
     # 2. 해당 파일에 대해 u2net을 돌린다.
-    u2test()
+    try:
+        u2test()
+    except tensorflow.python.framework.errors_impl.NotFoundError as e:
+        print(f"An NotFoundError occurred: {e}")
+        return json.dumps({"result": "실패", "u2net": None})
+    except Exception as e:
+        print(f"An unidentified error occurred: {e}")
+        return json.dumps({"result": "실패", "u2net": None})
 
     # 3. Json으로 변환하여 반환한다.
     try:
         u2net = ""
-        temp_path = ".\\U2Net\\test_data\\u2net_results\\" + file_name + ".jpg"
+        temp_path = r"./U2Net/test_data/u2net_results/" + file_name + ".jpg"
         if os.path.exists(temp_path):
             with open(temp_path, "rb") as file:
-                yes_bg = base64.b64encode(file.read()).decode('utf-8')
+                u2net = base64.b64encode(file.read()).decode('utf-8')
         no_bg = ""
         return json.dumps({"result": "성공", "u2net": u2net})
     finally:
         # 4. 파일을 삭제한다.
-        os.remove(temp_file_path)
-        os.remove(r".\\U2Net\\test_data\\u2net_results\\" + file_name + ".jpg")
+        delete_file(temp_file_path + file_name + file_extension)
+        delete_file(r"./U2Net/test_data/u2net_results/" + file_name + ".jpg")
 
 
 @app.post("/rembg")
 async def run_rembg(file: dict):
-    print("run_rembg called")
+    print(f"run_rembg called at {datetime.datetime.now()}")
     file_name = "temp"
 
     # 1. 바이트 코드를 임시 저장한다.
@@ -97,10 +135,15 @@ async def run_rembg(file: dict):
         temp_file_path = temp_file.name
 
     # 2. 해당 파일에 대해 rembg를 각각 돌린다.
-    # remove_yes_bg(temp_file_path + r"\\" + file_name + ".png", r".\\RemBg\\yes_bg" + file_name + ".jpg")
-    # remove_no_bg(temp_file_path + r"\\" + file_name + ".png", r".\\RemBg\\no_bg" + file_name + ".png")
-    remove_yes_bg(temp_file_path, r".\\RemBg\\yes_bg\\" + file_name + ".jpg")
-    remove_no_bg(temp_file_path, r".\\RemBg\\no_bg\\" + file_name + ".png")
+    try:
+        remove_yes_bg(temp_file_path, r"./RemBg/yes_bg/" + file_name + ".jpg")
+        remove_no_bg(temp_file_path, r"./RemBg/no_bg/" + file_name + ".png")
+    except tensorflow.python.framework.errors_impl.NotFoundError as e:
+        print(f"An NotFoundError occurred: {e}")
+        return json.dumps({"result": "실패", "file_yes_bg": None, "file_no_bg": None})
+    except Exception as e:
+        print(f"An unidentified error occurred: {e}")
+        return json.dumps({"result": "실패", "file_yes_bg": None, "file_no_bg": None})
 
     # 3. Json으로 변환하여 반환한다.
     try:
@@ -116,13 +159,11 @@ async def run_rembg(file: dict):
                 no_bg = base64.b64encode(file.read()).decode('utf-8')
         return json.dumps({"result": "성공", "file_yes_bg": yes_bg, "file_no_bg": no_bg})
 
-        # print(json.dumps({"result": "성공", "file_yes_bg": "??", "file_no_bg": "??"}, ensure_ascii=False))
-        # return json.dumps({"result": "성공", "file_yes_bg": "??", "file_no_bg": "??"}, ensure_ascii=False)
     finally:
         # 4. 파일을 삭제한다.
-        os.remove(temp_file_path)
-        os.remove(r"./RemBg/yes_bg/" + file_name + ".jpg")
-        os.remove(r"./RemBg/no_bg/" + file_name + ".png")
+        delete_file(temp_file_path)
+        delete_file(r"./RemBg/yes_bg/" + file_name + ".jpg")
+        delete_file(r"./RemBg/no_bg/" + file_name + ".png")
 
 # @app.post("/rembg/cloth")    #옷
 # def run_rembg_for_cloth(body:req):
