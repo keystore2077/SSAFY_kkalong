@@ -530,7 +530,7 @@ class _AvataPictureState extends State<AvataPicture> {
 
                 print('포토시퀀스ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ');
                 print(photoSeq);
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                       builder: (context) => WearCloth(photoSeq: photoSeq)),

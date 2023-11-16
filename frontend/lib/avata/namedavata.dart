@@ -997,8 +997,7 @@ class NamedAvataState extends State<NamedAvata> {
                                                 onPressed: () {
                                                   Navigator.of(context)
                                                       .pop(); // 대화 상자 닫기
-                                                  Navigator.of(context)
-                                                      .pushReplacement(
+                                                  Navigator.of(context).push(
                                                     MaterialPageRoute(
                                                       builder: (_) => MyPage(),
                                                     ),
@@ -1034,12 +1033,20 @@ class NamedAvataState extends State<NamedAvata> {
                                                 onPressed: () {
                                                   Navigator.of(context)
                                                       .pop(); // 대화 상자 닫기
-                                                  Navigator.of(context)
-                                                      .pushReplacement(
+                                                  // Navigator.of(context).push(
+                                                  //   MaterialPageRoute(
+                                                  //     builder: (_) =>
+                                                  //         ChoicePicture(),
+                                                  //   ),
+                                                  // );
+                                                  //수정한부분
+                                                  Navigator.pushAndRemoveUntil(
+                                                    context,
                                                     MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          ChoicePicture(),
-                                                    ),
+                                                        builder: (context) =>
+                                                            ChoicePicture()),
+                                                    (Route<dynamic> route) =>
+                                                        false,
                                                   );
                                                 },
                                               ),
