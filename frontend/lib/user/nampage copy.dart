@@ -538,7 +538,12 @@ class NamPage2State extends State<NamPage2> {
         ),
         centerTitle: true,
         elevation: 0,
-        leading: const Text(''),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back), // 뒤로 가기 아이콘
+          onPressed: () {
+            Navigator.of(context).pop(); // 뒤로 가기 동작
+          },
+        ),
       ),
       body: CustomScrollView(
         slivers: [
