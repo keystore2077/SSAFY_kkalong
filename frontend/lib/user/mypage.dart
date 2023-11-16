@@ -896,6 +896,10 @@ class _DialogUIState extends State<DialogUI> {
                                                       child: Text('정보수정 성공'))));
                                         });
                                     Navigator.pop(context);
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => MyPage()),
+                                    );
                                     //   Navigator.push(
                                     //     context,
                                     //     MaterialPageRoute(
@@ -938,31 +942,55 @@ class _DialogUIState extends State<DialogUI> {
                   ButtonTheme(
                       child: TextButton(
                           onPressed: () async {
-                            final userStore =
-                                Provider.of<UserStore>(context, listen: false);
-                            final accessToken = userStore.accessToken;
-
-                            final deleteuser =
-                                await pageapi.deleteuser(accessToken);
-                            print(deleteuser);
-                            if (deleteuser['result']['resultCode'] == 200) {
-                              await showDialog(
+                            showDialog(
                                   context: context,
                                   builder: (context) {
-                                    return Dialog(
-                                        child: Container(
-                                            width: 100,
-                                            height: 100,
-                                            color: Colors.white,
-                                            child: Center(
-                                                child: Text('회원탈퇴 성공'))));
+                                    return AlertDialog(
+                                      title: Text('회원탈퇴'),
+                                      content: Text('회원탈퇴 하시겠습니까?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () async {
+                                            // 첫 번째 버튼 클릭 시 실행될 로직을 추가하세요.
+                                            final userStore =
+                                                Provider.of<UserStore>(context, listen: false);
+                                            final accessToken = userStore.accessToken;
+
+                                            final deleteuser =
+                                                await pageapi.deleteuser(accessToken);
+                                            print(deleteuser);
+                                            if (deleteuser['result']['resultCode'] == 200) {
+                                              await showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return Dialog(
+                                                        child: Container(
+                                                            width: 100,
+                                                            height: 100,
+                                                            color: Colors.white,
+                                                            child: Center(
+                                                                child: Text('회원탈퇴 성공'))));
+                                                  });
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) => const LogIn()),
+                                              );
+                                            }
+                                          },
+                                          child: Text('확인'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            // 두 번째 버튼 클릭 시 실행될 로직을 추가하세요.
+                                            Navigator.of(context).pop(); // Dialog를 닫습니다.
+                                          },
+                                          child: Text('취소'),
+                                        ),
+                                      ],
+                                    );
                                   });
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const LogIn()),
-                              );
-                            }
+                            
                           },
                           style:
                               // const ButtonStyle(
