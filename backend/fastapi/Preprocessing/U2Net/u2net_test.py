@@ -13,13 +13,13 @@ import numpy as np
 from PIL import Image
 import glob
 
-from data_loader import RescaleT
-from data_loader import ToTensor
-from data_loader import ToTensorLab
-from data_loader import SalObjDataset
+from U2Net.data_loader import RescaleT
+from U2Net.data_loader import ToTensor
+from U2Net.data_loader import ToTensorLab
+from U2Net.data_loader import SalObjDataset
 
-from model import U2NET # full size version 173.6 MB
-from model import U2NETP # small version u2net 4.7 MB
+from U2Net.model import U2NET # full size version 173.6 MB
+from U2Net.model import U2NETP # small version u2net 4.7 MB
 
 # normalize the predicted SOD probability map
 def normPRED(d):
@@ -58,9 +58,9 @@ def main():
 
 
 
-    image_dir = os.path.join(os.getcwd(), 'test_data', 'test_images')
-    prediction_dir = os.path.join(os.getcwd(), 'test_data', model_name + '_results' + os.sep)
-    model_dir = os.path.join(os.getcwd(), 'saved_models', model_name, model_name + '.pth')
+    image_dir = os.path.join(os.getcwd()+"/U2Net", 'test_data', 'test_images')
+    prediction_dir = os.path.join(os.getcwd()+"/U2Net", 'test_data', model_name + '_results' + os.sep)
+    model_dir = os.path.join(os.getcwd()+"/U2Net", 'saved_models', model_name, model_name + '.pth')
 
     img_name_list = glob.glob(image_dir + os.sep + '*')
     print(img_name_list)

@@ -11,7 +11,7 @@ from networks import SegGenerator, GMM, ALIASGenerator
 from utils import gen_noise, load_checkpoint, save_images
 
 
-def get_opt(opt):
+def get_opt():
     parser = argparse.ArgumentParser()
     # parser.add_argument('--name', type=str, required=True)
     parser.add_argument('--name', type=str, default='test')

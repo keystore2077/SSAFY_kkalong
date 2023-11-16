@@ -224,7 +224,7 @@ public class SocialService {
         List<Cloth> cloths = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(member.getMemberSeq(),false,false);
         for(Cloth cloth : cloths){
             String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
-            DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), cloth.getClothImgName(),imgUrl);
+            DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), cloth.getClothName(),imgUrl);
             clothList.add(dtoRes);
         }
 
@@ -247,6 +247,11 @@ public class SocialService {
     public Fashion getFashion (int fashionSeq,int memberSeq){
         return fashionRepository.findByFashionSeqAndMemberMemberSeqAndIsFashionDeleted(fashionSeq, memberSeq,false).orElse(null);
     }
+
+    public Fashion getFashionBySeq (int fashionSeq){
+        return fashionRepository.findByFashionSeqAndIsFashionDeleted(fashionSeq,false).orElse(null);
+    }
+
 
     public FashionInfoRes getFashionInfo (Fashion fashion){
         String imgUrl = s3Service.generatePresignedUrl("fashion/" + fashion.getFashionImgName());
