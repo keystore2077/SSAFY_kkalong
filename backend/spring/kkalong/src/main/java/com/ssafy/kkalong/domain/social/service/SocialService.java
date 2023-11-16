@@ -224,7 +224,7 @@ public class SocialService {
         List<Cloth> cloths = clothRepository.findAllByMemberMemberSeqAndIsClothDeletedAndIsPrivate(member.getMemberSeq(),false,false);
         for(Cloth cloth : cloths){
             String imgUrl = s3Service.generatePresignedUrl("cloth/no_bg/" + cloth.getClothImgName()+".png");
-            DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), cloth.getClothImgName(),imgUrl);
+            DtoRes dtoRes = new DtoRes(cloth.getClothSeq(), cloth.getClothName(),imgUrl);
             clothList.add(dtoRes);
         }
 
