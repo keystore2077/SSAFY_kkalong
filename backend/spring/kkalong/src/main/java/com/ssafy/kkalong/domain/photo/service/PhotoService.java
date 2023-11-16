@@ -41,6 +41,7 @@ public class PhotoService {
         return false;
     }
 
+    @Transactional
     public Photo savePhoto(Photo photo) {
         return photoRepository.save(photo);
     }
