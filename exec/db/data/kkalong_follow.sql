@@ -1,0 +1,63 @@
+-- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+--
+-- Host: k9c105.p.ssafy.io    Database: kkalong
+-- ------------------------------------------------------
+-- Server version	8.1.0
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `follow`
+--
+
+DROP TABLE IF EXISTS `follow`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `follow` (
+  `is_follow_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '삭제여부',
+  `follow_del_date` datetime DEFAULT NULL COMMENT '삭제일시',
+  `reg_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '기록일시',
+  `following_member_seq` int NOT NULL COMMENT '구독하는  회원 인덱스',
+  `follower_member_seq` int NOT NULL COMMENT '구독자 회원 인덱스',
+  `follower_member_member_seq` int DEFAULT NULL,
+  `following_member_member_seq` int DEFAULT NULL,
+  PRIMARY KEY (`following_member_seq`,`follower_member_seq`),
+  KEY `FK_member_TO_follow_2` (`follower_member_seq`),
+  KEY `FK1ndkqaf2musmir6e1c1pibeyc` (`follower_member_member_seq`),
+  KEY `FKnox9yy2w2pag2thp2011kbfs8` (`following_member_member_seq`),
+  CONSTRAINT `FK1ndkqaf2musmir6e1c1pibeyc` FOREIGN KEY (`follower_member_member_seq`) REFERENCES `member` (`member_seq`),
+  CONSTRAINT `FK_member_TO_follow_1` FOREIGN KEY (`following_member_seq`) REFERENCES `member` (`member_seq`),
+  CONSTRAINT `FK_member_TO_follow_2` FOREIGN KEY (`follower_member_seq`) REFERENCES `member` (`member_seq`),
+  CONSTRAINT `FKnox9yy2w2pag2thp2011kbfs8` FOREIGN KEY (`following_member_member_seq`) REFERENCES `member` (`member_seq`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `follow`
+--
+
+LOCK TABLES `follow` WRITE;
+/*!40000 ALTER TABLE `follow` DISABLE KEYS */;
+INSERT INTO `follow` VALUES (1,'2023-11-13 17:15:24','2023-11-10 06:44:59',20,30,NULL,NULL),(0,NULL,'2023-11-15 14:38:58',21,30,NULL,NULL),(0,NULL,'2023-11-04 16:29:44',26,20,NULL,NULL),(0,NULL,'2023-11-04 16:29:02',26,21,NULL,NULL),(0,NULL,'2023-11-04 16:28:43',26,23,NULL,NULL),(0,NULL,'2023-11-04 15:51:52',26,24,NULL,NULL),(1,'2023-11-04 16:57:35','2023-11-04 16:57:33',26,27,NULL,NULL),(1,'2023-11-14 17:33:37','2023-11-14 17:33:32',26,30,NULL,NULL),(0,NULL,'2023-11-16 16:55:52',26,61,NULL,NULL),(0,NULL,'2023-11-13 17:20:06',27,26,NULL,NULL),(0,NULL,'2023-11-04 16:56:01',28,26,NULL,NULL),(0,NULL,'2023-11-04 16:34:21',29,26,NULL,NULL),(0,NULL,'2023-11-14 08:43:18',29,30,NULL,NULL),(0,NULL,'2023-11-10 06:45:01',30,21,NULL,NULL),(0,NULL,'2023-11-10 06:45:02',30,26,NULL,NULL),(0,NULL,'2023-11-10 06:45:03',30,29,NULL,NULL),(0,NULL,'2023-11-16 11:53:34',30,61,NULL,NULL),(0,NULL,'2023-11-16 11:58:18',35,56,NULL,NULL),(0,NULL,'2023-11-16 11:58:19',36,56,NULL,NULL),(0,NULL,'2023-11-16 11:58:20',37,56,NULL,NULL),(0,NULL,'2023-11-16 12:00:51',38,56,NULL,NULL),(1,'2023-11-13 17:14:40','2023-11-10 06:45:01',39,30,NULL,NULL),(0,NULL,'2023-11-10 06:45:00',43,30,NULL,NULL),(0,NULL,'2023-11-16 11:58:15',56,26,NULL,NULL),(0,NULL,'2023-11-16 11:58:14',56,30,NULL,NULL),(0,NULL,'2023-11-16 11:40:32',56,61,NULL,NULL),(0,NULL,'2023-11-16 11:58:16',56,79,NULL,NULL),(1,'2023-11-16 20:44:06','2023-11-16 20:44:05',61,56,NULL,NULL);
+/*!40000 ALTER TABLE `follow` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2023-11-17 10:00:38
