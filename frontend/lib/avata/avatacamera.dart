@@ -359,33 +359,10 @@ class _AvataPictureState extends State<AvataPicture> {
                   child: Image.file(capturedImage!, fit: BoxFit.cover),
                 )
               : Container(),
-          // ? Image.file(capturedImage!, fit: BoxFit.cover)
-          // : Container(),
 
-          // capturedImage == null
-          //     ? Positioned.fill(
-          //         child: Opacity(
-          //           opacity: 1,
-          //           child: Image.asset(
-          //             'Assets/Image/guide.png',
-          //             fit: BoxFit.cover,
-          //           ),
-          //         ),
-          //       )
-          //     : Container(),
           capturedImage == null
               ?
-              // Align(
-              //     alignment: Alignment.center,
-              //     child: Opacity(
-              //       opacity: 1,
-              //       child: Image.asset(
-              //         'Assets/Image/guide.png',
-              //         width: 700.0,
-              //         height: 800.0,
-              //       ),
-              //     ),
-              //   )
+
               //가이드라인이미지 가운데 정렬
               Align(
                   // alignment: Alignment.center,
@@ -497,6 +474,7 @@ class _AvataPictureState extends State<AvataPicture> {
             if (capturedImage != null) {
               var accessToken = context.read<UserStore>().accessToken;
               print(accessToken);
+
               // img.Image resizedImage = img.copyResize(originalImage, width: 600, height: 400);
 
               Dio dio = Dio();
@@ -535,9 +513,15 @@ class _AvataPictureState extends State<AvataPicture> {
                   MaterialPageRoute(
                       builder: (context) => WearCloth(photoSeq: photoSeq)),
                 );
+                setState(() {
+                  capturedImage = null;
+                });
                 return response.data;
               } catch (e) {
                 print('그밖의 에러ㅜㅜㅜㅜㅜㅜㅜㅜㅜ: $e');
+                setState(() {
+                  capturedImage = null;
+                });
               } finally {}
             }
           },
