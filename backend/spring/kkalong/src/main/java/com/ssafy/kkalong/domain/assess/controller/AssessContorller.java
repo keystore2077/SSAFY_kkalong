@@ -3,13 +3,11 @@ package com.ssafy.kkalong.domain.assess.controller;
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.domain.assess.dto.request.AssessReq;
-import com.ssafy.kkalong.domain.assess.service.AssessService;
-import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
+import com.ssafy.kkalong.domain.assess.service.AssessServiceImpl;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.domain.social.entity.Fashion;
 import com.ssafy.kkalong.domain.social.service.SocialService;
-import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class AssessContorller {
     private final MemberService memberService;
-    private final AssessService assessService;
+    private final AssessServiceImpl assessService;
     private final SocialService socialService;
 
     @Operation(summary = "공개된 사진 랜덤 조회")
