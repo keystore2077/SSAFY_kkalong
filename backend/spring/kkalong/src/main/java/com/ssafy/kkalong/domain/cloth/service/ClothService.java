@@ -1,6 +1,5 @@
 package com.ssafy.kkalong.domain.cloth.service;
 
-import com.ssafy.kkalong.domain.closet.entity.Closet;
 import com.ssafy.kkalong.domain.closet.entity.Section;
 import com.ssafy.kkalong.domain.closet.repository.SectionRepository;
 import com.ssafy.kkalong.domain.cloth.dto.request.ClothSaveReq;
@@ -18,7 +17,7 @@ import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.sort.entity.Sort;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import com.ssafy.kkalong.s3.S3Service;
+import com.ssafy.kkalong.domain.s3.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service

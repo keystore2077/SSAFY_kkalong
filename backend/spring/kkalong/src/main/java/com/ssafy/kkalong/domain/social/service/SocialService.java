@@ -12,7 +12,7 @@ import com.ssafy.kkalong.domain.social.entity.Follow;
 import com.ssafy.kkalong.domain.social.entity.FollowKey;
 import com.ssafy.kkalong.domain.social.repository.FashionRepository;
 import com.ssafy.kkalong.domain.social.repository.FollowRepository;
-import com.ssafy.kkalong.s3.S3Service;
+import com.ssafy.kkalong.domain.s3.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

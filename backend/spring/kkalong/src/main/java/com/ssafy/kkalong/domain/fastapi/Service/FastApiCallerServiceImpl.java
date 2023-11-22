@@ -1,14 +1,14 @@
-package com.ssafy.kkalong.fastapi;
+package com.ssafy.kkalong.domain.fastapi.Service;
 
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.api.Result;
 import com.ssafy.kkalong.domain.cloth.entity.Cloth;
 import com.ssafy.kkalong.domain.cloth.service.ClothService;
+import com.ssafy.kkalong.domain.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
-import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
-import com.ssafy.kkalong.s3.S3Service;
+import com.ssafy.kkalong.domain.s3.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 @Service
-public class FastApiCallerService {
+public class FastApiCallerServiceImpl implements FastApiCallerService{
     @Autowired
     private FastApiService fastApiService;
 
@@ -30,6 +30,7 @@ public class FastApiCallerService {
     private ClothService clothService;
 
     @Async
+    @Override
     public void callOpenpose(Member member, Photo photo){
         System.out.println("callOpenpose called...");
         // Openpose는 독자적인 과정을 거치므로 결과 저장 과정이 필요 없음
@@ -46,6 +47,7 @@ public class FastApiCallerService {
     }
 
     @Async
+    @Override
     public void callCihp(Member member, Photo photo){
         System.out.println("callCihp called...");
         System.out.println("요청 경로: photo/yes_bg/" + photo.getPhotoImgName() + ".jpg");
@@ -73,10 +75,13 @@ public class FastApiCallerService {
     }
 
     @Async
+    @Override
     public void callU2Net(Member member, Cloth cloth) {
         callU2Net(member,cloth.getClothImgName(),cloth.getClothSeq());
     }
 
+    @Async
+    @Override
     public void callU2Net(Member member, String clothImgName, int clothSeq) {
         System.out.println("callU2Net called...");
         System.out.println("요청 경로: cloth/yes_bg/" + clothImgName + ".jpg");

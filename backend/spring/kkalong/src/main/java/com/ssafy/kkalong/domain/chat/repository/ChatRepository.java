@@ -15,5 +15,5 @@ public interface ChatRepository  extends JpaRepository<ChatRoom,Integer> {
 
     Optional<List<ChatRoom>> findAllByMemberSec(Member member);
 
-    Optional<ChatRoom> findByChatRoomSeq(Integer roomSeq);
+    Optional<ChatRoom> findByChatRoomSeq(int roomSeq);
 }

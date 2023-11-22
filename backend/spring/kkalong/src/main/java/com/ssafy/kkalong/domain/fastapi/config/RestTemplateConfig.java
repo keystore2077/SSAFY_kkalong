@@ -1,4 +1,4 @@
-package com.ssafy.kkalong.fastapi;
+package com.ssafy.kkalong.domain.fastapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

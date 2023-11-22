@@ -1,4 +1,4 @@
-package com.ssafy.kkalong.s3;
+package com.ssafy.kkalong.domain.s3.service;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
@@ -7,25 +7,24 @@ import com.amazonaws.util.IOUtils;
 import com.ssafy.kkalong.common.util.MultipartFileToFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-@Service
-public class S3Service {
+public class S3ServiceImpl implements S3Service{
     private final AmazonS3 amazonS3;
     @Value("${aws.s3.bucket}")
     private String bucketName;
 
     @Autowired
-    public S3Service(AmazonS3 amazonS3) {
+    public S3ServiceImpl(AmazonS3 amazonS3) {
         this.amazonS3 = amazonS3;
     }
 
     // Amazon S3에 파일 업로드1
+    @Override
     public String uploadFile(String key, MultipartFile multipartFile) throws IOException {
         File uploadFile = MultipartFileToFile.convert(multipartFile)
                 .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File로 전환이 실패했습니다."));
@@ -34,6 +33,7 @@ public class S3Service {
     }
 
     // Amazon S3에 파일 업로드2
+    @Override
     public String uploadFile(String key, File file) {
         String uploadImageUrl = putS3(file, key); // s3로 업로드
         removeNewFile(file);
@@ -41,6 +41,7 @@ public class S3Service {
         return "사진 저장 성공";
     }
 
+    @Override
     public byte[] downloadFile(String key) {
         try {
             // S3 버킷에서 파일 다운로드
@@ -55,6 +56,7 @@ public class S3Service {
         }
     }
 
+    @Override
     public String generatePresignedUrl(String key) {
         try {
             boolean doesObjectExist = amazonS3.doesObjectExist(bucketName, key);
@@ -80,6 +82,7 @@ public class S3Service {
         }
     }
 
+    @Override
     public String copyS3(String sourceKey, String destinationKey) {
         // CopyObjectRequest 생성
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest(
@@ -94,6 +97,7 @@ public class S3Service {
         return generatePresignedUrl(destinationKey);
     }
 
+    @Override
     public String copyTempToFashion(String fileName){
         String newFileName = fileName.replace("temp_", "fashion_");
         return copyS3("temp/" + fileName + ".jpg", "fashion/" + newFileName + ".jpg");

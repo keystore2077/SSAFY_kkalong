@@ -15,6 +15,8 @@ import reactor.core.scheduler.Schedulers;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -35,7 +37,7 @@ public class ChatService {
     }
 
 
-    public ChatRoom getChatRoomBySeq(Integer roomSeq) {
+    public ChatRoom getChatRoomBySeq(int roomSeq) {
         return chatRepository.findByChatRoomSeq(roomSeq).orElse(null);
     }
 
@@ -65,17 +67,18 @@ public class ChatService {
                 chatRoomList.add(ChatRoomRes.toRes(room));
             }
         }
+        // 최신순으로 정렬
+        chatRoomList.sort(Comparator.comparing(ChatRoomRes::getChatRoomLatestDate).reversed());
 
         return chatRoomList;
     }
 
-    public Flux<Chat> findMyRoomSeq(Integer roomSeq) {
-        return mongoRepository.mFindByRoomSeq(roomSeq)
+    public Flux<Chat> findMyRoomSeq(int chatRoomSeq) {
+        return mongoRepository.mFindByRoomSeq(chatRoomSeq)
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
-    public Mono<Chat> setMsg(Chat chat) {
-        chat.setDatetime(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
-        return mongoRepository.save(chat);
-    }
+//    public Mono<Chat> setMsg(Chat chat) {
+//        return mongoRepository.save(chat);
+//    }
 }

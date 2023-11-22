@@ -1,14 +1,15 @@
-package com.ssafy.kkalong.fastapi;
+package com.ssafy.kkalong.domain.fastapi.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
+import com.ssafy.kkalong.domain.fastapi.dto.FastApiRequestGeneralRes;
+import com.ssafy.kkalong.domain.fastapi.dto.RequestRembgRes;
+import com.ssafy.kkalong.domain.fastapi.dto.RequestVitonRes;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
-import com.ssafy.kkalong.fastapi.dto.FastApiRequestGeneralRes;
-import com.ssafy.kkalong.fastapi.dto.RequestRembgRes;
-import com.ssafy.kkalong.fastapi.dto.RequestVitonRes;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,15 +17,16 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class FastApiService {
+public class FastApiServiceImpl implements FastApiService{
     @Value("${ai-server.gpu.ip}:${ai-server.gpu.preprocess-port}")
     private String preprocessUrl;
 //    private final String url = "http://localhost:4050";
@@ -39,10 +41,11 @@ public class FastApiService {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public FastApiService(RestTemplate restTemplate) {
+    public FastApiServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
+    @Override
     public Api<Object> callWelcome() {
         System.out.println("callWelcome called.....");
         String apiUrl = preprocessUrl;
@@ -51,6 +54,7 @@ public class FastApiService {
         return Api.OK(response);
     }
 
+    @Override
     public Api<Object> callWelcomeViton() {
         System.out.println("callWelcomeViton called.....");
         String apiUrl = vitonHdUrl;
@@ -59,6 +63,7 @@ public class FastApiService {
         return Api.OK(response);
     }
 
+    @Override
     public Api<Object> requestRembg(String memberId, MultipartFile mFile) {
         String apiUrl = preprocessUrl + "/rembg";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
@@ -117,6 +122,7 @@ public class FastApiService {
         }
     }
 
+    @Override
     public Api<Object> requestCihp(String memberId, MultipartFile mFile) {
         try {
             return requestCihp(memberId, mFile.getBytes());
@@ -125,6 +131,7 @@ public class FastApiService {
         }
     }
 
+    @Override
     public Api<Object> requestCihp(String memberId, byte[] mFile) {
         String apiUrl = preprocessUrl + "/cihp";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
@@ -176,10 +183,12 @@ public class FastApiService {
         }
     }
 
+    @Override
     public Api<Object> requestU2Net(String memberId, MultipartFile mFile) throws IOException {
         return requestU2Net(memberId, mFile.getBytes());
     }
 
+    @Override
     public Api<Object> requestU2Net(String memberId, byte[] mFile) {
         String apiUrl = preprocessUrl + "/u2net";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
@@ -227,10 +236,12 @@ public class FastApiService {
         }
     }
 
+    @Override
     public Api<Object> requestOpenpose(Member member, Photo photo) {
         return requestOpenpose(member, photo.getPhotoImgName(), photo.getPhotoSeq());
     }
 
+    @Override
     public Api<Object> requestOpenpose(Member member, String photoImgName, int photoSeq) {
         String apiUrl = openposeUrl + "/openpose";  // GPU서버의 URL
         System.out.println(apiUrl+"로 요청 보냄...");
@@ -250,9 +261,10 @@ public class FastApiService {
         return Api.OK("success");
     }
 
+    @Override
     public Api<Object> requestViton(Member member, String clothName, byte[] clothImg, byte[] clothMaskingImg,
-                             String photoName, byte[] photoImg, byte[] photoParsingImg, byte[] photoOpenposeImg,
-                             byte[] photoOpenposeJson) {
+                                    String photoName, byte[] photoImg, byte[] photoParsingImg, byte[] photoOpenposeImg,
+                                    byte[] photoOpenposeJson) {
         String apiUrl = vitonHdUrl + "/viton";  // GPU서버의 URL
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -265,19 +277,6 @@ public class FastApiService {
         String photoOpenposeImgBase64 = Base64.getEncoder().encodeToString(photoOpenposeImg);
         String photoOpenposeJsonBase64 = Base64.getEncoder().encodeToString(photoOpenposeJson);
         System.out.println("이미지 Base64 인코딩 완료");
-
-//        // ObjectMapper 초기화
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonStringReq = "{" +
-//                "\"cloth_name\": \"" + clothName + "\", " +
-//                "\"cloth\": \"" + clothImgBase64 + "\", " +
-//                "\"cloth_mask\": \"" + clothMaskingImgBase64 + "\", " +
-//                "\"image_name\": \"" + photoName + "\", " +
-//                "\"image\": \"" + photoImgBase64 + "\", " +
-//                "\"image_parse\": \"" + photoParsingImgBase64 + "\", " +
-//                "\"openpose_img\": \"" + photoOpenposeImgBase64 + "\", " +
-//                "\"openpose_json\": \"" + photoOpenposeJsonBase64 + "\"" +
-//                "}";
 
         // JSON 데이터를 담을 객체 생성
         ObjectMapper objectMapper = new ObjectMapper();
@@ -311,7 +310,7 @@ public class FastApiService {
             String jsonStr = responseEntity.getBody();
             jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
             jsonStr = unescapeJsonString(jsonStr);
-//            System.out.println(jsonStr);
+
             jsonMap = objectMapper.readValue(jsonStr, new TypeReference<>() {
             });
             byte[] viton = Base64.getDecoder().decode((String) jsonMap.get("viton"));

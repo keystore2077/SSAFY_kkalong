@@ -1,4 +1,4 @@
-package com.ssafy.kkalong.fastapi.dto;
+package com.ssafy.kkalong.domain.fastapi.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
