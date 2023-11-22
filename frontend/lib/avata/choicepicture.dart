@@ -1178,46 +1178,71 @@ class _ChoicePictureState extends State<ChoicePicture> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              width: 500,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (selectedPhotoSeq != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              WearCloth(photoSeq: selectedPhotoSeq!)),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF5BEB5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                ),
-                child: const Text(
-                  '선택완료',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   width: 500,
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       if (selectedPhotoSeq != null) {
+            //         Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //               builder: (context) =>
+            //                   WearCloth(photoSeq: selectedPhotoSeq!)),
+            //         );
+            //       }
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: const Color(0xFFF5BEB5),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(5.0),
+            //       ),
+            //     ),
+            //     child: const Text(
+            //       '선택완료',
+            //       style: TextStyle(
+            //         color: Colors.white,
+            //         fontWeight: FontWeight.w700,
+            //       ),
+            //     ),
+            //   ),
+            // ),
             const SizedBox(width: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
+                  // child: ElevatedButton(
+                  //   onPressed: () {
+                  //     // Navigator.push(
+                  //     //   context,
+                  //     //   MaterialPageRoute(
+                  //     //       builder: (context) => const AvataPicture()),
+                  //     // );
+                  //   },
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor: const Color(0xFFF5BEB5),
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(5.0),
+                  //     ),
+                  //   ),
+                  //   child: const Text(
+                  //     '내 패션찰칵',
+                  //     style: TextStyle(
+                  //       color: Colors.white,
+                  //       fontWeight: FontWeight.w700,
+                  //     ),
+                  //   ),
+                  // ),
                   child: ElevatedButton(
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => const AvataPicture()),
-                      // );
+                      if (selectedPhotoSeq != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  WearCloth(photoSeq: selectedPhotoSeq!)),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF5BEB5),
@@ -1226,7 +1251,7 @@ class _ChoicePictureState extends State<ChoicePicture> {
                       ),
                     ),
                     child: const Text(
-                      '내 패션찰칵',
+                      '선택완료',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,

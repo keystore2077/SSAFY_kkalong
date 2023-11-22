@@ -196,25 +196,38 @@ class _ClosetDetailState extends State<ClosetDetail> {
                           IconButton(
                             icon: const Icon(Icons.format_paint), // 두 번째 아이콘
                             onPressed: () {
-                              // 두 번째 아이콘을 클릭했을 때 실행할 작업
-                              // if (flag == 0) {
-                              //   setState(() {
-                              //     flag = 1;
-                              //   });
-                              // } else {
-                              //   setState(() {
-                              //     flag = 0;
-                              //   });
-                              // }
-                              cleanCloset(accessToken);
                               showDialog(
                                 context: context,
                                 builder: (ctx) => AlertDialog(
-                                  title: Text('비움 성공'),
-                                  content: Text('옷장 비움 성공!'),
+                                  title: Text('옷장 비움'),
+                                  content: Text('해당 옷장의 옷들을 비우시겠습니까?'),
                                   actions: <Widget>[
                                     TextButton(
                                       child: Text('확인'),
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (ctx) => AlertDialog(
+                                            title: Text('비움 성공'),
+                                            content: Text('옷장 비움 성공!'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: Text('확인'),
+                                                onPressed: () {
+                                                  cleanCloset(accessToken);
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(builder: (context) => Main()),
+                                                  );
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: Text('취소'),
                                       onPressed: () {
                                         Navigator.of(ctx).pop();
                                       },
@@ -227,10 +240,45 @@ class _ClosetDetailState extends State<ClosetDetail> {
                           IconButton(
                             icon: const Icon(Icons.delete_forever_outlined),
                             onPressed: () {
-                              deleteCloset(accessToken);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => Main()),
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text('옷장 삭제'),
+                                  content: Text('정말로 옷장을 삭제하시겠습니까?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text('확인'),
+                                      onPressed: () {
+                                        deleteCloset(accessToken);
+                                        showDialog(
+                                          context: context,
+                                          builder: (ctx) => AlertDialog(
+                                            title: Text('삭제 성공'),
+                                            content: Text('옷장 삭제 성공!'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: Text('확인'),
+                                                onPressed: () {
+                                                  cleanCloset(accessToken);
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(builder: (context) => Main()),
+                                                  );
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: Text('취소'),
+                                      onPressed: () {
+                                        Navigator.of(ctx).pop();
+                                      },
+                                    )
+                                  ],
+                                ),
                               );
                             },
                           ),

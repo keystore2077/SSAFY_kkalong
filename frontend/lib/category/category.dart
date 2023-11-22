@@ -133,7 +133,8 @@ class CategoryPageState extends State<CategoryPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => CategorySelect(category: index)),
+                            builder: (context) =>
+                                CategorySelect(category: index)),
                       );
                     },
                     child: Container(
@@ -143,7 +144,7 @@ class CategoryPageState extends State<CategoryPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Image.asset(
-                            item["image"] ?? "Assets/Image/logo.png",
+                            item["image"] ?? "Assets/Image/logol.png",
                             height: 125,
                             width: 180,
                           ),

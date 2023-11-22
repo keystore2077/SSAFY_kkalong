@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ChatService {
@@ -28,14 +29,14 @@ public class ChatService {
     private ChatMongoRepository mongoRepository;
 
     public ChatRoom getChatRoomByParticipant(int memberSeq1, int memberSeq2) {
-        ChatRoom foundChatRoom = chatRepository.findByMemberFirMemberSeqAndMemberSecMemberSeq(memberSeq1, memberSeq2).orElse(null);
-        if (foundChatRoom != null){
+        ChatRoom foundChatRoom = chatRepository.findByMemberFirMemberSeqAndMemberSecMemberSeq(memberSeq1, memberSeq2)
+                .orElse(null);
+        if (foundChatRoom != null) {
             return foundChatRoom;
         }
         return foundChatRoom = chatRepository.findByMemberFirMemberSeqAndMemberSecMemberSeq(memberSeq2, memberSeq1)
                 .orElse(null);
     }
-
 
     public ChatRoom getChatRoomBySeq(int roomSeq) {
         return chatRepository.findByChatRoomSeq(roomSeq).orElse(null);
@@ -55,15 +56,15 @@ public class ChatService {
     public List<ChatRoomRes> findAllRoomByMemberSeq(Member member) {
         List<ChatRoomRes> chatRoomList = new ArrayList<>();
         List<ChatRoom> result1 = chatRepository.findAllByMemberFir(member).orElse(null);
-        if (result1 != null && !result1.isEmpty()){
-            for(ChatRoom room : result1){
+        if (result1 != null && !result1.isEmpty()) {
+            for (ChatRoom room : result1) {
                 chatRoomList.add(ChatRoomRes.toRes(room));
             }
         }
 
         List<ChatRoom> result2 = chatRepository.findAllByMemberSec(member).orElse(null);
-        if (result2 != null && !result2.isEmpty()){
-            for(ChatRoom room : result2){
+        if (result2 != null && !result2.isEmpty()) {
+            for (ChatRoom room : result2) {
                 chatRoomList.add(ChatRoomRes.toRes(room));
             }
         }
@@ -78,7 +79,10 @@ public class ChatService {
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
-//    public Mono<Chat> setMsg(Chat chat) {
-//        return mongoRepository.save(chat);
-//    }
+    public Chat setMsg(Chat chat) {
+        chat.setDatetime(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        chat.setId(null);
+        return mongoRepository.save(chat).block();
+
+    }
 }

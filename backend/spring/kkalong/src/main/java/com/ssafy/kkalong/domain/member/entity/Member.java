@@ -23,7 +23,7 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int memberSeq;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, length = 20)
     private String memberNickname ;
 
     @Column(nullable = false, unique = true, length = 20)
@@ -32,7 +32,7 @@ public class Member {
     @Column(nullable = false, length = 100)
     private String memberPw ;
 
-    @Column(nullable = false, unique = true, length = 40)
+    @Column(nullable = false, length = 40)
     private String memberMail ;
 
     @Column(length = 11)
