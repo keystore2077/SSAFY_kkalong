@@ -37,7 +37,7 @@ public class ClothServiceImpl implements ClothService{
 
     @PersistenceContext
     private EntityManager entityManager;
-
+    @Override
     public ClothSaveRes saveCloth(Member member, Section section, Sort sort, ClothSaveReq request, String imgUrl,
             String fileName) {
         Cloth cloth = Cloth.builder()
@@ -80,7 +80,7 @@ public class ClothServiceImpl implements ClothService{
         }
         return ClothSaveRes.toRes(clothSave, imgUrl, tagList);
     }
-
+    @Override
     @Transactional
     public void updateClothImgMasking(int clothSeq) {
         // 엔티티를 조회
@@ -91,11 +91,11 @@ public class ClothServiceImpl implements ClothService{
             entityManager.merge(cloth);
         }
     }
-
+    @Override
     public Cloth getCloth(int clothSeq) {
         return clothRepository.findByClothSeqAndIsClothDeleted(clothSeq, false).orElse(null);
     }
-
+    @Override
     public List<Tag> getTagList(int clothSeq) {
         return tagRelaionRepository.findAllByClothClothSeqAndIsTagRelationDelete(clothSeq, false).stream()
                 .map(v -> {
@@ -103,7 +103,7 @@ public class ClothServiceImpl implements ClothService{
                 })
                 .toList();
     }
-
+    @Override
     public List<ClothGetRes> getClothListBySort(Member member, Sort sort) {
 
         return clothRepository.findAllByMemberAndSortAndIsClothDeleted(member, sort, false).stream()
@@ -115,11 +115,11 @@ public class ClothServiceImpl implements ClothService{
                 .toList();
 
     }
-
+    @Override
     public Section getSection(int sectionSeq) {
         return sectionRepository.findById(sectionSeq).orElse(null);
     }
-
+    @Override
     public List<ClothGetRes> getClothListBySection(Member member, Section section) {
 
         return clothRepository.findAllByMemberAndSectionAndIsClothDeleted(member, section, false).stream()
@@ -130,11 +130,11 @@ public class ClothServiceImpl implements ClothService{
                 })
                 .toList();
     }
-
+    @Override
     public Tag getTag(int tagSeq) {
         return tagRepository.findById(tagSeq).orElse(null);
     }
-
+    @Override
     public List<ClothGetRes> getClothListByTag(Member member, Tag tag) {
 
         return clothRepository.findClothsByMemberAndTag(member.getMemberSeq(), tag.getTagSeq()).stream()
@@ -147,7 +147,7 @@ public class ClothServiceImpl implements ClothService{
     }
 
 
-
+    @Override
     public  ClothSaveRes updateCloth(Cloth cloth, ClothUpdateReq req){
         // 옷 수정
         Cloth clothUp =clothRepository.save(cloth);
@@ -221,7 +221,7 @@ public class ClothServiceImpl implements ClothService{
         return ClothSaveRes.toRes(clothUp,imgUrl,resulttagList );
 
     }
-
+    @Override
     public void deleteCloth(Cloth cloth ){
         //옷 삭제
         cloth.setClothDeleted(true);
@@ -236,7 +236,7 @@ public class ClothServiceImpl implements ClothService{
         }
 
     }
-
+    @Override
     public List<String> emptySectionCloth(Member member ,Section section ){
         List<Cloth> clothList = clothRepository.findAllByMemberAndSectionAndIsClothDeleted(member, section, false);
         List<String> result = new ArrayList<>();
@@ -246,7 +246,7 @@ public class ClothServiceImpl implements ClothService{
         }
         return result;
     }
-
+    @Override
     public List<ClothGetRes> inputSectionCloth(List<Integer> clothSeqList, Section section){
         List<ClothGetRes> result = new ArrayList<>();
         for(int clothSeq:clothSeqList){
@@ -261,7 +261,7 @@ public class ClothServiceImpl implements ClothService{
         }
         return result;
     }
-
+    @Override
     public List<String> emptyClosetCloth(List<Section> sectionList){
         List<String> result = new ArrayList<>();
 
@@ -270,7 +270,7 @@ public class ClothServiceImpl implements ClothService{
         }
         return result;
     }
-
+    @Override
     public ClothGetRes lockCloth(Cloth cloth){
         boolean isPrivate = !cloth.isPrivate();
         cloth.setPrivate(isPrivate);

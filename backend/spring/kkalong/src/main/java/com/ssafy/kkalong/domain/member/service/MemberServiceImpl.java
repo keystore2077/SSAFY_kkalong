@@ -32,6 +32,7 @@ public class MemberServiceImpl implements MemberService {
     private final RedisTemplate<String, String> redisTemplate;
 
     //회원 가입
+    @Override
     public SignUpRes registMember(SignUpReq request) {
         System.out.println("service1");
         Member member = memberRepository.save(Member.toEntity(request, encoder));
@@ -47,6 +48,7 @@ public class MemberServiceImpl implements MemberService {
 
 
     //로그인
+    @Override
     public SignInRes signIn(SignInReq request) {
         Member member = memberRepository.findByMemberIdAndIsMemberDeleted(request.getMemberId(), false)
                 .filter(it -> encoder.matches(request.getMemberPw(), it.getMemberPw()))	// 암호화된 비밀번호와 비교하도록 수정
@@ -57,6 +59,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     //로그인된 회원 조회
+    @Override
     public Member getLoginUserInfo(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User)auth.getPrincipal();
@@ -69,26 +72,26 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
     }
-
+    @Override
     public Member checkId(String memberId){
         return memberRepository.findByMemberId(memberId).orElse(null);
     }
-
+    @Override
     public Member checkNickName(String nickName){
         return memberRepository.findByMemberNicknameAndIsMemberDeleted(nickName, false).orElse(null);
     }
-
+    @Override
     public Member checkNickNameEvenIfDeleted(String nickName){
         return memberRepository.findByMemberNickname(nickName).orElse(null);
     }
-
+    @Override
     public void logout(Member member){
 
         if (redisTemplate.opsForValue().get(member.getMemberId()) != null) {
             redisTemplate.delete(member.getMemberId()); //Token 삭제
         }
     }
-
+    @Override
     public Optional<MemberUpdateRes> updateMemberProfile(String memberId, MemberProfileUpdateReq request){
         return Optional.ofNullable(memberRepository.findByMemberIdAndIsMemberDeleted(memberId, false)
                 .filter(member -> encoder.matches(request.getMemberPw(), member.getMemberPw()))
@@ -107,7 +110,7 @@ public class MemberServiceImpl implements MemberService {
                 })
                 .orElseThrow(() -> new NoSuchElementException("비밀번호가 틀립니다")));
     }
-
+    @Override
     public MemberUpdateRes updateMember(Member member, MemberUpdateReq request){
         member.setMemberNickname(request.getMemberNickname());
         if(!request.getNewPassword().isEmpty()){
@@ -117,7 +120,7 @@ public class MemberServiceImpl implements MemberService {
         return MemberUpdateRes.toRes(memberRepository.save(member));
 
     }
-
+    @Override
     public void deleteMember(Member member){
         member.setMemberNickname("_");
         member.setMemberDeleted(true);

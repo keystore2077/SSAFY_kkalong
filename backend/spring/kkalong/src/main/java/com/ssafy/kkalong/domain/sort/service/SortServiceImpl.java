@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SortServiceImpl implements SortService {
     private final SortRepository sortRepository;
-
+    @Override
     public Sort getSort(String sort){
         return sortRepository.findBySortAndSortGroupSortGroupSeq(sort,2).orElse(null);
     }
+    @Override
     public Sort getClothSort(String sort){
         return sortRepository.findBySortAndSortGroupSortGroupSeq(sort,1).orElse(null);
     }
