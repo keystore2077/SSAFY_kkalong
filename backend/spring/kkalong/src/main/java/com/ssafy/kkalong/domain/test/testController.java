@@ -4,7 +4,7 @@ import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
 import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.member.entity.Member;
-import com.ssafy.kkalong.domain.member.service.MemberService;
+import com.ssafy.kkalong.domain.member.service.MemberServiceImpl;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
 import com.ssafy.kkalong.fastapi.FastApiService;
@@ -30,7 +30,7 @@ public class testController {
     @Autowired
     private FastApiService fastApiService;
     @Autowired
-    private MemberService memberService;
+    private MemberServiceImpl memberService;
     @Autowired
     private PhotoService photoService;
 

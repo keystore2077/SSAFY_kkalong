@@ -9,6 +9,7 @@ import com.ssafy.kkalong.domain.member.dto.request.SignUpReq;
 import com.ssafy.kkalong.domain.member.dto.response.MemberInfoRes;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
+import com.ssafy.kkalong.domain.member.service.MemberServiceImpl;
 import com.ssafy.kkalong.security.TokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

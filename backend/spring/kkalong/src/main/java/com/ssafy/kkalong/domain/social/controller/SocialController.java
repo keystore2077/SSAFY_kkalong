@@ -2,7 +2,6 @@ package com.ssafy.kkalong.domain.social.controller;
 
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.error.ErrorCode;
-import com.ssafy.kkalong.common.util.FileNameGenerator;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.domain.social.dto.request.FashionSaveReq;
@@ -12,11 +11,7 @@ import com.ssafy.kkalong.s3.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/social")
