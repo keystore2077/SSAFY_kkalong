@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
 public interface PhotoService {
     public List<Photo> getPhotoList(Member member);
 
