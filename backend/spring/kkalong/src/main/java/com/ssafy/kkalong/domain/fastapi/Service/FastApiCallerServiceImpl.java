@@ -4,6 +4,7 @@ import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.api.Result;
 import com.ssafy.kkalong.domain.cloth.entity.Cloth;
 import com.ssafy.kkalong.domain.cloth.service.ClothServiceImpl;
+import com.ssafy.kkalong.domain.fastapi.dto.FastApiRequestGeneralRes;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
