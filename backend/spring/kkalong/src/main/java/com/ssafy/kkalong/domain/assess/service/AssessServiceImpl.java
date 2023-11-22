@@ -24,6 +24,8 @@ public class AssessServiceImpl implements AssessService {
     private final AssessRepository assessRepository;
     private final FashionRepository fashionRepository;
     private final S3Service s3Service;
+
+    @Override
     public List<FashionAssessRes> getOpenFashionList(int memberSeq){
         List<Assess> assessList = assessRepository.findByMemberMemberSeq(memberSeq);
         Set<Integer> assessFashionSeqSet = assessList.stream()
@@ -49,7 +51,7 @@ public class AssessServiceImpl implements AssessService {
         return result;
 
     }
-
+    @Override
     public AssessRes likeFashion(Member member, AssessReq request){
         AssessKey assessKey = AssessKey.builder()
                 .fashionSeq(request.getFashionSeq())
@@ -75,7 +77,7 @@ public class AssessServiceImpl implements AssessService {
         }
 
     }
-
+    @Override
     public FashionListRes getlikeFashionList(Member member){
         List<Assess> assessList = assessRepository.findByMemberMemberSeq(member.getMemberSeq());
 

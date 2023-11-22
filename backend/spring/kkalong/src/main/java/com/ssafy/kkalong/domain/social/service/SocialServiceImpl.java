@@ -31,7 +31,7 @@ public class SocialServiceImpl implements SocialService {
     private final AssessRepository assessRepository;
 
     private final S3Service s3Service;
-
+    @Override
     public FollowRes followMember(Member member, Member nickNameMember){
         FollowKey followKey =FollowKey.builder()
                 .followingMemberSeq(nickNameMember.getMemberSeq()) //구독할 곳
@@ -48,7 +48,7 @@ public class SocialServiceImpl implements SocialService {
         return FollowRes.toRes(followRepository.save(follow));
 
     }
-
+    @Override
     public FollowListRes getFollowList(Member member){
 
         //찾을 려는 회원이 구독한 회원 닉네임 리스트
@@ -73,7 +73,7 @@ public class SocialServiceImpl implements SocialService {
                 .build();
 
     }
-
+    @Override
     public void deleteFollow(Member followingMember, Member followerMember){
         int followingSeq = followingMember.getMemberSeq();
         int followerSeq = followerMember.getMemberSeq();
@@ -90,7 +90,7 @@ public class SocialServiceImpl implements SocialService {
                 }
         );
     }
-
+    @Override
     public FashionSaveRes saveFashion(Member member, FashionSaveReq request,String imgUrl,String fileName) {
         Fashion fashion = Fashion.builder()
                 .fashionName(request.getFashionName())
@@ -103,7 +103,7 @@ public class SocialServiceImpl implements SocialService {
 
         return FashionSaveRes.toRes(fashionRepository.save(fashion),imgUrl);
     }
-
+    @Override
     public void changePrivateFashion(int memberSeq, int fashionSeq){
 
         Optional<Fashion> optionalValue = fashionRepository.findByFashionSeqAndMemberMemberSeqAndIsFashionDeleted(fashionSeq, memberSeq,false);
@@ -118,7 +118,7 @@ public class SocialServiceImpl implements SocialService {
                 }
         );
     }
-
+    @Override
     public List<FashionRes> getMyListFashion(int memberSeq){
         List<FashionRes>result = new ArrayList<>();
         List<Fashion> fashionList = fashionRepository.findAllByMemberMemberSeqAndIsFashionDeleted(memberSeq,false);
@@ -129,7 +129,7 @@ public class SocialServiceImpl implements SocialService {
         }
         return result;
     }
-
+    @Override
     public List<FashionRes> getListFashion(int memberSeq){
         List<FashionRes>result = new ArrayList<>();
         List<Fashion> fashionList = fashionRepository.findAllByMemberMemberSeqAndIsFashionDeletedAndIsFashionPrivate(memberSeq,false,false);
@@ -140,7 +140,7 @@ public class SocialServiceImpl implements SocialService {
         }
         return result;
     }
-
+    @Override
     public MyClothRes getMyListCloth(int memberSeq){
         List<ClothRes>clothOpenList = new ArrayList<>();
         List<ClothRes>clothPrivateList = new ArrayList<>();
@@ -164,7 +164,7 @@ public class SocialServiceImpl implements SocialService {
 
                 .build();
     }
-
+    @Override
     public List<ClothRes> getListCloth(int memberSeq){
         List<ClothRes>result = new ArrayList<>();
 
@@ -176,7 +176,7 @@ public class SocialServiceImpl implements SocialService {
         }
         return result;
     }
-
+    @Override
     public MyProfileRes getMyProfile(Member member){
         FollowListRes followListRes =  getFollowList(member);
         int followingCount = followListRes.getFollowingList().size();
@@ -206,7 +206,7 @@ public class SocialServiceImpl implements SocialService {
                 .clothList(clothList)
                 .build();
     }
-
+    @Override
     public ProfileRes getListProfile(Member member){
         FollowListRes followListRes =  getFollowList(member);
         int followingCount = followListRes.getFollowingList().size();
@@ -236,7 +236,7 @@ public class SocialServiceImpl implements SocialService {
                 .clothList(clothList)
                 .build();
     }
-
+    @Override
     public boolean checkFollow(Member loginMember,Member member){
 
         Follow follow  = followRepository.findByFollowingMemberMemberSeqAndFollowerMemberMemberSeqAndIsFollowDeleted(member.getMemberSeq(),loginMember.getMemberSeq(),false).orElse(null);
@@ -244,12 +244,12 @@ public class SocialServiceImpl implements SocialService {
         return follow != null;
     }
 
-
+    @Override
     public Fashion getFashionBySeq (int fashionSeq){
         return fashionRepository.findByFashionSeqAndIsFashionDeleted(fashionSeq,false).orElse(null);
     }
 
-
+    @Override
     public FashionInfoRes getFashionInfo (Fashion fashion){
         String imgUrl = s3Service.generatePresignedUrl("fashion/" + fashion.getFashionImgName());
         int cntLike = assessRepository.findByFashionFashionSeqAndIsLike(fashion.getFashionSeq(),true).size();
