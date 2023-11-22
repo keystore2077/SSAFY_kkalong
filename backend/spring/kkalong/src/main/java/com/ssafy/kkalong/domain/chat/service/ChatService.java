@@ -15,6 +15,8 @@ import reactor.core.scheduler.Schedulers;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -27,16 +29,16 @@ public class ChatService {
     private ChatMongoRepository mongoRepository;
 
     public ChatRoom getChatRoomByParticipant(int memberSeq1, int memberSeq2) {
-        ChatRoom foundChatRoom = chatRepository.findByMemberFirMemberSeqAndMemberSecMemberSeq(memberSeq1, memberSeq2).orElse(null);
-        if (foundChatRoom != null){
+        ChatRoom foundChatRoom = chatRepository.findByMemberFirMemberSeqAndMemberSecMemberSeq(memberSeq1, memberSeq2)
+                .orElse(null);
+        if (foundChatRoom != null) {
             return foundChatRoom;
         }
         return foundChatRoom = chatRepository.findByMemberFirMemberSeqAndMemberSecMemberSeq(memberSeq2, memberSeq1)
                 .orElse(null);
     }
 
-
-    public ChatRoom getChatRoomBySeq(Integer roomSeq) {
+    public ChatRoom getChatRoomBySeq(int roomSeq) {
         return chatRepository.findByChatRoomSeq(roomSeq).orElse(null);
     }
 
@@ -54,31 +56,33 @@ public class ChatService {
     public List<ChatRoomRes> findAllRoomByMemberSeq(Member member) {
         List<ChatRoomRes> chatRoomList = new ArrayList<>();
         List<ChatRoom> result1 = chatRepository.findAllByMemberFir(member).orElse(null);
-        if (result1 != null && !result1.isEmpty()){
-            for(ChatRoom room : result1){
+        if (result1 != null && !result1.isEmpty()) {
+            for (ChatRoom room : result1) {
                 chatRoomList.add(ChatRoomRes.toRes(room));
             }
         }
 
         List<ChatRoom> result2 = chatRepository.findAllByMemberSec(member).orElse(null);
-        if (result2 != null && !result2.isEmpty()){
-            for(ChatRoom room : result2){
+        if (result2 != null && !result2.isEmpty()) {
+            for (ChatRoom room : result2) {
                 chatRoomList.add(ChatRoomRes.toRes(room));
             }
         }
+        // 최신순으로 정렬
+        chatRoomList.sort(Comparator.comparing(ChatRoomRes::getChatRoomLatestDate).reversed());
 
         return chatRoomList;
     }
 
-    public Flux<Chat> findMyRoomSeq(Integer roomSeq) {
-        return mongoRepository.mFindByRoomSeq(roomSeq)
+    public Flux<Chat> findMyRoomSeq(int chatRoomSeq) {
+        return mongoRepository.mFindByRoomSeq(chatRoomSeq)
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
     public Chat setMsg(Chat chat) {
         chat.setDatetime(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
         chat.setId(null);
-        return  mongoRepository.save(chat).block();
+        return mongoRepository.save(chat).block();
 
     }
 }

@@ -7,7 +7,7 @@ import com.ssafy.kkalong.domain.member.service.MemberService;
 import com.ssafy.kkalong.domain.social.dto.request.FashionSaveReq;
 import com.ssafy.kkalong.domain.social.entity.Fashion;
 import com.ssafy.kkalong.domain.social.service.SocialService;
-import com.ssafy.kkalong.s3.S3Service;
+import com.ssafy.kkalong.domain.s3.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
