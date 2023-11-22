@@ -3,7 +3,7 @@ package com.ssafy.kkalong.fastapi;
 import com.ssafy.kkalong.common.api.Api;
 import com.ssafy.kkalong.common.api.Result;
 import com.ssafy.kkalong.domain.cloth.entity.Cloth;
-import com.ssafy.kkalong.domain.cloth.service.ClothService;
+import com.ssafy.kkalong.domain.cloth.service.ClothServiceImpl;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.photo.entity.Photo;
 import com.ssafy.kkalong.domain.photo.service.PhotoService;
@@ -27,7 +27,7 @@ public class FastApiCallerService {
     private PhotoService photoService;
 
     @Autowired
-    private ClothService clothService;
+    private ClothServiceImpl clothService;
 
     @Async
     public void callOpenpose(Member member, Photo photo){

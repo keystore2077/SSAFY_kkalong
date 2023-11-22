@@ -16,7 +16,6 @@ import com.ssafy.kkalong.domain.cloth.entity.Tag;
 import com.ssafy.kkalong.domain.cloth.service.ClothService;
 import com.ssafy.kkalong.domain.member.entity.Member;
 import com.ssafy.kkalong.domain.member.service.MemberService;
-import com.ssafy.kkalong.domain.social.dto.request.FashionSaveReq;
 import com.ssafy.kkalong.domain.sort.entity.Sort;
 import com.ssafy.kkalong.domain.sort.service.SortService;
 import com.ssafy.kkalong.fastapi.FastApiCallerService;
